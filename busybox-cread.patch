@@ -1,0 +1,22 @@
+diff -ur busybox-0.51/init.c busybox-0.51-/init.c
+--- busybox-0.51/init.c	Tue Apr 10 01:54:15 2001
++++ busybox-0.51-/init.c	Wed Jun 13 11:14:15 2001
+@@ -278,7 +278,7 @@
+ 
+ 	/* Make it be sane */
+ 	tty.c_cflag &= CBAUD|CBAUDEX|CSIZE|CSTOPB|PARENB|PARODD;
+-	tty.c_cflag |= HUPCL|CLOCAL;
++	tty.c_cflag |= HUPCL|CLOCAL|CREAD;
+ 
+ 	/* input modes */
+ 	tty.c_iflag = ICRNL | IXON | IXOFF;
+@@ -909,6 +909,8 @@
+ 	close(0);
+ 	close(1);
+ 	close(2);
++	/* reopen console... hm... why do we close(0)? */
++	open(console, O_RDWR);
+ 	set_term(0);
+ 	chdir("/");
+ 	setsid();
+Only in busybox-0.51-: tags
