@@ -72,7 +72,7 @@ cp -f %{SOURCE1} Config.h
 %if %{?BOOT:1}%{!?BOOT:0}
 %{__make} \
 	CFLAGS_EXTRA="-I%{_libdir}/bootdisk%{_includedir}" \
-	LDFLAGS="-nostdlib -s" \
+	LDFLAGS="-nostdlib" \
 	LIBRARIES="%{_libdir}/bootdisk%{_libdir}/crt0.o %{_libdir}/bootdisk%{_libdir}/libc.a -lgcc"
 mv -f busybox busybox-BOOT
 %endif
