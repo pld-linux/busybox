@@ -1,7 +1,7 @@
-diff -ur busybox-0.60.1/libbb/syscalls.c busybox-0.60.1-/libbb/syscalls.c
---- busybox-0.60.1/libbb/syscalls.c	Fri Jun 29 20:59:32 2001
-+++ busybox-0.60.1-/libbb/syscalls.c	Sun Oct 28 14:07:56 2001
-@@ -45,29 +45,25 @@
+diff -uNr busybox-0.60.1.orig/libbb/syscalls.c busybox-0.60.1/libbb/syscalls.c
+--- busybox-0.60.1.orig/libbb/syscalls.c	Fri Jun 29 18:59:32 2001
++++ busybox-0.60.1/libbb/syscalls.c	Thu Apr 25 08:11:30 2002
+@@ -45,29 +45,27 @@
  #endif
  
  #ifndef __NR_pivot_root
@@ -28,6 +28,8 @@ diff -ur busybox-0.60.1/libbb/syscalls.c busybox-0.60.1-/libbb/syscalls.c
 +#  define __NR_pivot_root 374
 +# elif defined(__sparc__) || defined(__sparc64__)
 +#  define __NR_pivot_root 146
++# elif defined(__powerpc__)
++#  define __NR_pivot_root 203
 +# else
 +#  error "Get kernel-2.4 headers!"
 +# endif
