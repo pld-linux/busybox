@@ -1,33 +1,33 @@
-diff -urN busybox-0.60.1/init.c busybox-0.60.1.new/init.c
---- busybox-0.60.5/init.c.orig  Tue Oct 22 21:15:43 2002
-+++ busybox-0.60.5/init.c       Sun Oct 27 12:19:38 2002
-@@ -160,7 +160,7 @@
- static char termType[32]   = "TERM=linux";
- static char console[32]    = _PATH_CONSOLE;
- #ifndef BB_SYSLOGD
--static char *log           = VC_5;
-+static char *log           = VC_12;
- #endif
- static sig_atomic_t got_cont = 0;
- static const int LOG = 0x1;
-diff -urN busybox-0.60.1/libbb/libbb.h busybox-0.60.1.new/libbb/libbb.h
---- busybox-0.60.1/libbb/libbb.h	Fri Aug 24 00:14:31 2001
-+++ busybox-0.60.1.new/libbb/libbb.h	Tue Aug 28 22:57:57 2001
-@@ -301,7 +301,7 @@
+diff -urN busybox-1.00-pre2/include/libbb.h busybox-1.00-pre2.org/include/libbb.h
+--- busybox-1.00-pre2/include/libbb.h	2003-08-02 23:40:57.000000000 +0200
++++ busybox-1.00-pre2.org/include/libbb.h	2003-08-02 23:45:09.000000000 +0200
+@@ -346,7 +346,7 @@
  # define VC_2 "/dev/vc/2"
  # define VC_3 "/dev/vc/3"
  # define VC_4 "/dev/vc/4"
 -# define VC_5 "/dev/vc/5"
 +# define VC_12 "/dev/vc/12"
- # define SC_0 "/dev/tts/0"
- # define SC_1 "/dev/tts/1"
- # define VC_FORMAT "/dev/vc/%d"
-@@ -312,7 +312,7 @@
+ #if defined(__sh__) || defined(__H8300H__) || defined(__H8300S__)
+ /* Yes, this sucks, but both SH (including sh64) and H8 have a SCI(F) for their
+    respective serial ports .. as such, we can't use the common device paths for
+@@ -367,7 +367,7 @@
  # define VC_2 "/dev/tty2"
  # define VC_3 "/dev/tty3"
  # define VC_4 "/dev/tty4"
 -# define VC_5 "/dev/tty5"
 +# define VC_12 "/dev/tty12"
- # define SC_0 "/dev/ttyS0"
- # define SC_1 "/dev/ttyS1"
- # define VC_FORMAT "/dev/tty%d"
+ #if defined(__sh__) || defined(__H8300H__) || defined(__H8300S__)
+ #  define SC_0 "/dev/ttySC0"
+ #  define SC_1 "/dev/ttySC1"
+diff -urN busybox-1.00-pre2/init/init.c busybox-1.00-pre2.org/init/init.c
+--- busybox-1.00-pre2/init/init.c	2003-08-02 23:40:57.000000000 +0200
++++ busybox-1.00-pre2.org/init/init.c	2003-08-02 23:45:30.000000000 +0200
+@@ -157,7 +157,7 @@
+ static char console[CONSOLE_BUFF_SIZE] = _PATH_CONSOLE;
+ 
+ #ifndef CONFIG_SYSLOGD
+-static char *log = VC_5;
++static char *log = VC_12;
+ #endif
+ static sig_atomic_t got_cont = 0;
+ static const int LOG = 0x1;
