@@ -1,8 +1,10 @@
+# _without_embed - don't build uClibc version
+# _without_static - don't build static version
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Name:		busybox
 Version:	0.60.1
-Release:	15
+Release:	16
 License:	GPL
 Group:		Applications
 Group(de):	Applikationen
@@ -20,9 +22,14 @@ Patch5:		%{name}-cread.patch
 Patch6:		%{name}-malloc.patch
 Patch7:		%{name}-pivot_root.patch
 URL:		http://busybox.lineo.com/
-%{?BOOT:BuildRequires:	uClibc-devel-BOOT >= 20010521-3}
+%{!?_without_embed:BuildRequires:	uClibc-devel}
+%{!?_without_embed:BuildRequires:	uClibc-static}
 %{!?_without_static:BuildRequires:	glibc-static}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define embed_path	/usr/lib/embed
+%define embed_cc	%{_arch}-uclibc-cc
+%define embed_cflags	%{rpmcflags} -Os
 
 %description
 BusyBox combines tiny versions of many common UNIX utilities into a
@@ -67,9 +74,9 @@ Static busybox.
 %description static -l pl
 Statycznie linkowany busybox.
 
-%package BOOT
-Summary:	busybox for PLD bootdisk
-Summary(pl):	busybox dla bootkietki PLD
+%package embed
+Summary:	Busybox for embedded systems
+Summary(pl):	Busybox dla systemów wbudowanych
 Group:		Applications
 Group(de):	Applikationen
 Group(es):	Aplicaciones
@@ -77,11 +84,11 @@ Group(pl):	Aplikacje
 Group(pt):	Aplicações
 Group(pt_BR):	Aplicações
 
-%description BOOT
-busybox for PLD bootdisk.
+%description embed
+Busybox for embedded systems.
 
-%description BOOT -l pl
-busybox dla bootkietki PLD.
+%description embed -l pl
+Busybox dla systemów wbudowanych.
 
 %prep
 %setup -q
@@ -96,12 +103,16 @@ busybox dla bootkietki PLD.
 %build
 cp -f %{SOURCE1} Config.h
 # BOOT
-%if %{?BOOT:1}%{!?BOOT:0}
+%if %{!?_without_embed:1}%{?_without_embed:0}
 %{__make} \
-	CFLAGS_EXTRA="-I%{_libdir}/bootdisk%{_includedir}" \
-	LDFLAGS="-nostdlib" \
-	LIBRARIES="%{_libdir}/bootdisk%{_libdir}/crt0.o %{_libdir}/bootdisk%{_libdir}/libc.a -lgcc"
-mv -f busybox busybox-BOOT
+	CFLAGS_EXTRA="%{embed_cflags}" \
+	CC=%{embed_cc}
+mv -f busybox busybox-embed-shared
+%{__make} \
+	CFLAGS_EXTRA="%{embed_cflags}" \
+	LDFLAGS="-static" \
+	CC=%{embed_cc}
+mv -f busybox busybox-embed-static
 %{__make} clean
 %endif
 
@@ -121,15 +132,17 @@ mv -f busybox busybox.static
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
-%if %{?BOOT:1}%{!?BOOT:0}
-install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk/{bin,%{_libdir}}
+%if %{!?_without_embed:1}%{?_without_embed:0}
+install -d $RPM_BUILD_ROOT%{embed_path}/{shared,static,aux}
 
-install busybox-BOOT $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/busybox
+install busybox-embed-static $RPM_BUILD_ROOT%{embed_path}/static/busybox
+install busybox-embed-shared $RPM_BUILD_ROOT%{embed_path}/shared/busybox
 
 for i in `cat busybox.links`; do
-	ln -sfn busybox "$RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/`basename $i`"
+	ln -sfn busybox "$RPM_BUILD_ROOT%{embed_path}/shared/`basename $i`"
+	ln -sfn busybox "$RPM_BUILD_ROOT%{embed_path}/static/`basename $i`"
 done
-install busybox.links $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}/busybox
+install busybox.links $RPM_BUILD_ROOT%{embed_path}/aux
 %endif
 
 %{!?_without_static:install busybox.static $RPM_BUILD_ROOT%{_bindir}}
@@ -157,9 +170,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/busybox.static
 %endif
 
-%if %{?BOOT:1}%{!?BOOT:0}
-%files BOOT
+%if %{!?_without_embed:1}%{?_without_embed:0}
+%files embed
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/bootdisk/bin/*
-%{_libdir}/bootdisk%{_libdir}/*
+%attr(755,root,root) %{embed_path}/s*/*
+%{embed_path}/aux/*
 %endif
