@@ -1,5 +1,5 @@
 
-# alternative busybox config file (replaces default one) you should 
+# alternative busybox config file (replaces default one) you should
 # define cfgfile macro, i.e.
 #
 #       rpm --rebuild busybox.*.src.rpm --with altconfig --define "cfgfile bb-emb-config.h"
@@ -164,7 +164,7 @@ mv -f busybox busybox.static
 %{__make} clean
 %endif
 
-%{__make} oldconfig 
+%{__make} oldconfig
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}" \
