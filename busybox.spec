@@ -37,10 +37,8 @@ Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-tee.patch
 Patch3:		%{name}-printf-gettext.patch
 Patch4:		%{name}-loadfont.patch
-Patch5:		%{name}-cread.patch
+Patch5:		%{name}-pivot_root.patch
 Patch6:		%{name}-malloc.patch
-Patch7:		%{name}-pivot_root.patch
-Patch8:		%{name}-child.patch
 URL:		http://www.busybox.net/
 %{?with_fileutl_prov:Provides:	fileutils}
 %{?with_grep_prov:Provides:	grep}
@@ -100,10 +98,8 @@ Statycznie linkowany busybox.
 %patch1 -p1
 %patch3 -p1
 %patch4 -p1
-#%patch5 -p1
+%patch5 -p1
 #%patch6 -p1
-%patch7 -p1
-#%patch8 -p1
 
 %build
 cp -f %{SOURCE1} Config.h
