@@ -6,7 +6,7 @@ diff -urN busybox-1.00-pre2.org/include/applets.h busybox-1.00-pre2/include/appl
  	APPLET(insmod, insmod_main, _BB_DIR_SBIN, _BB_SUID_NEVER)
  #endif
 +#ifdef CONFIG_FEATURE_REALLY_NEW_MODULE_INTERFACE
-+	APPLET(insmod_ng, insmod_ng_main, __BB_DIR_SBIN, _BB_SUID_NEVER)
++	APPLET(insmod_ng, insmod_ng_main, _BB_DIR_SBIN, _BB_SUID_NEVER)
 +#endif
  #ifdef CONFIG_IP
  	APPLET(ip, ip_main, _BB_DIR_BIN, _BB_SUID_NEVER)
