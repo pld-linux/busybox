@@ -52,7 +52,7 @@ diff -urN busybox-1.00-pre2.org/modutils/insmod.c busybox-1.00-pre2/modutils/ins
  
  	printf("Using %s\n", m_filename);
  
-+#ifdef BB_INSMOD_NG
++#ifdef CONFIG_FEATURE_REALLY_NEW_MODULE_INTERFACE
 +    if (create_module(NULL, 0) < 0 && errno == ENOSYS) {
 +		optind--;
 +		argv[optind] = m_filename;
