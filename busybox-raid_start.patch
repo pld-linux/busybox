@@ -1,0 +1,105 @@
+diff -u busybox-0.60.5/Config.h busybox-0.60.5-rd/Config.h
+--- busybox-0.60.5/Config.h	2003-07-01 01:55:38.000000000 +0200
++++ busybox-0.60.5-rd/Config.h	2003-07-01 01:53:40.000000000 +0200
+@@ -93,6 +93,7 @@
+ #define BB_PRINTF
+ #define BB_PS
+ #define BB_PWD
++#define BB_RAID_START
+ //#define BB_RDATE
+ //#define BB_READLINK
+ #define BB_REBOOT
+diff -u busybox-0.60.5/applets.h busybox-0.60.5-rd/applets.h
+--- busybox-0.60.5/applets.h	2002-09-18 00:04:28.000000000 +0200
++++ busybox-0.60.5-rd/applets.h	2003-07-01 01:53:33.000000000 +0200
+@@ -320,6 +320,9 @@
+ #ifdef BB_PWD
+ 	APPLET(pwd, pwd_main, _BB_DIR_BIN)
+ #endif
++#ifdef BB_RAID_START
++	APPLET(raid_start, raid_start_main, _BB_DIR_SBIN)
++#endif
+ #ifdef BB_RDATE
+ 	APPLET(rdate, rdate_main, _BB_DIR_USR_BIN)
+ #endif
+diff -u busybox-0.60.5/raid_start.c busybox-0.60.5-rd/raid_start.c
+--- busybox-0.60.5/raid_start.c	2003-07-01 01:55:57.000000000 +0200
++++ busybox-0.60.5-rd/raid_start.c	2003-07-01 01:44:32.000000000 +0200
+@@ -0,0 +1,61 @@
++/* vi: set sw=4 ts=4: */
++/*
++ * raid_start implementation for busybox
++ *
++ * Copyright (C) 2003 by Michal Moskal <malekith@pld-linux.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ *
++ */
++
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <sys/ioctl.h>
++#include <fcntl.h>
++#include <unistd.h>
++
++#include "busybox.h"
++
++#define MD_MAJOR        9
++#define START_ARRAY             _IO (MD_MAJOR, 0x31)
++
++extern int raid_start_main(int argc, char **argv)
++{
++	int fd_md;
++	struct stat st;
++	
++	if (argc != 3)
++	    show_usage();
++
++	fd_md = open(argv[1], O_RDWR, 0);
++	if (fd_md < 0)
++		perror_msg_and_die("error opening raid device `%s'", argv[1]);
++
++    if (stat(argv[2], &st))
++		perror_msg_and_die("error stating raid builing device `%s'", argv[2]);
++
++	if (ioctl(fd_md, START_ARRAY, (unsigned long) st.st_rdev) == -1)
++		perror_msg_and_die("error starting raid device `%s:%s'", argv[1], argv[2]);
++
++	return 0;
++}
++
++/*
++Local Variables:
++c-file-style: "linux"
++c-basic-offset: 4
++tab-width: 4
++End:
++*/
+diff -u busybox-0.60.5/usage.h busybox-0.60.5-rd/usage.h
+--- busybox-0.60.5/usage.h	2002-09-30 22:59:58.000000000 +0200
++++ busybox-0.60.5-rd/usage.h	2003-07-01 01:51:38.000000000 +0200
+@@ -1366,6 +1366,12 @@
+ 	"$ pwd\n" \
+ 	"/root\n"
+ 
++#define raid_start_trivial_usage \
++	"MD_DEVICE DISK_DEVICE"
++#define raid_start_full_usage \
++	"Start MD_DEVICE, taking superblock from DISK_DEVICE.\n" \
++	"Example: raid_start /dev/md0 /dev/sdb"
++	
+ #define rdate_trivial_usage \
+ 	"[OPTION] HOST"
+ #define rdate_full_usage \
