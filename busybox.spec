@@ -3,9 +3,9 @@ Name:		busybox
 Version:	0.51
 Release:	2
 License:	GPL
-Group:		Applications/File
-Group(de):	Applikationen/Datei
-Group(pl):	Aplikacje/Pliki
+Group:		Applications
+Group(de):	Applikationen
+Group(pl):	Aplikacje
 Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
 Source1:	%{name}-config.h
 Patch0:		%{name}-logconsole.patch
@@ -33,10 +33,7 @@ ae).
 
 %package BOOT
 Summary:	busybox for bootdisk
-Group:		Development/Libraries
-Group(de):	Entwicklung/Libraries
-Group(fr):	Development/Librairies
-Group(pl):	Programowanie/Biblioteki
+Group:		Applications
 
 %description BOOT
 
@@ -49,20 +46,20 @@ Group(pl):	Programowanie/Biblioteki
 # BOOT
 cp %{SOURCE1} Config.h
 %{__make} \
-	CFLAGS_EXTRA="-I/usr/lib/bootdisk/usr/include" \
+	CFLAGS_EXTRA="-I%{_libdir}/bootdisk%{_includedir}" \
 	LDFLAGS="-nostdlib -s" \
-	LIBRARIES="/usr/lib/bootdisk/usr/lib/crt0.o /usr/lib/bootdisk/usr/lib/libc.a -lgcc"
+	LIBRARIES="%{_libdir}/bootdisk%{_libdir}/crt0.o %{_libdir}/bootdisk%{_libdir}/libc.a -lgcc"
 
 # TODO make main package dynamically linked
 
 %install
 rm -rf $RPM_BUILD_ROOT
 # BOOT
-%{__install} -d $RPM_BUILD_ROOT/usr/lib/bootdisk/bin/
-%{__install} -d $RPM_BUILD_ROOT/usr/lib/bootdisk/usr/lib/busybox
-%{__install} busybox $RPM_BUILD_ROOT/usr/lib/bootdisk/bin/busybox
-for i in `cat busybox.links`; do ln -sfn busybox "$RPM_BUILD_ROOT/usr/lib/bootdisk/bin/`basename $i`"; done
-%{__install} busybox.links $RPM_BUILD_ROOT/usr/lib/bootdisk/usr/lib/busybox
+%{__install} -d $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/
+%{__install} -d $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}/busybox
+%{__install} busybox $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/busybox
+for i in `cat busybox.links`; do ln -sfn busybox "$RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/`basename $i`"; done
+%{__install} busybox.links $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}/busybox
 
 %{__install} -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir}/busybox,%{_mandir}/man1}
 %{__install} busybox $RPM_BUILD_ROOT%{_bindir}
@@ -85,5 +82,5 @@ rm -rf $RPM_BUILD_ROOT
 
 %files BOOT
 %defattr(644,root,root,755)
-%attr(755,root,root) /usr/lib/bootdisk/bin/*
-/usr/lib/bootdisk/usr/lib/*
+%attr(755,root,root) %{_libdir}/bootdisk/bin/*
+%{_libdir}/bootdisk%{_libdir}/*
