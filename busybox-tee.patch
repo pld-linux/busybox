@@ -1,10 +1,10 @@
---- tee.c.orig	Mon Oct 23 20:57:32 2000
-+++ tee.c	Mon Oct 23 20:58:29 2000
-@@ -51,7 +51,7 @@
- 			status = 1;
+diff -urN busybox-0.60.1/tee.c busybox-0.60.1.new/tee.c
+--- busybox-0.60.1/tee.c	Wed Feb 14 22:23:06 2001
++++ busybox-0.60.1.new/tee.c	Tue Aug 28 21:55:10 2001
+@@ -52,6 +52,7 @@
  		}
  	}
--
+ 
 +	setvbuf(stdout, NULL, _IONBF, 0);
  	while ((c = getchar()) != EOF)
  		for (i = 0; i < nfiles; i++)

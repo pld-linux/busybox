@@ -1,6 +1,6 @@
-diff -ur busybox-0.51/printf.c busybox/printf.c
---- busybox-0.51/printf.c	Mon Mar 19 20:25:49 2001
-+++ busybox/printf.c	Thu May 31 16:41:31 2001
+diff -ur busybox-0.60.1/printf.c busybox-0.60.1.new/printf.c
+--- busybox-0.60.1/printf.c	Mon Mar 19 20:25:49 2001
++++ busybox-0.60.1.new/printf.c	Thu May 31 16:41:31 2001
 @@ -47,6 +47,9 @@
  
  //   19990508 Busy Boxed! Dave Cinege
