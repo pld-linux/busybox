@@ -25,8 +25,7 @@
 %bcond_with dietlibc
 %bcond_with glibc
 
-%ifarch %{x86}
-%else
+%ifnarch %{ix86}
 %define with_glibc 1
 %endif
 
