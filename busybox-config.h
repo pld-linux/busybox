@@ -42,7 +42,7 @@
 //#define BB_FDFLUSH
 #define BB_FIND
 #define BB_FREE
-//#define BB_FREERAMDISK
+#define BB_FREERAMDISK
 //#define BB_FSCK_MINIX
 //#define BB_GETOPT
 #define BB_GREP
