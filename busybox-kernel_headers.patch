@@ -10,12 +10,13 @@ diff -durN -x '*~' -x '*.o' -x '.*' -x '*.[0-9]' -x '*.links' -x '*.html' -x '*.
 diff -durN -x '*~' -x '*.o' -x '.*' -x '*.[0-9]' -x '*.links' -x '*.html' -x '*.txt' -x '*.pod' -x 'config*' busybox-1.00-pre4.orig/miscutils/hdparm.c busybox-1.00-pre4/miscutils/hdparm.c
 --- busybox-1.00-pre4.orig/miscutils/hdparm.c	2004-12-21 17:58:28.111674208 +0100
 +++ busybox-1.00-pre4/miscutils/hdparm.c	2004-12-21 17:53:25.000000000 +0100
-@@ -45,7 +45,7 @@
+@@ -45,7 +45,8 @@
  #include <linux/types.h>
  #include <linux/hdreg.h>
  #include <linux/major.h>
 -#include <asm/byteorder.h>
 +#include <endian.h>
++#include <byteswap.h>
  
  
  #if (__BYTE_ORDER == __BIG_ENDIAN) && !defined(__USE_XOPEN)
