@@ -1,0 +1,172 @@
+diff -ur busybox-0.60.5/Config.h busybox-0.60.5-ng/Config.h
+--- busybox-0.60.5/Config.h	2003-07-01 02:56:02.000000000 +0200
++++ busybox-0.60.5-ng/Config.h	2003-07-01 02:55:01.000000000 +0200
+@@ -57,6 +57,7 @@
+ //#define BB_IFCONFIG
+ #define BB_INIT
+ //#define BB_INSMOD
++#define BB_INSMOD_NG
+ #define BB_KILL
+ #define BB_KILLALL
+ #define BB_KLOGD
+diff -ur busybox-0.60.5/applets.h busybox-0.60.5-ng/applets.h
+--- busybox-0.60.5/applets.h	2003-07-01 02:56:02.000000000 +0200
++++ busybox-0.60.5-ng/applets.h	2003-07-01 02:54:47.000000000 +0200
+@@ -203,6 +203,9 @@
+ #ifdef BB_INSMOD
+ 	APPLET(insmod, insmod_main, _BB_DIR_SBIN)
+ #endif
++#ifdef BB_INSMOD_NG
++	APPLET(insmod_ng, insmod_ng_main, _BB_DIR_SBIN)
++#endif
+ #ifdef BB_KILL
+ 	APPLET(kill, kill_main, _BB_DIR_BIN)
+ #endif
+diff -ur busybox-0.60.5/insmod.c busybox-0.60.5-ng/insmod.c
+--- busybox-0.60.5/insmod.c	2002-09-16 07:30:10.000000000 +0200
++++ busybox-0.60.5-ng/insmod.c	2003-07-01 02:37:14.000000000 +0200
+@@ -3567,6 +3567,14 @@
+ 
+ 	printf("Using %s\n", m_filename);
+ 
++#ifdef BB_INSMOD_NG
++    if (create_module(NULL, 0) < 0 && errno == ENOSYS) {
++		optind--;
++		argv[optind] = m_filename;
++		return insmod_ng_main(argc - optind, argv + optind);
++    }
++#endif
++
+ 	if ((f = obj_load(fp, LOADBITS)) == NULL)
+ 		perror_msg_and_die("Could not load the module");
+ 
+Only in busybox-0.60.5-ng: insmod.o
+diff -ur busybox-0.60.5/insmod_ng.c busybox-0.60.5-ng/insmod_ng.c
+--- busybox-0.60.5/insmod_ng.c	2003-07-01 02:56:12.000000000 +0200
++++ busybox-0.60.5-ng/insmod_ng.c	2003-07-01 02:54:18.000000000 +0200
+@@ -0,0 +1,110 @@
++/* vi: set sw=4 ts=4: */
++/*
++ * insmod for 2.5 kernels implementation for busybox
++ * busybox version by Michal Moskal <malekith@pld-linux.org>
++ *
++ * Copyright (C) 2001  Rusty Russell.
++ * Copyright (C) 2002  Rusty Russell, IBM Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
++
++#include <string.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <sys/mman.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#include <errno.h>
++#include <asm/unistd.h>
++#include <sys/syscall.h>
++
++#include "busybox.h"
++
++#define __NR_init_module_25 __NR_init_module
++static _syscall3(long, init_module_25, void *, map, size_t, len, char *, options)
++
++/* We use error numbers in a loose translation... */
++static const char *moderror(int err)
++{
++	switch (err) {
++	case ENOEXEC:
++		return "Invalid module format";
++	case ENOENT:
++		return "Unknown symbol in module";
++	case ESRCH:
++		return "Module has wrong symbol version";
++	case EINVAL:
++		return "Invalid parameters";
++	default:
++		return strerror(err);
++	}
++}
++
++extern int insmod_ng_main(int argc, char **argv)
++{
++	int i;
++	int fd;
++	long int ret;
++	struct stat st;
++	unsigned long len;
++	void *map;
++	char *filename, *options = xstrdup("");
++	
++	filename = argv[1];
++	if (!filename)
++		show_usage();
++
++	/* Rest is options */
++	for (i = 2; i < argc; i++) {
++		options = xrealloc(options,
++				  strlen(options) + 2 + strlen(argv[i]) + 2);
++		/* Spaces handled by "" pairs, but no way of escaping quotes */
++		if (strchr(argv[i], ' ')) {
++			strcat(options, "\"");
++			strcat(options, argv[i]);
++			strcat(options, "\"");
++		} else {
++			strcat(options, argv[i]);
++		}
++		strcat(options, " ");
++	}
++
++	if ((fd = open(filename, O_RDONLY, 0)) < 0)
++		perror_msg_and_die("cannot open module `%s'", filename);
++
++	fstat(fd, &st);
++	len = st.st_size;
++	map = mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0);
++	if (map == MAP_FAILED)
++		perror_msg_and_die("cannot mmap `%s'", filename);
++
++	ret = init_module_25(map, len, options);
++	if (ret != 0)
++		perror_msg_and_die("cannot insert `%s': %s (%li)",
++						   filename, moderror(errno), ret);
++	
++	return 0;
++}
++
++/*
++Local Variables:
++c-file-style: "linux"
++c-basic-offset: 4
++tab-width: 4
++End:
++*/
+diff -ur busybox-0.60.5/usage.h busybox-0.60.5-ng/usage.h
+--- busybox-0.60.5/usage.h	2003-07-01 02:56:02.000000000 +0200
++++ busybox-0.60.5-ng/usage.h	2003-07-01 02:55:44.000000000 +0200
+@@ -818,6 +818,11 @@
+ 	"\t-L\tLock to prevent simultaneous loads of a module\n" \
+ 	"\t-x\tdo not export externs"
+ 
++#define insmod_ng_trivial_usage \
++	"MODULE [symbol=value]..."
++#define insmod_ng_full_usage \
++	"Loads the specified kernel modules into the kernel."
++
+ #define kill_trivial_usage \
+ 	"[-signal] process-id [process-id ...]"
+ #define kill_full_usage \
