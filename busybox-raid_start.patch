@@ -11,22 +11,6 @@ diff -urN busybox-1.00-pre2.org/include/applets.h busybox-1.00-pre2/include/appl
  #ifdef CONFIG_RDATE
  	APPLET(rdate, rdate_main, _BB_DIR_USR_SBIN, _BB_SUID_NEVER)
  #endif
-diff -urN busybox-1.00-pre2.org/include/usage.h busybox-1.00-pre2/include/usage.h
---- busybox-1.00-pre2.org/include/usage.h	2003-08-02 23:46:48.000000000 +0200
-+++ busybox-1.00-pre2/include/usage.h	2003-08-03 00:32:31.000000000 +0200
-@@ -1924,6 +1924,12 @@
- 	"$ pwd\n" \
- 	"/root\n"
- 
-+#define raid_start_trivial_usage \
-+	"MD_DEVICE DISK_DEVICES..."
-+#define raid_start_full_usage \
-+	"Start MD_DEVICE, taking superblock from DISK_DEVICES.\n" \
-+	"Example: raid_start /dev/md0 /dev/sdb /dev/sdc2"
-+	
- #define rdate_trivial_usage \
- 	"[-sp] HOST"
- #define rdate_full_usage \
 diff -urN busybox-1.00-pre2.org/sysdeps/linux/defconfig busybox-1.00-pre2/sysdeps/linux/defconfig
 --- busybox-1.00-pre2.org/sysdeps/linux/defconfig	2003-08-02 23:46:49.000000000 +0200
 +++ busybox-1.00-pre2/sysdeps/linux/defconfig	2003-08-03 00:32:31.000000000 +0200
