@@ -1,6 +1,6 @@
 diff -urN busybox-1.00-pre2.org/include/applets.h busybox-1.00-pre2/include/applets.h
 --- busybox-1.00-pre2.org/include/applets.h	2003-08-02 23:46:48.000000000 +0200
-+++ busybox-1.00-pre2/include/applets.h	2003-08-02 23:54:03.000000000 +0200
++++ busybox-1.00-pre2/include/applets.h	2003-08-03 00:32:31.000000000 +0200
 @@ -457,6 +457,9 @@
  #ifdef CONFIG_PWD
  	APPLET(pwd, pwd_main, _BB_DIR_BIN, _BB_SUID_NEVER)
@@ -13,7 +13,7 @@ diff -urN busybox-1.00-pre2.org/include/applets.h busybox-1.00-pre2/include/appl
  #endif
 diff -urN busybox-1.00-pre2.org/include/usage.h busybox-1.00-pre2/include/usage.h
 --- busybox-1.00-pre2.org/include/usage.h	2003-08-02 23:46:48.000000000 +0200
-+++ busybox-1.00-pre2/include/usage.h	2003-08-02 23:52:05.000000000 +0200
++++ busybox-1.00-pre2/include/usage.h	2003-08-03 00:32:31.000000000 +0200
 @@ -1924,6 +1924,12 @@
  	"$ pwd\n" \
  	"/root\n"
@@ -27,283 +27,9 @@ diff -urN busybox-1.00-pre2.org/include/usage.h busybox-1.00-pre2/include/usage.
  #define rdate_trivial_usage \
  	"[-sp] HOST"
  #define rdate_full_usage \
-diff -urN busybox-1.00-pre2.org/libbb/xfuncs.c.orig busybox-1.00-pre2/libbb/xfuncs.c.orig
---- busybox-1.00-pre2.org/libbb/xfuncs.c.orig	1970-01-01 01:00:00.000000000 +0100
-+++ busybox-1.00-pre2/libbb/xfuncs.c.orig	2003-08-02 23:48:39.000000000 +0200
-@@ -0,0 +1,196 @@
-+/* vi: set sw=4 ts=4: */
-+/*
-+ * Utility routines.
-+ *
-+ * Copyright (C) 1999-2003 by Erik Andersen <andersen@codepoet.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-+ * General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
-+
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <stdio.h>
-+#include <string.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <fcntl.h>
-+#include "libbb.h"
-+
-+
-+#ifndef DMALLOC
-+#ifdef L_xmalloc
-+extern void *xmalloc(size_t size)
-+{
-+	void *ptr = malloc(size);
-+	if (ptr == NULL && size != 0)
-+		bb_error_msg_and_die(bb_msg_memory_exhausted);
-+	return ptr;
-+}
-+#endif
-+
-+#ifdef L_xrealloc
-+extern void *xrealloc(void *ptr, size_t size)
-+{
-+	ptr = realloc(ptr, size);
-+	if (ptr == NULL && size != 0)
-+		bb_error_msg_and_die(bb_msg_memory_exhausted);
-+	return ptr;
-+}
-+#endif
-+
-+#ifdef L_xcalloc
-+extern void *xcalloc(size_t nmemb, size_t size)
-+{
-+	void *ptr = calloc(nmemb, size);
-+	if (ptr == NULL && nmemb != 0 && size != 0)
-+		bb_error_msg_and_die(bb_msg_memory_exhausted);
-+	return ptr;
-+}
-+#endif
-+#endif /* DMALLOC */
-+
-+#ifdef L_xstrdup
-+extern char * bb_xstrdup (const char *s) {
-+	char *t;
-+
-+	if (s == NULL)
-+		return NULL;
-+
-+	t = strdup (s);
-+
-+	if (t == NULL)
-+		bb_error_msg_and_die(bb_msg_memory_exhausted);
-+
-+	return t;
-+}
-+#endif
-+
-+#ifdef L_xstrndup
-+extern char * bb_xstrndup (const char *s, int n) {
-+	char *t;
-+
-+	if (s == NULL)
-+		bb_error_msg_and_die("bb_xstrndup bug");
-+
-+	t = xmalloc(++n);
-+	
-+	return safe_strncpy(t,s,n);
-+}
-+#endif
-+
-+#ifdef L_xfopen
-+FILE *bb_xfopen(const char *path, const char *mode)
-+{
-+	FILE *fp;
-+	if ((fp = fopen(path, mode)) == NULL)
-+		bb_perror_msg_and_die("%s", path);
-+	return fp;
-+}
-+#endif
-+
-+#ifdef L_xopen
-+extern int bb_xopen(const char *pathname, int flags)
-+{
-+	int ret;
-+	
-+	ret = open(pathname, flags, 0777);
-+	if (ret == -1) {
-+		bb_perror_msg_and_die("%s", pathname);
-+	}
-+	return ret;
-+}
-+#endif
-+
-+#ifdef L_xread
-+extern ssize_t bb_xread(int fd, void *buf, size_t count)
-+{
-+	ssize_t size;
-+
-+	size = read(fd, buf, count);
-+	if (size == -1) {
-+		bb_perror_msg_and_die("Read error");
-+	}
-+	return(size);
-+}
-+#endif
-+
-+#ifdef L_xread_all
-+extern void bb_xread_all(int fd, void *buf, size_t count)
-+{
-+	ssize_t size;
-+
-+	while (count) {
-+		if ((size = bb_xread(fd, buf, count)) == 0) {	/* EOF */
-+			bb_error_msg_and_die("Short read");
-+		}
-+		count -= size;
-+	}
-+	return;
-+}
-+#endif
-+
-+#ifdef L_xread_char
-+extern unsigned char bb_xread_char(int fd)
-+{
-+	char tmp;
-+	
-+	bb_xread_all(fd, &tmp, 1);
-+
-+	return(tmp);	
-+}
-+#endif
-+
-+#ifdef L_xferror
-+extern void bb_xferror(FILE *fp, const char *fn)
-+{
-+	if (ferror(fp)) {
-+		bb_error_msg_and_die("%s", fn);
-+	}
-+}
-+#endif
-+
-+#ifdef L_xferror_stdout
-+extern void bb_xferror_stdout(void)
-+{
-+	bb_xferror(stdout, bb_msg_standard_output);
-+}
-+#endif
-+
-+#ifdef L_xfflush_stdout
-+extern void bb_xfflush_stdout(void)
-+{
-+	if (fflush(stdout)) {
-+		bb_perror_msg_and_die(bb_msg_standard_output);
-+	}
-+}
-+#endif
-+
-+#ifdef L_strlen
-+/* Stupid gcc always includes its own builtin strlen()... */
-+#undef strlen
-+size_t bb_strlen(const char *string)
-+{
-+	    return(strlen(string));
-+}
-+#endif
-+
-+/* END CODE */
-+/*
-+Local Variables:
-+c-file-style: "linux"
-+c-basic-offset: 4
-+tab-width: 4
-+End:
-+*/
-diff -urN busybox-1.00-pre2.org/libbb/xfuncs.c.rej busybox-1.00-pre2/libbb/xfuncs.c.rej
---- busybox-1.00-pre2.org/libbb/xfuncs.c.rej	1970-01-01 01:00:00.000000000 +0100
-+++ busybox-1.00-pre2/libbb/xfuncs.c.rej	2003-08-02 23:49:05.000000000 +0200
-@@ -0,0 +1,70 @@
-+***************
-+*** 35,41 ****
-+  #ifndef DMALLOC
-+  extern void *xmalloc(size_t size)
-+  {
-+- 	void *ptr = malloc(size);
-+  
-+  	if (!ptr)
-+  		error_msg_and_die(memory_exhausted);
-+--- 35,46 ----
-+  #ifndef DMALLOC
-+  extern void *xmalloc(size_t size)
-+  {
-++ 	void *ptr;
-++ 
-++ 	if (size == 0)
-++ 		size++;
-++ 		
-++ 	ptr = malloc(size);
-+  
-+  	if (!ptr)
-+  		error_msg_and_die(memory_exhausted);
-+***************
-+*** 54,59 ****
-+  		return NULL;
-+  	}
-+  
-+  	ptr = realloc(old, size);
-+  	if (!ptr)
-+  		error_msg_and_die(memory_exhausted);
-+--- 59,67 ----
-+  		return NULL;
-+  	}
-+  
-++ 	if (size == 0)
-++ 		size++;
-++ 
-+  	ptr = realloc(old, size);
-+  	if (!ptr)
-+  		error_msg_and_die(memory_exhausted);
-+***************
-+*** 62,70 ****
-+  
-+  extern void *xcalloc(size_t nmemb, size_t size)
-+  {
-+- 	void *ptr = calloc(nmemb, size);
-+  	if (!ptr)
-+  		error_msg_and_die(memory_exhausted);
-+  	return ptr;
-+  }
-+  
-+--- 70,87 ----
-+  
-+  extern void *xcalloc(size_t nmemb, size_t size)
-+  {
-++ 	void *ptr;
-++ 	
-++ 	if (nmemb == 0)
-++ 		nmemb++;
-++ 		
-++ 	if (size == 0)
-++ 		size++;
-++ 		
-++ 	ptr = calloc(nmemb, size);
-+  	if (!ptr)
-+  		error_msg_and_die(memory_exhausted);
-++ 		
-+  	return ptr;
-+  }
-+  
 diff -urN busybox-1.00-pre2.org/sysdeps/linux/defconfig busybox-1.00-pre2/sysdeps/linux/defconfig
 --- busybox-1.00-pre2.org/sysdeps/linux/defconfig	2003-08-02 23:46:49.000000000 +0200
-+++ busybox-1.00-pre2/sysdeps/linux/defconfig	2003-08-02 23:55:23.000000000 +0200
++++ busybox-1.00-pre2/sysdeps/linux/defconfig	2003-08-03 00:32:31.000000000 +0200
 @@ -290,6 +290,7 @@
  # CONFIG_FEATURE_USE_DEVPS_PATCH is not set
  CONFIG_UMOUNT=y
@@ -314,7 +40,7 @@ diff -urN busybox-1.00-pre2.org/sysdeps/linux/defconfig busybox-1.00-pre2/sysdep
  # Common options for mount/umount
 diff -urN busybox-1.00-pre2.org/util-linux/Config.in busybox-1.00-pre2/util-linux/Config.in
 --- busybox-1.00-pre2.org/util-linux/Config.in	2003-08-02 23:46:49.000000000 +0200
-+++ busybox-1.00-pre2/util-linux/Config.in	2003-08-02 23:58:22.000000000 +0200
++++ busybox-1.00-pre2/util-linux/Config.in	2003-08-03 00:32:31.000000000 +0200
 @@ -285,6 +285,12 @@
  	  NFS filesystems.  Most people using BusyBox will also want to enable
  	  the 'mount' utility.
@@ -330,7 +56,7 @@ diff -urN busybox-1.00-pre2.org/util-linux/Config.in busybox-1.00-pre2/util-linu
  	default n
 diff -urN busybox-1.00-pre2.org/util-linux/Makefile.in busybox-1.00-pre2/util-linux/Makefile.in
 --- busybox-1.00-pre2.org/util-linux/Makefile.in	2003-08-02 23:46:49.000000000 +0200
-+++ busybox-1.00-pre2/util-linux/Makefile.in	2003-08-02 23:59:35.000000000 +0200
++++ busybox-1.00-pre2/util-linux/Makefile.in	2003-08-03 00:32:31.000000000 +0200
 @@ -38,6 +38,7 @@
  UTILLINUX-$(CONFIG_MKSWAP)		+= mkswap.o
  UTILLINUX-$(CONFIG_MORE)		+= more.o
@@ -341,8 +67,8 @@ diff -urN busybox-1.00-pre2.org/util-linux/Makefile.in busybox-1.00-pre2/util-li
  UTILLINUX-$(CONFIG_RDATE)		+= rdate.o
 diff -urN busybox-1.00-pre2.org/util-linux/raid_start.c busybox-1.00-pre2/util-linux/raid_start.c
 --- busybox-1.00-pre2.org/util-linux/raid_start.c	1970-01-01 01:00:00.000000000 +0100
-+++ busybox-1.00-pre2/util-linux/raid_start.c	2003-08-02 23:52:00.000000000 +0200
-@@ -0,0 +1,61 @@
++++ busybox-1.00-pre2/util-linux/raid_start.c	2003-08-03 00:34:47.000000000 +0200
+@@ -0,0 +1,63 @@
 +/* vi: set sw=4 ts=4: */
 +/*
 + * raid_start implementation for busybox
@@ -381,18 +107,20 @@ diff -urN busybox-1.00-pre2.org/util-linux/raid_start.c busybox-1.00-pre2/util-l
 +	int fd_md;
 +	struct stat st;
 +	
-+	if (argc != 3)
-+	    show_usage();
++	if (argc != 3) {
++	    bb_show_usage();
++		return 0;
++	}
 +
 +	fd_md = open(argv[1], O_RDWR, 0);
 +	if (fd_md < 0)
-+		perror_msg_and_die("error opening raid device `%s'", argv[1]);
++		bb_perror_msg_and_die("error opening raid device `%s'", argv[1]);
 +
 +    if (stat(argv[2], &st))
-+		perror_msg_and_die("error stating raid builing device `%s'", argv[2]);
++		bb_perror_msg_and_die("error stating raid builing device `%s'", argv[2]);
 +
 +	if (ioctl(fd_md, START_ARRAY, (unsigned long) st.st_rdev) == -1)
-+		perror_msg_and_die("error starting raid device `%s:%s'", argv[1], argv[2]);
++		bb_perror_msg_and_die("error starting raid device `%s:%s'", argv[1], argv[2]);
 +
 +	return 0;
 +}
