@@ -33,17 +33,19 @@ a kernel, a shell (such as ash), and an editor (such as elvis-tiny or
 ae).
 
 %package BOOT
-Summary:	busybox for bootdisk
+Summary:	busybox for PLD bootdisk
 Group:		Applications
+Group(de):	Applikationen
+Group(pl):	Aplikacje
 
 %description BOOT
+busybox for PLD bootdisk.
 
 %prep
 %setup -q
 %patch0
 %patch1
 %patch2 -p1
-
 
 %build
 # BOOT
@@ -57,21 +59,21 @@ cp %{SOURCE1} Config.h
 
 %install
 rm -rf $RPM_BUILD_ROOT
-# BOOT
-%{__install} -d $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/
-%{__install} -d $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}/busybox
+%{__install} -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1},%{_libdir}/busybox/{bin,%{_libdir}/busybox}}
+
 %{__install} busybox $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/busybox
-for i in `cat busybox.links`; do ln -sfn busybox "$RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/`basename $i`"; done
+
+for i in `cat busybox.links`; do
+	ln -sfn busybox "$RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/`basename $i`"
+done
 %{__install} busybox.links $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}/busybox
 # change sh to lash (see sh_name patch)
 mv -f $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/{sh,lash}
 
-%{__install} -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir}/busybox,%{_mandir}/man1}
 %{__install} busybox $RPM_BUILD_ROOT%{_bindir}
 %{__install} busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 %{__install} docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
 echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
-
 
 gzip -9nf AUTHORS TODO Changelog README
 
