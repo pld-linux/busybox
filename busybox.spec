@@ -35,7 +35,7 @@ Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.00
 %define	pre	rc3
-Release:	0.%{pre}.2
+Release:	0.%{pre}.3
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}-%{pre}.tar.bz2
@@ -54,6 +54,7 @@ Patch7:		%{name}-kernel_headers.patch
 Patch8:		%{name}-insmod-morearchs.patch
 Patch9:		%{name}-dhcp.patch
 Patch10:	%{name}-switchroot.patch
+Patch11:	%{name}-fix_64_archs.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
@@ -148,6 +149,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 %build
 install %{SOURCE1} .config
