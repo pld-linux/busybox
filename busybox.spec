@@ -12,6 +12,7 @@ Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-tee.patch
 URL:		http://busybox.lineo.com/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+BuildRequires:	uClibc-devel-BOOT
 
 %description
 BusyBox combines tiny versions of many common UNIX utilities into a
@@ -30,23 +31,45 @@ customize your embedded systems. To create a working system, just add
 a kernel, a shell (such as ash), and an editor (such as elvis-tiny or
 ae).
 
+%package BOOT
+Summary:	busybox for bootdisk
+Group:		Development/Libraries
+Group(de):	Entwicklung/Libraries
+Group(fr):	Development/Librairies
+Group(pl):	Programowanie/Biblioteki
+
+%description BOOT
+
 %prep
 %setup -q
 %patch0
 %patch1
 
 %build
+# BOOT
 cp %{SOURCE1} Config.h
-%{__make}
+%{__make} \
+	CFLAGS_EXTRA="-I/usr/lib/bootdisk/usr/include" \
+	LDFLAGS="-nostdlib -s" \
+	LIBRARIES="/usr/lib/bootdisk/usr/lib/crt0.o /usr/lib/bootdisk/usr/lib/libc.a -lgcc"
+
+# TODO make main package dynamically linked
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__install} -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir}/busybox,%{_mandir}/man1}
+# BOOT
+%{__install} -d $RPM_BUILD_ROOT/usr/lib/bootdisk/bin/
+%{__install} -d $RPM_BUILD_ROOT/usr/lib/bootdisk/usr/lib/busybox
+%{__install} busybox $RPM_BUILD_ROOT/usr/lib/bootdisk/bin/busybox
+for i in `cat busybox.links`; do ln -sfn busybox "$RPM_BUILD_ROOT/usr/lib/bootdisk/bin/`basename $i`"; done
+%{__install} busybox.links $RPM_BUILD_ROOT/usr/lib/bootdisk/usr/lib/busybox
 
+%{__install} -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir}/busybox,%{_mandir}/man1}
 %{__install} busybox $RPM_BUILD_ROOT%{_bindir}
 %{__install} busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 %{__install} docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
 echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
+
 
 gzip -9nf AUTHORS TODO Changelog README
 
@@ -59,3 +82,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/*
 %{_libdir}/busybox
 %{_mandir}/man1/*
+
+%files BOOT
+%defattr(644,root,root,755)
+%attr(755,root,root) /usr/lib/bootdisk/bin/*
+/usr/lib/bootdisk/usr/lib/*
