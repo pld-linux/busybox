@@ -1,14 +1,14 @@
 diff -urN busybox-1.00-pre2.org/modutils/insmod.c busybox-1.00-pre2/modutils/insmod.c
 --- busybox-1.00-pre2.org/modutils/insmod.c	2003-08-02 23:46:49.000000000 +0200
-+++ busybox-1.00-pre2/modutils/insmod.c	2003-08-05 23:08:15.000000000 +0200
-@@ -1646,6 +1646,9 @@
- 	int n_binding = ELFW(ST_BIND) (info);
++++ busybox-1.00-pre2/modutils/insmod.c	2003-08-05 23:34:53.000000000 +0200
+@@ -1890,6 +1890,9 @@
+ 		struct obj_symbol *sym;
+ 		char *name = (char *)s->name;
  
- 	for (sym = f->symtab[hash]; sym; sym = sym->next)
-+		if (strncmp((char *)sym->name, "GPLONLY_", 8) == 0)
-+			((char *)sym->name) += 8;
-+	
- 		if (f->symbol_cmp(sym->name, name) == 0) {
- 			int o_secidx = sym->secidx;
- 			int o_info = sym->info;
++		if (strncmp(name, "GPLONLY_", 8) == 0)
++			name += 8;
++
+ #ifdef SYMBOL_PREFIX
+ 		/* Prepend SYMBOL_PREFIX to the symbol's name (the
+ 		   kernel exports `C names', but module object files
 
