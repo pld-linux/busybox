@@ -52,10 +52,10 @@
 #define BB_INSMOD
 #define BB_KILL
 #define BB_KILLALL
-//#define BB_KLOGD
+#define BB_KLOGD
 //#define BB_LENGTH
 #define BB_LN
-//#define BB_LOADACM
+#define BB_LOADACM
 #define BB_LOADFONT
 //#define BB_LOADKMAP
 //#define BB_LOGGER
@@ -99,7 +99,7 @@
 //#define BB_STTY
 #define BB_SWAPONOFF
 #define BB_SYNC
-//#define BB_SYSLOGD
+#define BB_SYSLOGD
 #define BB_TAIL
 #define BB_TAR
 #define BB_TEE
