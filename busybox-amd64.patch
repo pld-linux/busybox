@@ -17,3 +17,22 @@ diff -urN busybox-1.00-pre4.org/modutils/insmod.c busybox-1.00-pre4/modutils/ins
  #ifndef SHT_RELM
  #error Sorry, but insmod.c does not yet support this architecture...
  #endif
+diff -durN -x '*~' -x '*.o' -x '.*' -x '*.[0-9]' -x '*.links' -x '*.html' -x '*.txt' -x '*.pod' -x 'config*' busybox-1.00-pre4.orig/util-linux/fdisk.c busybox-1.00-pre4/util-linux/fdisk.c
+--- busybox-1.00-pre4.orig/util-linux/fdisk.c	2003-12-04 08:07:14.000000000 +0100
++++ busybox-1.00-pre4/util-linux/fdisk.c	2004-12-21 17:45:00.000000000 +0100
+@@ -856,13 +856,13 @@
+  */
+ 
+ 
+-#if defined(__alpha__) || defined(__ia64__) || defined(__s390x__)
++#if defined(__alpha__) || defined(__ia64__) || defined(__s390x__) || defined(__x86_64__)
+ 
+ #define my_llseek lseek
+ 
+ #else
+ 
+-#include <syscall.h>
++#include <syscall.h>
+ 
+ static fdisk_loff_t my_llseek (unsigned int f_d, fdisk_loff_t offset,
+ 		unsigned int origin)
