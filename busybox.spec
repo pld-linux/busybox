@@ -33,7 +33,7 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	0.60.2
-Release:	6
+Release:	7
 License:	GPL
 Group:		Applications
 Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
@@ -131,7 +131,7 @@ install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
 %{!?_without_static:install busybox.static $RPM_BUILD_ROOT%{_bindir}}
 
-install busybox $RPM_BUILD_ROOT%{_bindir}
+%{?!_with_linkfl:install busybox $RPM_BUILD_ROOT%{_bindir}}
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
 echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
