@@ -1,0 +1,152 @@
+diff -Nur busybox-1.00-orig/include/libbb.h busybox-1.00/include/libbb.h
+--- busybox-1.00-orig/include/libbb.h	2005-02-14 16:53:58.000000000 +0100
++++ busybox-1.00/include/libbb.h	2005-02-15 10:55:16.547885312 +0100
+@@ -193,6 +193,8 @@
+ extern int safe_strtod(char *arg, double* value);
+ extern int safe_strtol(char *arg, long* value);
+ extern int safe_strtoul(char *arg, unsigned long* value);
++extern int safe_strtoll(char *arg, long long* value);
++extern int safe_strtoull(char *arg, unsigned long long* value);
+ 
+ struct suffix_mult {
+ 	const char *suffix;
+diff -Nur busybox-1.00-orig/libbb/Makefile.in busybox-1.00/libbb/Makefile.in
+--- busybox-1.00-orig/libbb/Makefile.in	2004-10-08 09:45:31.000000000 +0200
++++ busybox-1.00/libbb/Makefile.in	2005-02-15 10:51:08.585581312 +0100
+@@ -72,7 +72,7 @@
+ 	xgetularg_bnd.o xgetularg10_bnd.o xgetularg10.o
+ 
+ LIBBB_MSRC4:=$(srcdir)/safe_strtol.c
+-LIBBB_MOBJ4:=safe_strtoi.o safe_strtod.o safe_strtol.o safe_strtoul.o
++LIBBB_MOBJ4:=safe_strtoi.o safe_strtod.o safe_strtol.o safe_strtoul.o safe_strtoull.o safe_strtoll.o
+ 
+ LIBBB_MOBJS0=$(patsubst %,$(LIBBB_DIR)%, $(LIBBB_MOBJ0))
+ LIBBB_MOBJS1=$(patsubst %,$(LIBBB_DIR)%, $(LIBBB_MOBJ1))
+diff -Nur busybox-1.00-orig/libbb/safe_strtol.c busybox-1.00/libbb/safe_strtol.c
+--- busybox-1.00-orig/libbb/safe_strtol.c	2004-03-06 23:11:45.000000000 +0100
++++ busybox-1.00/libbb/safe_strtol.c	2005-02-15 10:53:56.546047440 +0100
+@@ -90,3 +90,38 @@
+ }
+ #endif
+ 
++#ifdef L_safe_strtoll
++extern
++int safe_strtoll(char *arg, long long* value)
++{
++	char *endptr;
++	int errno_save = errno;
++
++	assert(arg!=NULL);
++	errno = 0;
++	*value = strtoll(arg, &endptr, 0);
++	if (errno != 0 || *endptr!='\0' || endptr==arg) {
++		return 1;
++	}
++	errno = errno_save;
++	return 0;
++}
++#endif
++
++#ifdef L_safe_strtoull
++extern
++int safe_strtoull(char *arg, unsigned long long* value)
++{
++	char *endptr;
++	int errno_save = errno;
++
++	assert(arg!=NULL);
++	errno = 0;
++	*value = strtoull(arg, &endptr, 0);
++	if (errno != 0 || *endptr!='\0' || endptr==arg) {
++		return 1;
++	}
++	errno = errno_save;
++	return 0;
++}
++#endif
+diff -Nur busybox-1.00-orig/networking/ftpgetput.c busybox-1.00/networking/ftpgetput.c
+--- busybox-1.00-orig/networking/ftpgetput.c	2004-05-04 12:43:34.000000000 +0200
++++ busybox-1.00/networking/ftpgetput.c	2005-02-15 11:02:41.127298968 +0100
+@@ -152,8 +152,12 @@
+ 	fd_data = xconnect_ftpdata(server, buf);
+ 
+ 	if (ftpcmd("SIZE ", server_path, control_stream, buf) == 213) {
+-		unsigned long value=filesize;
+-		if (safe_strtoul(buf + 4, &value))
++		off_t value=filesize;
++#ifdef CONFIG_LFS
++		if (safe_strtoull(buf + 4, &value))
++#else
++		if (safe_strtoull(buf + 4, &value))
++#endif
+ 			bb_error_msg_and_die("SIZE error: %s", buf + 4);
+ 		filesize = value;
+ 	}
+@@ -240,7 +244,11 @@
+ 		fd_local = bb_xopen(local_path, O_RDONLY);
+ 		fstat(fd_local, &sbuf);
+ 
++#ifdef CONFIG_LFS
++		sprintf(buf, "ALLO %llu", (unsigned long long)sbuf.st_size);
++#else
+ 		sprintf(buf, "ALLO %lu", (unsigned long)sbuf.st_size);
++#endif
+ 		response = ftpcmd(buf, NULL, control_stream, buf);
+ 		switch (response) {
+ 		case 200:
+diff -Nur busybox-1.00-orig/networking/wget.c busybox-1.00/networking/wget.c
+--- busybox-1.00-orig/networking/wget.c	2004-10-08 10:27:40.000000000 +0200
++++ busybox-1.00/networking/wget.c	2005-02-15 11:33:10.235232296 +0100
+@@ -389,8 +389,12 @@
+ 			 */
+ 			while ((s = gethdr(buf, sizeof(buf), sfp, &n)) != NULL) {
+ 				if (strcasecmp(buf, "content-length") == 0) {
+-					unsigned long value;
++					off_t value;
++#ifdef CONFIG_LFS
++					if (safe_strtoull(s, &value)) {
++#else
+ 					if (safe_strtoul(s, &value)) {
++#endif
+ 						close_delete_and_die("content-length %s is garbage", s);
+ 					}
+ 					filesize = value;
+@@ -460,8 +464,12 @@
+ 		 * Querying file size
+ 		 */
+ 		if (ftpcmd("SIZE /", target.path, sfp, buf) == 213) {
+-			unsigned long value;
++			off_t value;
++#ifdef CONFIG_LFS
++			if (safe_strtoull(buf+4, &value)) {
++#else
+ 			if (safe_strtoul(buf+4, &value)) {
++#endif
+ 				close_delete_and_die("SIZE value is garbage");
+ 			}
+ 			filesize = value;
+@@ -502,7 +510,12 @@
+ 	 */
+ 	if (chunked) {
+ 		fgets(buf, sizeof(buf), dfp);
++#ifdef CONFIG_LFS
++		filesize = strtoll(buf, (char **) NULL, 16);
++#else
+ 		filesize = strtol(buf, (char **) NULL, 16);
++#endif
++
+ 	}
+ #ifdef CONFIG_FEATURE_WGET_STATUSBAR
+ 	if (quiet_flag==FALSE)
+@@ -524,7 +537,11 @@
+ 		if (chunked) {
+ 			safe_fgets(buf, sizeof(buf), dfp); /* This is a newline */
+ 			safe_fgets(buf, sizeof(buf), dfp);
++#ifdef CONFIG_LFS
++			filesize = strtoll(buf, (char **) NULL, 16);
++#else
+ 			filesize = strtol(buf, (char **) NULL, 16);
++#endif
+ 			if (filesize==0) {
+ 				chunked = 0; /* all done! */
+ 			}
