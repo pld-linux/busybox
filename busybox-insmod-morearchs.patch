@@ -1,11 +1,9 @@
---- busybox-1.00-pre5/modutils/insmod.c.orig	2003-12-26 12:46:30.000000000 +0000
-+++ busybox-1.00-pre5/modutils/insmod.c	2003-12-26 12:57:03.000000000 +0000
-@@ -256,7 +256,29 @@
- #define SHT_RELM        SHT_RELA
- #define Elf64_RelM      Elf64_Rela
+--- busybox-1.00-pre10/modutils/insmod.c.orig	Tue Apr  6 13:56:26 2004
++++ busybox-1.00-pre10/modutils/insmod.c	Fri May 14 16:39:38 2004
+@@ -248,6 +248,36 @@
+ #define ELFCLASSM	ELFCLASS32
  #endif
--	
-+
+ 
 +#if defined(__alpha__)
 +#define ELFCLASSM		ELFCLASS64
 +#define ELFDATAM		ELFDATA2LSB
@@ -26,6 +24,14 @@
 +#define MATCH_MACHINE(x)  (x == EM_SPARC)
 +#define SHT_RELM		SHT_RELA
 +#define Elf32_RelM		Elf32_Rela
++#endif
++
++#if defined(__x86_64__)
++#define ELFCLASSM       ELFCLASS64
++#define ELFDATAM        ELFDATA2LSB
++#define MATCH_MACHINE(x)  (x == EM_X86_64)
++#define SHT_RELM        SHT_RELA
++#define Elf64_RelM      Elf64_Rela
 +#endif
 +
  #ifndef SHT_RELM
