@@ -30,7 +30,7 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.00
-Release:	0.%{pre}.4
+Release:	0.%{pre}.5
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}-pre2.tar.bz2
@@ -175,7 +175,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_initrd_bindir},%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
 %{?with_static:install busybox.static $RPM_BUILD_ROOT%{_bindir}}
-%{?with_initrd:install busybox.initrd $RPM_BUILD_ROOT%{_initrd_bindir}}
+%{?with_initrd:install busybox.initrd $RPM_BUILD_ROOT%{_initrd_bindir}/initrd-busybox}
 
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -216,5 +216,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with initrd}
 %files initrd
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_initrd_bindir}/busybox.initrd
+%attr(755,root,root) %{_initrd_bindir}/initrd-busybox
 %endif
