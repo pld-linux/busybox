@@ -1,5 +1,6 @@
---- busybox-1.00-pre10/coreutils/printf.c.orig	Mon Mar 15 09:28:21 2004
-+++ busybox-1.00-pre10/coreutils/printf.c	Fri May 14 16:22:51 2004
+diff -ur busybox-1.00.orig/coreutils/printf.c busybox-1.00/coreutils/printf.c
+--- busybox-1.00.orig/coreutils/printf.c	2004-09-15 02:05:23.000000000 +0000
++++ busybox-1.00/coreutils/printf.c	2004-11-11 18:16:33.724386928 +0000
 @@ -47,8 +47,13 @@
  
  //   19990508 Busy Boxed! Dave Cinege
@@ -14,9 +15,9 @@
  #include <sys/types.h>
  #include <string.h>
  #include <errno.h>
-@@ -114,19 +119,139 @@
- /* The value to return to the calling program.  */
- static int exit_status;
+@@ -66,18 +71,137 @@
+ static void print_direc __P( (char *start, size_t length,
+ 			int field_width, int precision, char *argument));
  
 +/*
 + * Very pure gettext added by Michal Moskal <malekith@pld-linux.org>
@@ -135,14 +136,9 @@
 +	int opt;
 +	const char *nls_file = NULL;
  
- 	exit_status = 0;
 -	if (argc <= 1 || **(argv + 1) == '-') {
 -		bb_show_usage();
 -	}
- 
--	format = argv[1];
--	argc -= 2;
--	argv += 2;
 +	while ((opt = getopt(argc, argv, "n:")) != -1)
 +		switch (opt) {
 +		case 'n':
@@ -154,7 +150,10 @@
 +		}
 +
 +	format = getmsg(nls_file, argv[optind++]);
-+
+ 
+-	format = argv[1];
+-	argc -= 2;
+-	argv += 2;
 +	argc -= optind;
 +	argv += optind;
  
