@@ -1,40 +1,35 @@
-
+#
+# Conditional build:
 # alternative busybox config file (replaces default one) you should
 # define cfgfile macro, i.e.
 #
 #       rpm --rebuild busybox.*.src.rpm --with altconfig --define "cfgfile bb-emb-config.h"
-%bcond_with altconfig
-
-%bcond_with linkfl # creates links to busybox binary and puts them into file list
-
+%bcond_with	altconfig	# use alternative config (defined by cfgfile)
+%bcond_with	linkfl		# creates links to busybox binary and puts them into file list
 # Options below are useful, when you want fileutils and grep providing.
 # For example, ash package requires fileutils and grep.
-%bcond_with fileutl_prov # adds fileutils providing
-%bcond_with grep_prov    # adds grep providing
-
+%bcond_with	fileutl_prov	# adds fileutils providing
+%bcond_with	grep_prov	# adds grep providing
 # Option below is useful, when busybox is built with shell support.
-%bcond_with sh_prov      # adds /bin/sh providing
-
+%bcond_with	sh_prov		# adds /bin/sh providing
 # WARNING! Shell, filetuils and grep providing may depend on config file!
 # Fileutils, grep and shell provided with busybox have not such
 # functionality as their GNU countenders.
-
-%bcond_without static  # don't build static version
-%bcond_without initrd  # don't build initrd version
-
-%bcond_with dietlibc
-%bcond_with glibc
-
+#
+%bcond_without	static		# don't build static version
+%bcond_without	initrd		# don't build initrd version
+%bcond_with	dietlibc	# build dietlibc-based initrd version
+%bcond_with	glibc		# build glibc-based initrd version
+#
 %ifnarch %{ix86}
 %define with_glibc 1
 %endif
-
-%define	pre	pre5
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.00
+%define	pre	pre5
 Release:	0.%{pre}.1
 License:	GPL
 Group:		Applications
@@ -54,10 +49,8 @@ Patch8:		%{name}-force-dietlibc.patch
 Patch9:		%{name}-ash_exec.patch
 Patch10:	%{name}-amd64.patch
 Patch11:	%{name}-kernel_headers.patch
+Patch12:	%{name}-insmod-morearchs.patch
 URL:		http://www.busybox.net/
-%{?with_fileutl_prov:Provides:	fileutils}
-%{?with_grep_prov:Provides:	grep}
-%{?with_sh_prov:Provides:	/bin/sh}
 %{?with_static:BuildRequires:	glibc-static}
 %if %{with initrd}
   %if %{with dietlibc}
@@ -70,6 +63,9 @@ BuildRequires:	uClibc-static >= 0.9.21
     %endif
   %endif
 %endif
+%{?with_fileutl_prov:Provides:	fileutils}
+%{?with_grep_prov:Provides:	grep}
+%{?with_sh_prov:Provides:	/bin/sh}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_initrd_bindir	/bin
@@ -145,6 +141,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
 
 %build
 install %{SOURCE1} .config
@@ -204,7 +201,7 @@ echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
 
 # install links to busybox binary, when linkfl is defined
 %if %{with linkfl}
-make install \
+%{__make} install \
 	PREFIX=$RPM_BUILD_ROOT
 %else
 install busybox $RPM_BUILD_ROOT%{_bindir}
