@@ -1,6 +1,7 @@
 # _without_static - don't build static version
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
+Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	0.60.1
 Release:	17
@@ -45,6 +46,14 @@ lub wbudowanych systemów. Narzêdzia maj± mniej opcji ni¿ ich pe³ne
 odpowiedniki GNU, ale maj± podstawow± funkcjonalno¶æ. Do dzia³aj±cego
 systemu potrzeba jeszcze tylko kernela, shella (np. ash) oraz edytora
 (np. elvis-tiny albo ae).
+
+%description -l pt_BR
+BusyBox combina versões reduzidas de muitos utilitários UNIX num único
+executável, fornecendo substitutos minimalistas para muitos dos
+executáveis encontrados em pacotes como fileutils, shellutils,
+findutils, textutils, grep, gzip, tar, etc. Os utilitários do BusyBox
+em geral têm menos opções que os utilitários GNU, mas as opções
+implementadas comportam-se de maneira similar aos equivalentes GNU.
 
 %package static
 Summary:	Static busybox
