@@ -1,0 +1,74 @@
+--- busybox-1.00-pre4/miscutils/hdparm.c.orig	2003-11-28 22:55:03.000000000 +0000
++++ busybox-1.00-pre4/miscutils/hdparm.c	2003-12-11 14:04:48.000000000 +0000
+@@ -518,7 +518,34 @@
+ 		va_end(ap);
+ }
+ 
+-static void print_ascii(uint16_t *p, uint8_t length);
++static void print_ascii(uint16_t *p, uint8_t length) {
++        uint8_t ii;
++        char cl;
++        
++        /* find first non-space & print it */
++        for(ii = 0; ii< length; ii++)
++        {
++                if(((char) 0x00ff&((*p)>>8)) != ' ')
++                        break;
++                if((cl = (char) 0x00ff&(*p)) != ' ')
++                {
++                        if_printf((cl != '\0'),"%c",cl);
++                        p++;
++                        ii++;
++                        break;
++                }
++                p++;
++        }
++        /* print the rest */
++        for(; ii< length; ii++)
++        {
++                if(!(*p))
++                        break; /* some older devices have NULLs */
++                printf("%c%c",(char)0x00ff&((*p)>>8),(char)(*p)&0x00ff);
++                p++;
++        }
++        printf("\n");
++}
+ 
+ static void xprint_ascii(uint16_t *val ,int i, char * string, int n)
+ {
+@@ -600,35 +627,6 @@
+ 	return err_dma;
+ }
+ 
+-static void print_ascii(uint16_t *p, uint8_t length) {
+-	uint8_t ii;
+-	char cl;
+-	
+-	/* find first non-space & print it */
+-	for(ii = 0; ii< length; ii++)
+-	{
+-		if(((char) 0x00ff&((*p)>>8)) != ' ')
+-			break;
+-		if((cl = (char) 0x00ff&(*p)) != ' ')
+-		{
+-			if_printf((cl != '\0'),"%c",cl);
+-			p++;
+-			ii++;
+-			break;
+-		}
+-		p++;
+-	}
+-	/* print the rest */
+-	for(; ii< length; ii++)
+-	{
+-		if(!(*p))
+-			break; /* some older devices have NULLs */
+-		printf("%c%c",(char)0x00ff&((*p)>>8),(char)(*p)&0x00ff);
+-		p++;
+-	}
+-	printf("\n");
+-}
+-
+ /* identify() is the only extern function used across two source files.  The
+    others, though, were declared in hdparm.c with global scope; since other
+    functions in that file have static (file) scope, I assume the difference is
