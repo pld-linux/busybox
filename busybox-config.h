@@ -54,7 +54,7 @@
 #define BB_HOSTNAME
 //#define BB_HUSH
 //#define BB_ID
-//#define BB_IFCONFIG
+#define BB_IFCONFIG
 #define BB_INIT
 #define BB_INSMOD
 #define BB_KILL
@@ -78,7 +78,7 @@
 #define BB_MKNOD
 #define BB_MKSWAP
 #define BB_MKTEMP
-//#define BB_MODPROBE
+#define BB_MODPROBE
 #define BB_MORE
 #define BB_MOUNT
 //#define BB_MSH
