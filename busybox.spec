@@ -32,7 +32,6 @@ License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
 # Source0-md5:	79d244d5adbb048f1aa0d90ee9e187e4
-%{!?with_altconfig:Source1:	%{name}-config.h}
 %{?with_altconfig:Source1:	%{cfgfile}}
 Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-tee.patch
@@ -41,6 +40,7 @@ Patch4:		%{name}-loadfont.patch
 Patch5:		%{name}-pivot_root.patch
 Patch6:		%{name}-malloc.patch
 Patch7:		%{name}-initrd-config.patch
+Patch8:		%{name}-config.patch
 URL:		http://www.busybox.net/
 %{?with_fileutl_prov:Provides:	fileutils}
 %{?with_grep_prov:Provides:	grep}
@@ -116,9 +116,12 @@ cp -f Config.h Config-initrd.h
 %patch5 -p1
 #%patch6 -p1
 %patch7 -p0
+%patch8 -p0
 
 %build
+%if %{with altconfig}
 cp -f %{SOURCE1} Config.h
+%endif
 
 %if %{with initrd}
 cp -f Config.h Config.h-no-initrd
