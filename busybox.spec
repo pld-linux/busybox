@@ -65,7 +65,7 @@ BuildRequires:	dietlibc-static
     %if %{with glibc}
 BuildRequires:	glibc-static
     %else
-BuildRequires:	uClibc-static
+BuildRequires:	uClibc-static >= 0.9.21
     %endif
   %endif
 %endif
