@@ -8,9 +8,8 @@ Group(de):	Applikationen/Datei
 Group(pl):	Aplikacje/Pliki
 Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
 Source1:	%{name}-config.h
-Patch0:		%{name}-0.50.patch
-Patch1:		%{name}-logconsole.patch
-Patch2:		%{name}-tee.patch
+Patch0:		%{name}-logconsole.patch
+Patch1:		%{name}-tee.patch
 URL:		http://busybox.lineo.com/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -33,9 +32,8 @@ ae).
 
 %prep
 %setup -q
-#%patch0 -p1
+%patch0
 %patch1
-%patch2
 
 %build
 cp %{SOURCE1} Config.h
