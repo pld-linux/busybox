@@ -1,14 +1,44 @@
-# _without_static - don't build static version
+
+#
+# _with_altconfig <name>  - alternative busybox config file (replaces default one)
+#                           you should define cfgfile macro, i.e.
+#
+#       rpm --rebuild busybox.*.src.rpm --with altconfig --define "cfgfile bb-emb-config.h"
+#
+#
+# _with_linkfl            - creates links to busybox binary and puts them into file list;
+#
+# Options below are useful, when you want fileutils and grep providing.
+# For example, ash package requires fileutils and grep.
+#
+# _with_fileutl_prov      - adds fileutils providing
+# _with_grep_prov         - adds grep providing
+#
+#
+# Option below is useful, when busybox is built with shell support.
+#
+# _with_sh_prov           - adds /bin/sh providing
+#
+#
+# WARNING! Shell, filetuils and grep providing may depend on config file!
+# Fileutils, grep and shell provided with busybox have not such
+# functionality as their GNU countenders.
+#
+#
+# _without_static         - don't build static version
+#
+
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	0.60.2
-Release:	5
+Release:	6
 License:	GPL
 Group:		Applications
 Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
-Source1:	%{name}-config.h
+%{!?_with_altconfig:Source1:	%{name}-config.h}
+%{?_with_altconfig:Source1:	%{cfgfile}}
 Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-tee.patch
 Patch3:		%{name}-printf-gettext.patch
@@ -17,6 +47,9 @@ Patch5:		%{name}-cread.patch
 Patch6:		%{name}-malloc.patch
 Patch7:		%{name}-pivot_root.patch
 URL:		http://busybox.lineo.com/
+%{?_with_fileutl_prov:Provides:	fileutils}
+%{?_with_grep_prov:Provides:	grep}
+%{?_with_sh_prov:Provides:	/bin/sh}
 %{!?_without_static:BuildRequires:	glibc-static}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -103,6 +136,9 @@ install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
 echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
 
+# install links to busybox binary, when linkfl is defined
+%{?_with_linkfl:make install PREFIX=$RPM_BUILD_ROOT}
+
 gzip -9nf AUTHORS TODO Changelog README
 
 %clean
@@ -111,7 +147,16 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc *.gz
-%attr(755,root,root) %{_bindir}/busybox
+
+%{?!_with_linkfl: %attr(755,root,root) %{_bindir}/busybox}
+
+%if %{?_with_linkfl:1}%{?!_with_linkfl:0}
+%attr(755,root,root) /bin/*
+%attr(755,root,root) /sbin/*
+%attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) %{_sbindir}/*
+%endif
+
 %{_libdir}/busybox
 %{_mandir}/man1/*
 
