@@ -70,7 +70,7 @@
 #define BB_MKNOD
 #define BB_MKSWAP
 #define BB_MKTEMP
-//#define BB_NC
+#define BB_NC
 #define BB_MORE
 #define BB_MOUNT
 //#define BB_MT
