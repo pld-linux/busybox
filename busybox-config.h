@@ -78,7 +78,7 @@
 //#define BB_PING
 //#define BB_PIVOT_ROOT
 #define BB_POWEROFF
-//#define BB_PRINTF
+#define BB_PRINTF
 #define BB_PS
 #define BB_PWD
 //#define BB_RDATE
