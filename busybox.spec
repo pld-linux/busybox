@@ -1,6 +1,6 @@
 Summary:	Set of common unix utils for embeded systems
 Name:		busybox
-Version:	0.50
+Version:	0.51
 Release:	1
 License:	GPL
 Group:		Applications/File
@@ -33,7 +33,7 @@ ae).
 
 %prep
 %setup -q
-%patch0 -p1
+#%patch0 -p1
 %patch1
 %patch2
 
