@@ -125,7 +125,19 @@ diff -Nur busybox-1.00-orig/networking/ftpgetput.c busybox-1.00/networking/ftpge
  			bb_error_msg_and_die("SIZE error: %s", buf + 4);
  		filesize = value;
  	}
-@@ -240,7 +244,11 @@
+@@ -176,7 +180,11 @@
+ 	}
+ 
+ 	if (do_continue) {
++#ifdef CONFIG_LFS
++		sprintf(buf, "REST %lld", (long long)beg_range);
++#else
+ 		sprintf(buf, "REST %ld", (long)beg_range);
++#endif
+ 		if (ftpcmd(buf, NULL, control_stream, buf) != 350) {
+ 			do_continue = 0;
+ 		} else {
+@@ -240,7 +248,11 @@
  		fd_local = bb_xopen(local_path, O_RDONLY);
  		fstat(fd_local, &sbuf);
  
