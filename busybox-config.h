@@ -17,7 +17,7 @@
 //#define BB_CMP
 #define BB_CP_MV
 #define BB_CUT
-//#define BB_DATE
+#define BB_DATE
 //#define BB_DC
 #define BB_DD
 //#define BB_DEALLOCVT
