@@ -22,17 +22,20 @@
 %bcond_without static  # don't build static version
 %bcond_without initrd  # don't build initrd version
 
+%define	pre	pre2
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
-Version:	0.60.5
-Release:	2
+Version:	1.00
+Release:	0.%{pre}.1
 License:	GPL
 Group:		Applications
-Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	79d244d5adbb048f1aa0d90ee9e187e4
-%{?with_altconfig:Source1:	%{cfgfile}}
+Source0:	http://www.busybox.net/downloads/%{name}-%{version}-pre2.tar.bz2
+# Source0-md5:	06e433389a8b34ce1031a144ba5677d1
+Source1:	%{name}.config
+Source2:	%{name}-initrd.config
+%{?with_altconfig:Source3:	%{cfgfile}}
 Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-tee.patch
 Patch3:		%{name}-printf-gettext.patch
@@ -109,27 +112,26 @@ Static busybox for initrd.
 Statycznie linkowany busybox dla initrd.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}-%{pre}
 %patch0 -p1
 %patch1 -p1
-%patch3 -p1
+#X %patch3 -p1 // UPDATE ME
 %patch4 -p1
 %patch5 -p1
-#%patch6 -p1
+#%patch6 -p1 // not needed
 %patch7 -p1
 %patch8 -p1
-cp -f Config.h Config-initrd.h
-%patch100 -p0
-%patch101 -p0
 
 %build
+install %{SOURCE1} .config
+
 %if %{with altconfig}
-cp -f %{SOURCE1} Config.h
+install %{SOURCE3} .config
 %endif
 
 %if %{with initrd}
-cp -f Config.h Config.h-no-initrd
-cp -f Config-initrd.h Config.h
+install %{SOURCE2} .config
+%{__make} oldconfig
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags} -D_BSD_SOURCE" \
 	LDFLAGS="%{rpmldflags} -static" \
@@ -137,11 +139,12 @@ cp -f Config-initrd.h Config.h
 	CC="diet gcc"
 mv -f busybox busybox.initrd
 %{__make} clean
-cp -f Config.h-no-initrd Config.h
+install %{SOURCE1} .config
 %endif
 
 %if %{with static}
-%{__make} \
+%{__make} oldconfig
+%{__make}  \
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags} -static" \
 	CC="%{__cc}"
@@ -149,6 +152,7 @@ mv -f busybox busybox.static
 %{__make} clean
 %endif
 
+%{__make} oldconfig 
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}" \
@@ -177,7 +181,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS TODO Changelog README Config.h
+%doc AUTHORS TODO Changelog README .config
 
 %if %{with linkfl}
 %attr(755,root,root) /bin/*
