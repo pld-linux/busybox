@@ -42,13 +42,13 @@ diff -urN busybox-1.00-pre2.org/util-linux/Makefile.in busybox-1.00-pre2/util-li
 --- busybox-1.00-pre2.org/util-linux/Makefile.in	2003-08-02 23:46:49.000000000 +0200
 +++ busybox-1.00-pre2/util-linux/Makefile.in	2003-08-03 00:32:31.000000000 +0200
 @@ -38,6 +38,7 @@
- UTILLINUX-$(CONFIG_MKSWAP)		+= mkswap.o
- UTILLINUX-$(CONFIG_MORE)		+= more.o
- UTILLINUX-$(CONFIG_MOUNT)		+= mount.o
-+UTILLINUX-$(CONFIG_RAID_START)		+= raid_start.o
- UTILLINUX-$(CONFIG_NFSMOUNT)		+= nfsmount.o
- UTILLINUX-$(CONFIG_PIVOT_ROOT)	+= pivot_root.o
- UTILLINUX-$(CONFIG_RDATE)		+= rdate.o
+ UTILLINUX-$(CONFIG_MKSWAP)		+=mkswap.o
+ UTILLINUX-$(CONFIG_MORE)		+=more.o
+ UTILLINUX-$(CONFIG_MOUNT)		+=mount.o
++UTILLINUX-$(CONFIG_RAID_START)		+=raid_start.o
+ UTILLINUX-$(CONFIG_NFSMOUNT)		+=nfsmount.o
+ UTILLINUX-$(CONFIG_PIVOT_ROOT)		+=pivot_root.o
+ UTILLINUX-$(CONFIG_RDATE)		+=rdate.o
 diff -urN busybox-1.00-pre2.org/util-linux/raid_start.c busybox-1.00-pre2/util-linux/raid_start.c
 --- busybox-1.00-pre2.org/util-linux/raid_start.c	1970-01-01 01:00:00.000000000 +0100
 +++ busybox-1.00-pre2/util-linux/raid_start.c	2003-08-03 00:34:47.000000000 +0200
