@@ -141,14 +141,12 @@ echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
 # install links to busybox binary, when linkfl is defined
 %{?_with_linkfl:make install PREFIX=$RPM_BUILD_ROOT}
 
-gzip -9nf AUTHORS TODO Changelog README
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc *.gz Config.h
+%doc AUTHORS TODO Changelog README Config.h
 
 %{?!_with_linkfl: %attr(755,root,root) %{_bindir}/busybox}
 
