@@ -113,7 +113,6 @@ mv -f busybox busybox.static
 %{__make} clean
 %endif
 
-# TODO make main package dynamically linked
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}"
