@@ -53,6 +53,7 @@ Patch6:		%{name}-raid_start.patch
 Patch7:		%{name}-insmod_ng.patch
 Patch8:		%{name}-force-dietlibc.patch
 Patch9:		%{name}-ash_exec.patch
+Patch10:	%{name}-amd64.patch
 URL:		http://www.busybox.net/
 %{?with_fileutl_prov:Provides:	fileutils}
 %{?with_grep_prov:Provides:	grep}
@@ -142,6 +143,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
+%patch10 -p1
 
 %build
 install %{SOURCE1} .config
