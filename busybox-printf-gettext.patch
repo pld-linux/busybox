@@ -1,7 +1,6 @@
-diff -ur busybox-0.60.1/printf.c busybox-0.60.1.new/printf.c
---- busybox-0.60.1/printf.c	Mon Mar 19 20:25:49 2001
-+++ busybox-0.60.1.new/printf.c	Thu May 31 16:41:31 2001
-@@ -47,6 +47,9 @@
+--- busybox-1.00-pre10/coreutils/printf.c.orig	Mon Mar 15 09:28:21 2004
++++ busybox-1.00-pre10/coreutils/printf.c	Fri May 14 16:22:51 2004
+@@ -47,8 +47,13 @@
  
  //   19990508 Busy Boxed! Dave Cinege
  
@@ -10,24 +9,15 @@ diff -ur busybox-0.60.1/printf.c busybox-0.60.1.new/printf.c
 +
  #include <unistd.h>
  #include <stdio.h>
- #include <sys/types.h>
-@@ -55,6 +58,11 @@
- #include <stdlib.h>
- #include <fcntl.h>
- #include <ctype.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <stdio.h>
-+#include <sys/stat.h>
 +#include <sys/mman.h>
- #include "busybox.h"
- 
- 
-@@ -117,19 +125,140 @@
++#include <sys/stat.h>
+ #include <sys/types.h>
+ #include <string.h>
+ #include <errno.h>
+@@ -114,19 +119,139 @@
  /* The value to return to the calling program.  */
  static int exit_status;
  
-+
 +/*
 + * Very pure gettext added by Michal Moskal <malekith@pld-linux.org>
 + * This possibly could be converted into utility function
@@ -147,7 +137,7 @@ diff -ur busybox-0.60.1/printf.c busybox-0.60.1.new/printf.c
  
  	exit_status = 0;
 -	if (argc <= 1 || **(argv + 1) == '-') {
--		show_usage();
+-		bb_show_usage();
 -	}
  
 -	format = argv[1];
@@ -159,7 +149,7 @@ diff -ur busybox-0.60.1/printf.c busybox-0.60.1.new/printf.c
 +			nls_file = optarg;
 +			break;
 +		default:
-+			show_usage();
++			bb_show_usage();
 +			break;
 +		}
 +
