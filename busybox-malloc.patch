@@ -1,0 +1,32 @@
+diff -ur busybox-0.51/libbb/xfuncs.c busybox-0.51-/libbb/xfuncs.c
+--- busybox-0.51/libbb/xfuncs.c	Fri Mar 16 23:47:14 2001
++++ busybox-0.51-/libbb/xfuncs.c	Sat Aug 18 11:40:15 2001
+@@ -40,7 +40,12 @@
+ #ifndef DMALLOC
+ extern void *xmalloc(size_t size)
+ {
+-	void *ptr = malloc(size);
++	void *ptr;
++
++	if (size == 0)
++		size++;
++		
++	ptr = malloc(size);
+ 
+ 	if (!ptr)
+ 		error_msg_and_die(memory_exhausted);
+@@ -49,7 +54,13 @@
+ 
+ extern void *xrealloc(void *old, size_t size)
+ {
+-	void *ptr = realloc(old, size);
++	void *ptr;
++	
++	if (size == 0)
++		size++;
++		
++	ptr = realloc(old, size);
++	
+ 	if (!ptr)
+ 		error_msg_and_die(memory_exhausted);
+ 	return ptr;
