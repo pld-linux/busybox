@@ -10,6 +10,7 @@ Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
 Source1:	%{name}-config.h
 Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-tee.patch
+Patch2:		%{name}-sh-name.patch
 URL:		http://busybox.lineo.com/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	uClibc-devel-BOOT
@@ -41,6 +42,8 @@ Group:		Applications
 %setup -q
 %patch0
 %patch1
+%patch2 -p1
+
 
 %build
 # BOOT
@@ -60,6 +63,8 @@ rm -rf $RPM_BUILD_ROOT
 %{__install} busybox $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/busybox
 for i in `cat busybox.links`; do ln -sfn busybox "$RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/`basename $i`"; done
 %{__install} busybox.links $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}/busybox
+# change sh to lash (see sh_name patch)
+mv -f $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/{sh,lash}
 
 %{__install} -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir}/busybox,%{_mandir}/man1}
 %{__install} busybox $RPM_BUILD_ROOT%{_bindir}
