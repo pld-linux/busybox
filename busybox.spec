@@ -29,17 +29,17 @@
 %define with_glibc 1
 %endif
 
-%define	pre	pre2
+%define	pre	pre3
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.00
-Release:	0.%{pre}.8
+Release:	0.%{pre}.1
 License:	GPL
 Group:		Applications
-Source0:	http://www.busybox.net/downloads/%{name}-%{version}-pre2.tar.bz2
-# Source0-md5:	06e433389a8b34ce1031a144ba5677d1
+Source0:	http://www.busybox.net/downloads/%{name}-%{version}-pre3.tar.bz2
+# Source0-md5:	947a4e3ae501a9f76f2d0371974a5b51
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
