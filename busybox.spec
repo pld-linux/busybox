@@ -114,6 +114,11 @@ Statycznie linkowany busybox.
 
 %build
 cp -f %{SOURCE1} Config.h
+%ifarch sparc sparc64
+cat >> Config.h <<EOF
+#undef BB_INSMOD
+EOF
+%endif
 
 %if %{?_without_static:0}%{!?_without_static:1}
 %{__make} \
