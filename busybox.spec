@@ -80,7 +80,8 @@ mv -f busybox busybox.static
 
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
-	LDFLAGS="%{rpmldflags}"
+	LDFLAGS="%{rpmldflags}" \
+	CC="%{__cc}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
