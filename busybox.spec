@@ -51,6 +51,7 @@ Patch10:	%{name}-amd64.patch
 Patch11:	%{name}-kernel_headers.patch
 Patch12:	%{name}-insmod-morearchs.patch
 URL:		http://www.busybox.net/
+BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
 %if %{with initrd}
   %if %{with dietlibc}
