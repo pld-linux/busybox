@@ -2,7 +2,7 @@ Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Name:		busybox
 Version:	0.51
-Release:	11
+Release:	12
 License:	GPL
 Group:		Applications
 Group(de):	Applikationen
@@ -91,7 +91,7 @@ install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 %if %{?BOOT:1}%{!?BOOT:0}
 install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk/{bin,%{_libdir}}
 
-install busybox-BOOT $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/
+install busybox-BOOT $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/busybox
 
 for i in `cat busybox.links`; do
 	ln -sfn busybox "$RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/`basename $i`"
