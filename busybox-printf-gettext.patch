@@ -29,7 +29,7 @@ diff -ur busybox-0.60.1/printf.c busybox-0.60.1.new/printf.c
  
 +
 +/*
-+ * Very pure gettext added by Michal Moskal <malekith@pld.org.pl>
++ * Very pure gettext added by Michal Moskal <malekith@pld-linux.org>
 + * This possibly could be converted into utility function
 + * and used in other places as well.
 + */
