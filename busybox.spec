@@ -29,6 +29,9 @@
 %ifnarch %{ix86}
 %define with_glibc 1
 %endif
+%ifarch alpha
+%undefine with_static
+%endif
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
