@@ -1,5 +1,5 @@
---- Config.h.orig	2003-07-01 00:59:49.000000000 +0200
-+++ Config.h	2003-07-01 01:02:00.000000000 +0200
+--- Config.h	2003-07-01 03:06:16.000000000 +0200
++++ Config.h	2003-07-01 03:07:21.000000000 +0200
 @@ -9,14 +9,14 @@
  // BusyBox Applications
  //#define BB_ADJTIMEX
@@ -17,7 +17,7 @@
  #define BB_CLEAR
  //#define BB_CMP
  #define BB_CP
-@@ -36,62 +36,61 @@
+@@ -36,63 +36,62 @@
  #define BB_DU
  //#define BB_DUMPKMAP
  #define BB_ECHO
@@ -50,6 +50,7 @@
  #define BB_INIT
 -//#define BB_INSMOD
 +#define BB_INSMOD
+ #define BB_INSMOD_NG
  #define BB_KILL
  #define BB_KILLALL
  #define BB_KLOGD
@@ -99,8 +100,8 @@
 +#define BB_PRINTF
  #define BB_PS
  #define BB_PWD
- //#define BB_RDATE
-@@ -101,7 +100,7 @@
+ #define BB_RAID_START
+@@ -103,7 +102,7 @@
  #define BB_RESET
  #define BB_RM
  #define BB_RMDIR
@@ -109,7 +110,7 @@
  //#define BB_ROUTE
  //#define BB_RPM2CPIO
  #define BB_SED
-@@ -114,34 +113,32 @@
+@@ -116,34 +115,32 @@
  #define BB_SYSLOGD
  #define BB_TAIL
  #define BB_TAR
@@ -155,7 +156,7 @@
  // End of Applications List
  //
  //
-@@ -182,16 +179,16 @@
+@@ -184,16 +181,16 @@
  //#define BB_FEATURE_USE_DEVPS_PATCH
  //
  // show verbose usage messages
@@ -175,7 +176,7 @@
  //
  // show file timestamps in ls
  #define BB_FEATURE_LS_TIMESTAMPS
-@@ -206,25 +203,25 @@
+@@ -208,25 +205,25 @@
  #define BB_FEATURE_LS_RECURSIVE
  //
  // enable ls -L
@@ -206,7 +207,7 @@
  //
  // enable syslogd -R remotehost
  #define BB_FEATURE_REMOTE_LOG
-@@ -234,10 +231,10 @@
+@@ -236,10 +233,10 @@
  //
  //Disable for a simple tail implementation (2.34k vs 3k for the full one).
  //Both provide 'tail -f', but this cuts out -c, -q, -s, and -v. 
@@ -219,7 +220,7 @@
  //
  // Enable support for a real /etc/mtab file instead of /proc/mounts
  //#define BB_FEATURE_MTAB_SUPPORT
-@@ -248,7 +245,7 @@
+@@ -250,7 +247,7 @@
  //
  // If you are using uClibc, be sure that you've already compiled
  // uClibc with INCLUDE_RPC=true (contained in the Config file)
@@ -228,7 +229,7 @@
  //
  // Enable support forced filesystem unmounting 
  // (i.e., in case of an unreachable NFS system).
-@@ -261,13 +258,13 @@
+@@ -263,13 +260,13 @@
  #define BB_FEATURE_TAR_EXCLUDE
  //
  // Enable support for tar -z option (currently only works for inflating)
@@ -244,7 +245,7 @@
  //
  // Enable command line editing in the shell.  
  // Only relevant if a shell is enabled. On by default.
-@@ -284,7 +281,7 @@
+@@ -286,7 +283,7 @@
  //were shell builtins.  Nice for staticly linking an emergency rescue shell,
  //among other things. Off by default.
  // Only relevant if a shell is enabled.
@@ -253,7 +254,7 @@
  //
  //When this is enabled, busybox shell applets can be called using full path
  //names.  This causes applets (i.e., most busybox commands) to override
-@@ -365,7 +362,7 @@
+@@ -367,7 +364,7 @@
  //#define BB_FEATURE_CLEAN_UP
  //
  // Support for human readable output by ls, du, etc.(example 13k, 23M, 235G)
