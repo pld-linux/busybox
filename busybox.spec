@@ -1,7 +1,7 @@
 Summary:	Set of common unix utils for embeded systems
 Name:		busybox
 Version:	0.51
-Release:	1
+Release:	2
 License:	GPL
 Group:		Applications/File
 Group(de):	Applikationen/Datei
