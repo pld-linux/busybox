@@ -30,7 +30,7 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.00
-Release:	0.%{pre}.6
+Release:	0.%{pre}.7
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}-pre2.tar.bz2
@@ -48,6 +48,7 @@ Patch7:		%{name}-raid_start.patch
 Patch8:		%{name}-insmod_ng.patch
 Patch9:		%{name}-force-dietlibc.patch
 Patch10:	%{name}-insmod-gpl.patch
+Patch11:	%{name}-ash_exec.patch
 URL:		http://www.busybox.net/
 %{?with_fileutl_prov:Provides:	fileutils}
 %{?with_grep_prov:Provides:	grep}
@@ -127,6 +128,7 @@ Statycznie linkowany busybox dla initrd.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 %build
 install %{SOURCE1} .config
