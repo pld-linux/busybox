@@ -50,6 +50,7 @@ Patch9:		%{name}-ash_exec.patch
 Patch10:	%{name}-amd64.patch
 Patch11:	%{name}-kernel_headers.patch
 Patch12:	%{name}-insmod-morearchs.patch
+Patch13:	%{name}-readahead.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
@@ -141,7 +142,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch9 -p1
 #%patch10 -p1
 %patch11 -p1
-#%patch12 -p1
+%patch13 -p1
 
 %build
 install %{SOURCE1} .config
