@@ -54,6 +54,8 @@ Patch8:		%{name}-insmod-morearchs.patch
 Patch9:		%{name}-dhcp.patch
 Patch10:	%{name}-switchroot.patch
 Patch11:	%{name}-fix_64_archs.patch
+Patch12:	%{name}-LFS.patch
+Patch13:	%{name}-ftpput.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
@@ -149,6 +151,8 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
+%patch13 -p1
 
 %build
 install %{SOURCE1} .config
