@@ -71,6 +71,9 @@ exclude commands (or features) at compile time. This makes it easy to
 customize your embedded systems. To create a working system, just add
 a kernel, a shell (such as ash), and an editor (such as elvis-tiny or
 ae).
+%ifarch sparc sparc64 alpha
+Warning - busybox on this architecture doesn't support insmod.
+%endif
 
 %description -l pl
 BusyBox sk³ada ma³e wersje wielu narzêdzi uniksowych w jeden ma³y plik
@@ -81,6 +84,9 @@ lub wbudowanych systemów. Narzêdzia maj± mniej opcji ni¿ ich pe³ne
 odpowiedniki GNU, ale maj± podstawow± funkcjonalno¶æ. Do dzia³aj±cego
 systemu potrzeba jeszcze tylko kernela, shella (np. ash) oraz edytora
 (np. elvis-tiny albo ae).
+%ifarch sparc sparc64 alpha
+Uwaga: busybox na tej architekturze nie obs³uguje polecenia insmod.
+%endif
 
 %description -l pt_BR
 BusyBox combina versões reduzidas de muitos utilitários UNIX num único
@@ -89,6 +95,9 @@ executáveis encontrados em pacotes como fileutils, shellutils,
 findutils, textutils, grep, gzip, tar, etc. Os utilitários do BusyBox
 em geral têm menos opções que os utilitários GNU, mas as opções
 implementadas comportam-se de maneira similar aos equivalentes GNU.
+%ifarch sparc sparc64 alpha
+Warning - busybox on this architecture doesn't support insmod.
+%endif
 
 %package static
 Summary:	Static busybox
@@ -97,9 +106,15 @@ Group:		Applications
 
 %description static
 Static busybox.
+%ifarch sparc sparc64 alpha
+Warning - busybox on this architecture doesn't support insmod.
+%endif
 
 %description static -l pl
 Statycznie linkowany busybox.
+%ifarch sparc sparc64 alpha
+Uwaga: busybox na tej architekturze nie obs³uguje polecenia insmod.
+%endif
 
 %prep
 %setup -q
