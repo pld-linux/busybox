@@ -1,32 +1,25 @@
 
-#
-# _with_altconfig <name>  - alternative busybox config file (replaces default one)
-#                           you should define cfgfile macro, i.e.
+# alternative busybox config file (replaces default one) you should 
+# define cfgfile macro, i.e.
 #
 #       rpm --rebuild busybox.*.src.rpm --with altconfig --define "cfgfile bb-emb-config.h"
-#
-#
-# _with_linkfl            - creates links to busybox binary and puts them into file list;
-#
+%bcond_with altconfig
+
+%bcond_with linkfl # creates links to busybox binary and puts them into file list
+
 # Options below are useful, when you want fileutils and grep providing.
 # For example, ash package requires fileutils and grep.
-#
-# _with_fileutl_prov      - adds fileutils providing
-# _with_grep_prov         - adds grep providing
-#
-#
+%bcond_with fileutl_prov # adds fileutils providing
+%bcond_with grep_prov    # adds grep providing
+
 # Option below is useful, when busybox is built with shell support.
-#
-# _with_sh_prov           - adds /bin/sh providing
-#
-#
+%bcond_with sh_prov      # adds /bin/sh providing
+
 # WARNING! Shell, filetuils and grep providing may depend on config file!
 # Fileutils, grep and shell provided with busybox have not such
 # functionality as their GNU countenders.
-#
-#
-# _without_static         - don't build static version
-#
+
+%bcond_without static  # don't build static version
 
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
@@ -38,8 +31,8 @@ License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
 # Source0-md5:	79d244d5adbb048f1aa0d90ee9e187e4
-%{!?_with_altconfig:Source1:	%{name}-config.h}
-%{?_with_altconfig:Source1:	%{cfgfile}}
+%{!?with_altconfig:Source1:	%{name}-config.h}
+%{?with_altconfig:Source1:	%{cfgfile}}
 Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-tee.patch
 Patch3:		%{name}-printf-gettext.patch
@@ -49,10 +42,10 @@ Patch6:		%{name}-malloc.patch
 Patch7:		%{name}-pivot_root.patch
 Patch8:		%{name}-child.patch
 URL:		http://www.busybox.net/
-%{?_with_fileutl_prov:Provides:	fileutils}
-%{?_with_grep_prov:Provides:	grep}
-%{?_with_sh_prov:Provides:	/bin/sh}
-%{!?_without_static:BuildRequires:	glibc-static}
+%{?with_fileutl_prov:Provides:	fileutils}
+%{?with_grep_prov:Provides:	grep}
+%{?with_sh_prov:Provides:	/bin/sh}
+%{?with_static:BuildRequires:	glibc-static}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -115,7 +108,7 @@ Statycznie linkowany busybox.
 %build
 cp -f %{SOURCE1} Config.h
 
-%if %{?_without_static:0}%{!?_without_static:1}
+%if %{with static}
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags} -static"
@@ -132,15 +125,18 @@ mv -f busybox busybox.static
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
-%{!?_without_static:install busybox.static $RPM_BUILD_ROOT%{_bindir}}
+%{?with_static:install busybox.static $RPM_BUILD_ROOT%{_bindir}}
 
-%{?!_with_linkfl:install busybox $RPM_BUILD_ROOT%{_bindir}}
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
 echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
 
 # install links to busybox binary, when linkfl is defined
-%{?_with_linkfl:make install PREFIX=$RPM_BUILD_ROOT}
+%if %{with linkfl}
+make install PREFIX=$RPM_BUILD_ROOT
+%else
+install busybox $RPM_BUILD_ROOT%{_bindir}
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -149,19 +145,19 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc AUTHORS TODO Changelog README Config.h
 
-%{?!_with_linkfl: %attr(755,root,root) %{_bindir}/busybox}
-
-%if %{?_with_linkfl:1}%{?!_with_linkfl:0}
+%if %{with linkfl}
 %attr(755,root,root) /bin/*
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_sbindir}/*
+%else
+%attr(755,root,root) %{_bindir}/busybox
 %endif
 
 %{_libdir}/busybox
 %{_mandir}/man1/*
 
-%if %{?_without_static:0}%{!?_without_static:1}
+%if %{with static}
 %files static
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/busybox.static
