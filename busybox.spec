@@ -29,12 +29,12 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.00
-%define	pre	pre8
+%define	pre	pre10
 Release:	0.%{pre}.1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}-%{pre}.tar.bz2
-# Source0-md5:	13afe6912c89eb2709b0049e45d2d139
+# Source0-md5:	e64c855f4b9e5e8c0645422c34499753
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
@@ -132,7 +132,6 @@ Statycznie skonsolidowany busybox dla initrd.
 %prep
 %setup -q -n %{name}-%{version}-%{pre}
 %patch0 -p1
-%patch1 -p1
 #X %patch2 -p1 // UPDATE ME
 %patch3 -p1
 %patch4 -p1
@@ -140,9 +139,9 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch6 -p1
 %patch8 -p1
 %patch9 -p1
-%patch10 -p1
+#%patch10 -p1
 %patch11 -p1
-%patch12 -p1
+#%patch12 -p1
 
 %build
 install %{SOURCE1} .config
@@ -213,7 +212,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS TODO Changelog README .config
+%doc AUTHORS Changelog README .config
 
 %if %{with linkfl}
 %attr(755,root,root) /bin/*
