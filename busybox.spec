@@ -1,4 +1,6 @@
 #
+# TODO: sparc64 modules support in sparc(32) version
+#
 # Conditional build:
 # alternative busybox config file (replaces default one) you should
 # define cfgfile macro, i.e.
