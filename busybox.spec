@@ -53,6 +53,7 @@ Patch6:		%{name}-ash_exec.patch
 Patch7:		%{name}-kernel_headers.patch
 Patch8:		%{name}-insmod-morearchs.patch
 Patch9:		%{name}-dhcp.patch
+Patch10:	%{name}-switchroot.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
@@ -146,6 +147,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
+%patch10 -p1
 
 %build
 install %{SOURCE1} .config
