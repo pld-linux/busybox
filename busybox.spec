@@ -2,7 +2,7 @@ Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Name:		busybox
 Version:	0.60.1
-Release:	13
+Release:	14
 License:	GPL
 Group:		Applications
 Group(de):	Applikationen
@@ -15,6 +15,7 @@ Patch3:		%{name}-printf-gettext.patch
 Patch4:		%{name}-loadfont.patch
 Patch5:		%{name}-cread.patch
 Patch6:		%{name}-malloc.patch
+Patch7:		%{name}-pivot_root.patch
 URL:		http://busybox.lineo.com/
 %{?BOOT:BuildRequires:	uClibc-devel-BOOT >= 20010521-3}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -63,6 +64,7 @@ busybox for PLD bootdisk.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 
 %build
 cp -f %{SOURCE1} Config.h
