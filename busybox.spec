@@ -37,7 +37,7 @@ Source0:	http://www.busybox.net/downloads/%{name}-%{version}-pre2.tar.bz2
 # Source0-md5:	06e433389a8b34ce1031a144ba5677d1
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
-%{?with_altconfig:Source3:	%{cfgfile}}
+Source3:	%{cfgfile}
 Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-tee.patch
 Patch3:		%{name}-printf-gettext.patch
