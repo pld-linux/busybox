@@ -33,10 +33,11 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	0.60.2
-Release:	7
+Release:	9
 License:	GPL
 Group:		Applications
 Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
+# Source0-md5:	9e8269d5ef95a14258dc07473464cfb6
 %{!?_with_altconfig:Source1:	%{name}-config.h}
 %{?_with_altconfig:Source1:	%{cfgfile}}
 Patch0:		%{name}-logconsole.patch
@@ -46,6 +47,7 @@ Patch4:		%{name}-loadfont.patch
 Patch5:		%{name}-cread.patch
 Patch6:		%{name}-malloc.patch
 Patch7:		%{name}-pivot_root.patch
+Patch8:		%{name}-child.patch
 URL:		http://busybox.lineo.com/
 %{?_with_fileutl_prov:Provides:	fileutils}
 %{?_with_grep_prov:Provides:	grep}
@@ -108,6 +110,7 @@ Statycznie linkowany busybox.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 
 %build
 cp -f %{SOURCE1} Config.h
@@ -115,7 +118,8 @@ cp -f %{SOURCE1} Config.h
 %if %{?_without_static:0}%{!?_without_static:1}
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
-	LDFLAGS="%{rpmldflags} -static"
+	LDFLAGS="%{rpmldflags} -static" \
+	CC="%{__cc}"
 mv -f busybox busybox.static
 %{__make} clean
 %endif
@@ -139,14 +143,12 @@ echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
 # install links to busybox binary, when linkfl is defined
 %{?_with_linkfl:make install PREFIX=$RPM_BUILD_ROOT}
 
-gzip -9nf AUTHORS TODO Changelog README
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc *.gz Config.h
+%doc AUTHORS TODO Changelog README Config.h
 
 %{?!_with_linkfl: %attr(755,root,root) %{_bindir}/busybox}
 
