@@ -1,0 +1,172 @@
+diff -ur busybox-0.51/printf.c busybox/printf.c
+--- busybox-0.51/printf.c	Mon Mar 19 20:25:49 2001
++++ busybox/printf.c	Thu May 31 16:41:31 2001
+@@ -47,6 +47,9 @@
+ 
+ //   19990508 Busy Boxed! Dave Cinege
+ 
++// on by default
++#define BB_FEATURE_PRINTF_GETTEXT
++
+ #include <unistd.h>
+ #include <stdio.h>
+ #include <sys/types.h>
+@@ -55,6 +58,11 @@
+ #include <stdlib.h>
+ #include <fcntl.h>
+ #include <ctype.h>
++#include <string.h>
++#include <unistd.h>
++#include <stdio.h>
++#include <sys/stat.h>
++#include <sys/mman.h>
+ #include "busybox.h"
+ 
+ 
+@@ -117,19 +125,140 @@
+ /* The value to return to the calling program.  */
+ static int exit_status;
+ 
++
++/*
++ * Very pure gettext added by Michal Moskal <malekith@pld.org.pl>
++ * This possibly could be converted into utility function
++ * and used in other places as well.
++ */
++
++#ifdef BB_FEATURE_PRINTF_GETTEXT
++/* The magic number of the GNU message catalog format.  */
++#define _MAGIC 0x950412de
++
++/* Header for binary .mo file format.  */
++struct mo_file_header
++{
++	/* The magic number.  */
++	u_int32_t magic;
++	/* The revision number of the file format.  */
++	u_int32_t revision;
++	/* The number of strings pairs.  */
++	u_int32_t nstrings;
++	/* Offset of table with start offsets of original strings.  */
++	u_int32_t orig_tab_offset;
++	/* Offset of table with start offsets of translation strings.  */
++	u_int32_t trans_tab_offset;
++	/* Size of hashing table.  */
++	u_int32_t hash_tab_size;
++	/* Offset of first hashing entry.  */
++	u_int32_t hash_tab_offset;
++};
++
++struct string_desc
++{
++	/* Length of addressed string.  */
++	u_int32_t length;
++	/* Offset of string in file.  */
++	u_int32_t offset;
++};
++
++static u_int32_t swap(u_int32_t i)
++{
++	return (i << 24) | ((i & 0xff00) << 8) | 
++	       ((i >> 8) & 0xff00) | (i >> 24);
++}
++
++#define swap_if(a) ((has_to_swap) ? swap(a) : (a))
++
++static char *getmsg(const char *filename, const char *msgid)
++{
++	int fd;
++	struct mo_file_header *ptr;
++	struct stat st;
++	int has_to_swap;
++	size_t top, bottom;
++	struct string_desc *orig_tab, *trans_tab = NULL;
++	int act = -1;
++	char *ret = (char*)msgid;
++		
++	if (filename == NULL || stat(filename, &st))
++		return ret;
++
++	fd = open(filename, O_RDONLY);
++	if (fd == -1)
++		return ret;
++
++	ptr = (struct mo_file_header *) mmap(NULL, st.st_size, PROT_READ,
++					     MAP_PRIVATE, fd, 0);
++	close(fd);
++
++	if (ptr == (void*)-1)
++		return ret;
++
++	has_to_swap = ptr->magic != _MAGIC;
++
++	if (swap_if(ptr->magic) != _MAGIC)
++		goto oops;
++
++	/* FIXME: use hash table */
++
++	orig_tab = (struct string_desc *)
++	    ((char *) ptr + swap_if(ptr->orig_tab_offset));
++	trans_tab = (struct string_desc *)
++	    ((char *) ptr + swap_if(ptr->trans_tab_offset));
++
++	bottom = 0;
++	top = swap_if(ptr->nstrings);
++	while (bottom < top) {
++		int cmp_val;
++
++		act = (bottom + top) / 2;
++		cmp_val =
++		    strcmp(msgid,
++			   ((char *) ptr + swap_if(orig_tab[act].offset)));
++		if (cmp_val < 0)
++			top = act;
++		else if (cmp_val > 0)
++			bottom = act + 1;
++		else
++			break;
++		act = -1;
++	}
++
++      oops:
++	if (act != -1)
++		ret = strdup(((char *) ptr + swap_if(trans_tab[act].offset)));
++	munmap(ptr, st.st_size);
++	return ret;
++}
++#else
++# define getmsg(a,b) (b)
++#endif
++
+ int printf_main(int argc, char **argv)
+ {
+ 	char *format;
+ 	int args_used;
++	int opt;
++	const char *nls_file = NULL;
+ 
+ 	exit_status = 0;
+-	if (argc <= 1 || **(argv + 1) == '-') {
+-		show_usage();
+-	}
+ 
+-	format = argv[1];
+-	argc -= 2;
+-	argv += 2;
++	while ((opt = getopt(argc, argv, "n:")) != -1)
++		switch (opt) {
++		case 'n':
++			nls_file = optarg;
++			break;
++		default:
++			show_usage();
++			break;
++		}
++
++	format = getmsg(nls_file, argv[optind++]);
++
++	argc -= optind;
++	argv += optind;
+ 
+ 	do {
+ 		args_used = print_formatted(format, argc, argv);
