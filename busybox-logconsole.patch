@@ -1,15 +1,15 @@
 diff -urN busybox-0.60.1/init.c busybox-0.60.1.new/init.c
---- busybox-0.60.1/init.c	Fri Aug 24 00:14:30 2001
-+++ busybox-0.60.1.new/init.c	Tue Aug 28 22:57:34 2001
-@@ -172,7 +172,7 @@
- static char *secondConsole = VC_2;
- static char *thirdConsole  = VC_3;
- static char *fourthConsole = VC_4;
--static char *log           = VC_5;
-+static char *log           = VC_12;
- static int  kernelVersion  = 0;
+--- busybox-0.60.5/init.c.orig  Tue Oct 22 21:15:43 2002
++++ busybox-0.60.5/init.c       Sun Oct 27 12:19:38 2002
+@@ -160,7 +160,7 @@
  static char termType[32]   = "TERM=linux";
  static char console[32]    = _PATH_CONSOLE;
+ #ifndef BB_SYSLOGD
+-static char *log           = VC_5;
++static char *log           = VC_12;
+ #endif
+ static sig_atomic_t got_cont = 0;
+ static const int LOG = 0x1;
 diff -urN busybox-0.60.1/libbb/libbb.h busybox-0.60.1.new/libbb/libbb.h
 --- busybox-0.60.1/libbb/libbb.h	Fri Aug 24 00:14:31 2001
 +++ busybox-0.60.1.new/libbb/libbb.h	Tue Aug 28 22:57:57 2001
