@@ -71,11 +71,13 @@ cp -f %{SOURCE1} Config.h
 # BOOT
 %if %{?BOOT:1}%{!?BOOT:0}
 %{__make} \
-	CFLAGS_EXTRA="-m386 -I%{_libdir}/bootdisk%{_includedir}" \
+	CFLAGS_EXTRA="-I%{_libdir}/bootdisk%{_includedir}" \
 	LDFLAGS="-nostdlib -s" \
 	LIBRARIES="%{_libdir}/bootdisk%{_libdir}/crt0.o %{_libdir}/bootdisk%{_libdir}/libc.a -lgcc"
 mv -f busybox busybox-BOOT
 %endif
+
+%{__make} clean
 
 # TODO make main package dynamically linked
 %{__make} \
@@ -87,7 +89,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
 %if %{?BOOT:1}%{!?BOOT:0}
-install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin
+install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk/{bin,%{_libdir}}
 
 install busybox-BOOT $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/
 
