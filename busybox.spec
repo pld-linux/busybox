@@ -30,7 +30,7 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.00
-Release:	0.%{pre}.1
+Release:	0.%{pre}.2
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}-pre2.tar.bz2
@@ -55,6 +55,8 @@ URL:		http://www.busybox.net/
 %{?with_static:BuildRequires:	glibc-static}
 %{?with_initrd:BuildRequires:	%{?with_dietlibc:dietlibc}%{?!with_dietlibc:uClibc}-static}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		_initrd_bindir	/bin
 
 %description
 BusyBox combines tiny versions of many common UNIX utilities into a
@@ -166,10 +168,10 @@ mv -f busybox busybox.static
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
+install -d $RPM_BUILD_ROOT{%{_initrd_bindir},%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
 %{?with_static:install busybox.static $RPM_BUILD_ROOT%{_bindir}}
-%{?with_initrd:install busybox.initrd $RPM_BUILD_ROOT%{_bindir}}
+%{?with_initrd:install busybox.initrd $RPM_BUILD_ROOT%{_initrd_bindir}}
 
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -210,5 +212,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with initrd}
 %files initrd
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/busybox.initrd
+%attr(755,root,root) %{_initrd_bindir}/busybox.initrd
 %endif
