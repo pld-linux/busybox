@@ -7,11 +7,6 @@ Version:	0.60.1
 Release:	16
 License:	GPL
 Group:		Applications
-Group(de):	Applikationen
-Group(es):	Aplicaciones
-Group(pl):	Aplikacje
-Group(pt):	Aplicações
-Group(pt_BR):	Aplicações
 Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
 Source1:	%{name}-config.h
 Patch0:		%{name}-logconsole.patch
@@ -62,11 +57,6 @@ systemu potrzeba jeszcze tylko kernela, shella (np. ash) oraz edytora
 Summary:	Static busybox
 Summary(pl):	Statycznie linkowany busybox
 Group:		Applications
-Group(de):	Applikationen
-Group(es):	Aplicaciones
-Group(pl):	Aplikacje
-Group(pt):	Aplicações
-Group(pt_BR):	Aplicações
 
 %description static
 Static busybox.
@@ -78,11 +68,6 @@ Statycznie linkowany busybox.
 Summary:	Busybox for embedded systems
 Summary(pl):	Busybox dla systemów wbudowanych
 Group:		Applications
-Group(de):	Applikationen
-Group(es):	Aplicaciones
-Group(pl):	Aplikacje
-Group(pt):	Aplicações
-Group(pt_BR):	Aplicações
 
 %description embed
 Busybox for embedded systems.
