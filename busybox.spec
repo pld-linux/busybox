@@ -22,6 +22,8 @@
 %bcond_without static  # don't build static version
 %bcond_without initrd  # don't build initrd version
 
+%bcond_with dietlibc
+
 %define	pre	pre2
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
@@ -51,7 +53,7 @@ URL:		http://www.busybox.net/
 %{?with_grep_prov:Provides:	grep}
 %{?with_sh_prov:Provides:	/bin/sh}
 %{?with_static:BuildRequires:	glibc-static}
-%{?with_initrd:BuildRequires:	dietlibc-static}
+%{?with_initrd:BuildRequires:	%{?with_dietlibc:dietlibc}%{?!with_dietlibc:uClibc}-static}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -135,8 +137,12 @@ install %{SOURCE2} .config
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags} -D_BSD_SOURCE" \
 	LDFLAGS="%{rpmldflags} -static" \
+%if %{with dietlibc}
 	LIBRARIES="-lrpc" \
 	CC="diet gcc"
+%else
+	CC="%{_target_cpu}-uclibc-gcc"
+%endif
 mv -f busybox busybox.initrd
 %{__make} clean
 install %{SOURCE1} .config
