@@ -1,12 +1,12 @@
-diff -ur busybox-0.60.1/init.c busybox-0.60.1.new/init.c
---- busybox-0.60.1/init.c	Tue Apr 10 01:54:15 2001
-+++ busybox-0.60.1.new/init.c	Wed Jun 13 11:14:15 2001
-@@ -907,6 +907,8 @@
- 	close(0);
- 	close(1);
- 	close(2);
-+	/* reopen console... hm... why do we close(0)? */
-+	open(console, O_RDWR);
- 	set_term(0);
- 	chdir("/");
- 	setsid();
+diff -Naur busybox-0.60.2/init.c busybox-0.60.2-p/init.c
+--- busybox-0.60.2/init.c	Thu Apr 18 13:10:26 2002
++++ busybox-0.60.2-p/init.c	Thu Apr 18 13:12:51 2002
+@@ -464,6 +464,8 @@
+ 		close(0);
+ 		close(1);
+ 		close(2);
++		/* reopen console... hm... why do we close(0)? */
++		open(console, O_RDWR);
+ 		setsid();
+ 
+ 		/* Reset signal handlers set for parent process */
