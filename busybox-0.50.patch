@@ -1,0 +1,71 @@
+diff -ur busybox-0.50/applets.h busybox/applets.h
+--- busybox-0.50/applets.h	Thu Mar 15 22:33:33 2001
++++ busybox/applets.h	Wed Mar 21 14:41:59 2001
+@@ -197,6 +197,9 @@
+ #ifdef BB_KLOGD
+ 	APPLET(klogd, klogd_main, _BB_DIR_SBIN)
+ #endif
++#ifdef BB_SH
++       APPLET(lash, shell_main, _BB_DIR_BIN)
++#endif
+ #ifdef BB_LENGTH
+ 	APPLET(length, length_main, _BB_DIR_USR_BIN)
+ #endif
+@@ -325,9 +328,6 @@
+ #endif
+ #ifdef BB_SETKEYCODES
+ 	APPLET(setkeycodes, setkeycodes_main, _BB_DIR_USR_BIN)
+-#endif
+-#ifdef BB_SH
+-	APPLET(sh, shell_main, _BB_DIR_BIN)
+ #endif
+ #ifdef BB_SLEEP
+ 	APPLET(sleep, sleep_main, _BB_DIR_BIN)
+Only in busybox: applets.h.orig
+diff -ur busybox-0.50/getopt.c busybox/getopt.c
+--- busybox-0.50/getopt.c	Fri Mar  9 22:24:12 2001
++++ busybox/getopt.c	Wed Mar 21 14:41:59 2001
+@@ -273,6 +273,8 @@
+                 shell=TCSH;
+         else if (!strcmp(new_shell,"sh"))
+                 shell=BASH;
++        else if (!strcmp(new_shell,"lash"))
++                shell=BASH;
+         else if (!strcmp(new_shell,"csh"))
+                 shell=TCSH;
+         else
+Only in busybox: getopt.c.orig
+diff -ur busybox-0.50/usage.h busybox/usage.h
+--- busybox-0.50/usage.h	Fri Mar 16 09:06:30 2001
++++ busybox/usage.h	Wed Mar 21 14:46:56 2001
+@@ -1297,12 +1297,12 @@
+ #define setkeycodes_example_usage \
+ 	"$ setkeycodes e030 127\n"
+ 
+-#define sh_trivial_usage \
++#define lash_trivial_usage \
+ 	"[FILE]...\n" \
+ 	"or: sh -c command [args]..."
+-#define sh_full_usage \
++#define lash_full_usage \
+ 	"lash: The BusyBox LAme SHell (command interpreter)"
+-#define sh_notes_usage \
++#define lash_notes_usage \
+ "This command does not yet have proper documentation.\n" \
+ "\n" \
+ "Use lash just as you would use any other shell.  It properly handles pipes,\n" \
+Only in busybox: usage.h.orig
+Only in busybox: usage.h.rej
+diff -ur busybox-0.50/utility.c busybox/utility.c
+--- busybox-0.50/utility.c	Wed Mar 14 01:43:16 2001
++++ busybox/utility.c	Wed Mar 21 14:41:59 2001
+@@ -1414,7 +1414,7 @@
+ #endif
+ 
+ #if defined BB_IFCONFIG || defined BB_ROUTE || defined BB_NFSMOUNT || \
+-    defined BB_FEATURE_MOUNT_LOOP
++    defined BB_FEATURE_MOUNT_LOOP || defined BB_SH
+ /* Like strncpy but make sure the resulting string is always 0 terminated. */  
+ extern char * safe_strncpy(char *dst, const char *src, size_t size)
+ {   
+Only in busybox: utility.c.orig

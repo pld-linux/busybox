@@ -1,0 +1,11 @@
+--- init.c	Wed Dec 13 17:41:29 2000
++++ init.c.sz	Mon Dec 25 18:34:15 2000
+@@ -122,7 +122,7 @@
+ #define VT_SECONDARY "/dev/tty2"     /* Virtual console */
+ #define VT_THIRD     "/dev/tty3"     /* Virtual console */
+ #define VT_FOURTH    "/dev/tty4"     /* Virtual console */
+-#define VT_LOG       "/dev/tty5"     /* Virtual console */
++#define VT_LOG       "/dev/tty12"     /* Virtual console */
+ #define SERIAL_CON0  "/dev/ttyS0"    /* Primary serial console */
+ #define SERIAL_CON1  "/dev/ttyS1"    /* Serial console */
+ #define SHELL        "-/bin/sh"	     /* Default shell */

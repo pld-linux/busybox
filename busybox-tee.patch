@@ -1,0 +1,11 @@
+--- tee.c.orig	Mon Oct 23 20:57:32 2000
++++ tee.c	Mon Oct 23 20:58:29 2000
+@@ -51,7 +51,7 @@
+ 			status = 1;
+ 		}
+ 	}
+-
++	setvbuf(stdout, NULL, _IONBF, 0);
+ 	while ((c = getchar()) != EOF)
+ 		for (i = 0; i < nfiles; i++)
+ 			putc(c, files[i]);
