@@ -29,7 +29,7 @@
 %define with_glibc 1
 %endif
 
-%define	pre	pre4
+%define	pre	pre5
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
@@ -38,8 +38,8 @@ Version:	1.00
 Release:	0.%{pre}.1
 License:	GPL
 Group:		Applications
-Source0:	http://www.busybox.net/downloads/%{name}-%{version}-pre4.tar.bz2
-# Source0-md5:	e423335994b5cd2d078dad3492768d51
+Source0:	http://www.busybox.net/downloads/%{name}-%{version}-%{pre}.tar.bz2
+# Source0-md5:	f89d08842d0a48c73ba4ef1e3c3bdb8b
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
@@ -50,7 +50,6 @@ Patch3:		%{name}-loadfont.patch
 Patch4:		%{name}-pivot_root.patch
 Patch5:		%{name}-malloc.patch
 Patch6:		%{name}-raid_start.patch
-Patch7:		%{name}-insmod_ng.patch
 Patch8:		%{name}-force-dietlibc.patch
 Patch9:		%{name}-ash_exec.patch
 Patch10:	%{name}-amd64.patch
@@ -141,7 +140,6 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch4 -p1
 #%patch5 -p1 // not needed
 %patch6 -p1
-%patch7 -p1
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
