@@ -1,7 +1,7 @@
 Summary:	Set of common unix utils for embeded systems
 Name:		busybox
 Version:	0.51
-Release:	4
+Release:	5
 License:	GPL
 Group:		Applications
 Group(de):	Applikationen
@@ -11,6 +11,7 @@ Source1:	%{name}-config.h
 Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-tee.patch
 Patch2:		%{name}-sh-name.patch
+Patch3:		%{name}-printf-gettext.patch
 URL:		http://busybox.lineo.com/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	uClibc-devel-BOOT >= 20010521-3
@@ -46,6 +47,7 @@ busybox for PLD bootdisk.
 %patch0
 %patch1
 %patch2 -p1
+%patch3 -p1
 
 %build
 # BOOT
