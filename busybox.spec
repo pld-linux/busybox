@@ -40,6 +40,7 @@ Patch4:		%{name}-loadfont.patch
 Patch5:		%{name}-pivot_root.patch
 Patch6:		%{name}-malloc.patch
 Patch7:		%{name}-raid_start.patch
+Patch8:		%{name}-insmod_ng.patch
 Patch100:	%{name}-config.patch
 Patch101:	%{name}-initrd-config.patch
 URL:		http://www.busybox.net/
@@ -109,7 +110,6 @@ Statycznie linkowany busybox dla initrd.
 
 %prep
 %setup -q
-cp -f Config.h Config-initrd.h
 %patch0 -p1
 %patch1 -p1
 %patch3 -p1
@@ -117,6 +117,8 @@ cp -f Config.h Config-initrd.h
 %patch5 -p1
 #%patch6 -p1
 %patch7 -p1
+%patch8 -p1
+cp -f Config.h Config-initrd.h
 %patch100 -p0
 %patch101 -p0
 
