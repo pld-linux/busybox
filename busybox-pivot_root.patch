@@ -1,0 +1,47 @@
+diff -ur busybox-0.60.1/libbb/syscalls.c busybox-0.60.1-/libbb/syscalls.c
+--- busybox-0.60.1/libbb/syscalls.c	Fri Jun 29 20:59:32 2001
++++ busybox-0.60.1-/libbb/syscalls.c	Sun Oct 28 14:07:56 2001
+@@ -45,29 +45,25 @@
+ #endif
+ 
+ #ifndef __NR_pivot_root
+-#warning This kernel does not support the pivot_root syscall
+-#warning -> The pivot_root system call is being stubbed out...
+-int pivot_root(const char * new_root,const char * put_old)
+-{
+-	/* BusyBox was compiled against a kernel that did not support
+-	 *  the pivot_root system call.  To make this application work,
+-	 *  you will need to recompile with a kernel supporting the
+-	 *  pivot_root system call.
+-	 */
+-	fprintf(stderr, "\n\nTo make this application work, you will need to recompile\n");
+-	fprintf(stderr, "with a kernel supporting the pivot_root system call. -Erik\n\n");
+-	errno=ENOSYS;
+-	return -1;
+-}
+-#else
+-#  if defined(__ia64__)
++# warning "Guessing pivot_root() syscall number"
++# ifdef __i386__
++#  define __NR_pivot_root 217
++# elif defined(__alpha__)
++#  define __NR_pivot_root 374
++# elif defined(__sparc__) || defined(__sparc64__)
++#  define __NR_pivot_root 146
++# else
++#  error "Get kernel-2.4 headers!"
++# endif
++#endif
++
++#if defined(__ia64__)
+ 	int pivot_root(const char * new_root,const char * put_old)
+ 	{
+ 		return(syscall(__NR_pivot_root, new_root, put_old));
+ 	}
+-#  else
++#else
+     _syscall2(int,pivot_root,const char *,new_root,const char *,put_old);
+-#  endif
+ #endif
+ 
+ 
