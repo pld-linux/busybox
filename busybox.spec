@@ -118,7 +118,8 @@ cp -f %{SOURCE1} Config.h
 %if %{?_without_static:0}%{!?_without_static:1}
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
-	LDFLAGS="%{rpmldflags} -static"
+	LDFLAGS="%{rpmldflags} -static" \
+	CC="%{__cc}"
 mv -f busybox busybox.static
 %{__make} clean
 %endif
