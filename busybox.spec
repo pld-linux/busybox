@@ -110,25 +110,25 @@ implementadas comportam-se de maneira similar aos equivalentes GNU.
 
 %package static
 Summary:	Static busybox
-Summary(pl):	Statycznie linkowany busybox
+Summary(pl):	Statycznie skonsolidowany busybox
 Group:		Applications
 
 %description static
 Static busybox.
 
 %description static -l pl
-Statycznie linkowany busybox.
+Statycznie skonsolidowany busybox.
 
 %package initrd
 Summary:	Static busybox for initrd
-Summary(pl):	Statycznie linkowany busybox dla initrd
+Summary(pl):	Statycznie skonsolidowany busybox dla initrd
 Group:		Applications
 
 %description initrd
 Static busybox for initrd.
 
 %description initrd -l pl
-Statycznie linkowany busybox dla initrd.
+Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q -n %{name}-%{version}-%{pre}
