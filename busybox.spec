@@ -23,6 +23,12 @@
 %bcond_without initrd  # don't build initrd version
 
 %bcond_with dietlibc
+%bcond_with glibc
+
+%ifarch %{x86}
+%else
+%define with_glibc 1
+%endif
 
 %define	pre	pre2
 Summary:	Set of common unix utils for embeded systems
@@ -30,7 +36,7 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.00
-Release:	0.%{pre}.7
+Release:	0.%{pre}.8
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}-pre2.tar.bz2
@@ -54,7 +60,17 @@ URL:		http://www.busybox.net/
 %{?with_grep_prov:Provides:	grep}
 %{?with_sh_prov:Provides:	/bin/sh}
 %{?with_static:BuildRequires:	glibc-static}
-%{?with_initrd:BuildRequires:	%{?with_dietlibc:dietlibc}%{?!with_dietlibc:uClibc}-static}
+%if %{with initrd}
+  %if %{with dietlibc}
+BuildRequires:	dietlibc-static
+  %else
+    %if %{with glibc}
+BuildRequires:	glibc-static
+    %else
+BuildRequires:	uClibc-static
+    %endif
+  %endif
+%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_initrd_bindir	/bin
@@ -133,10 +149,6 @@ Statycznie linkowany busybox dla initrd.
 %build
 install %{SOURCE1} .config
 
-%if %{with altconfig}
-install %{SOURCE3} .config
-%endif
-
 %if %{with initrd}
 install %{SOURCE2} .config
 %{__make} oldconfig
@@ -147,11 +159,20 @@ install %{SOURCE2} .config
 	LIBRARIES="-lrpc" \
 	CC="diet gcc"
 %else
+%if %{with glibc}
+	CC="%{__cc}"
+%else
 	CC="%{_target_cpu}-uclibc-gcc"
 %endif
+%endif
+
 mv -f busybox busybox.initrd
 %{__make} clean
 install %{SOURCE1} .config
+%endif
+
+%if %{with altconfig}
+install %{SOURCE3} .config
 %endif
 
 %if %{with static}
