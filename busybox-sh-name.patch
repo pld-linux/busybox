@@ -1,0 +1,12 @@
+diff -Nur --exclude *~ busybox-0.51/busybox.c busybox-0.51.new/busybox.c
+--- busybox-0.51/busybox.c	Tue Apr 10 00:48:11 2001
++++ busybox-0.51.new/busybox.c	Sat May 19 12:53:12 2001
+@@ -97,7 +97,7 @@
+ 	/* Add in a special case hack -- whenever **argv == '-'
+ 	 * (i.e. '-su' or '-sh') always invoke the shell */
+ 	if (**argv == '-' && *(*argv+1)!= '-') {
+-		applet_name = "sh";
++		applet_name = "lash";
+ 	}
+ #endif
+ 
