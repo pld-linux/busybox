@@ -33,7 +33,7 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	0.60.2
-Release:	9
+Release:	10
 License:	GPL
 Group:		Applications
 Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
@@ -114,7 +114,7 @@ Statycznie linkowany busybox.
 
 %build
 cp -f %{SOURCE1} Config.h
-%ifarch sparc sparc64
+%ifarch sparc sparc64 alpha
 cat >> Config.h <<EOF
 #undef BB_INSMOD
 EOF
