@@ -59,9 +59,10 @@ cp %{SOURCE1} Config.h
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__install} -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1},%{_libdir}/busybox/{bin,%{_libdir}/busybox}}
+%{__install} -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1}
+%{__install} -d $RPM_BUILD_ROOT%{_libdir}/bootdisk/{bin,%{_libdir}/busybox}
 
-%{__install} busybox $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/busybox
+%{__install} busybox $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/
 
 for i in `cat busybox.links`; do
 	ln -sfn busybox "$RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/`basename $i`"
