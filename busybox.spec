@@ -15,8 +15,8 @@ Patch3:		%{name}-printf-gettext.patch
 Patch4:		%{name}-loadfont.patch
 Patch5:		%{name}-cread.patch
 URL:		http://busybox.lineo.com/
+%{?BOOT:BuildRequires:	uClibc-devel-BOOT >= 20010521-3}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-BuildRequires:	uClibc-devel-BOOT >= 20010521-3
 
 %description
 BusyBox combines tiny versions of many common UNIX utilities into a
