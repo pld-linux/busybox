@@ -1,0 +1,15 @@
+diff -urN busybox-1.00-pre2.org/libbb/printf.c busybox-1.00-pre2/libbb/printf.c
+--- busybox-1.00-pre2.org/libbb/printf.c	2003-08-02 23:46:49.000000000 +0200
++++ busybox-1.00-pre2/libbb/printf.c	2003-08-05 00:19:57.000000000 +0200
+@@ -116,7 +116,10 @@
+  * you can extract the information you need from dietstdio.h.  See the
+  * other library implementations for examples.
+  */
+-#error dietlibc is currently not supported.  Please see the commented source.
++#warning dietlibc is currently not supported.  Please see the commented source.
++#warning FORCED BUILD BY PLD PATCH.
++
++#define SET_FERROR_UNLOCKED(S) //    ((S)->flags |= 1)
+ 
+ #else /* some other lib */
+ /* Please see the comments for the above supported libaries for examples

@@ -1,0 +1,14 @@
+diff -urN busybox-1.00-pre2.org/console-tools/loadfont.c busybox-1.00-pre2/console-tools/loadfont.c
+--- busybox-1.00-pre2.org/console-tools/loadfont.c	2003-08-02 23:46:48.000000000 +0200
++++ busybox-1.00-pre2/console-tools/loadfont.c	2003-08-02 23:47:38.000000000 +0200
+@@ -185,8 +185,10 @@
+ 		head0 = sizeof(struct psf_header);
+ 
+ 		head = head0 + fontsize * unit;
++		/*
+ 		if (head > inputlth || (!hastable && head != inputlth))
+ 			bb_error_msg_and_die("Input file: bad length");
++		*/
+ 		do_loadfont(fd, inbuf + head0, unit, fontsize);
+ 		if (hastable)
+ 			do_loadtable(fd, inbuf + head, inputlth - head, fontsize);
