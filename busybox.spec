@@ -20,13 +20,14 @@
 # functionality as their GNU countenders.
 
 %bcond_without static  # don't build static version
+%bcond_without initrd  # don't build initrd version
 
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	0.60.5
-Release:	1
+Release:	2
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -39,11 +40,13 @@ Patch3:		%{name}-printf-gettext.patch
 Patch4:		%{name}-loadfont.patch
 Patch5:		%{name}-pivot_root.patch
 Patch6:		%{name}-malloc.patch
+Patch7:		%{name}-initrd-config.patch
 URL:		http://www.busybox.net/
 %{?with_fileutl_prov:Provides:	fileutils}
 %{?with_grep_prov:Provides:	grep}
 %{?with_sh_prov:Provides:	/bin/sh}
 %{?with_static:BuildRequires:	glibc-static}
+%{?with_initrd:BuildRequires:	dietlibc-static}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -92,22 +95,49 @@ Static busybox.
 %description static -l pl
 Statycznie linkowany busybox.
 
+%package initrd
+Summary:	Static busybox for initrd
+Summary(pl):	Statycznie linkowany busybox dla initrd
+Group:		Applications
+
+%description initrd
+Static busybox for initrd.
+
+%description initrd -l pl
+Statycznie linkowany busybox dla initrd.
+
 %prep
 %setup -q
+cp -f Config.h Config-initrd.h
 %patch0 -p1
 %patch1 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
 #%patch6 -p1
+%patch7 -p0
 
 %build
 cp -f %{SOURCE1} Config.h
 
+%if %{with initrd}
+cp -f Config.h Config.h-no-initrd
+cp -f Config-initrd.h Config.h
+%{__make} \
+	CFLAGS_EXTRA="%{rpmcflags} -D_BSD_SOURCE" \
+	LDFLAGS="%{rpmldflags} -static" \
+	LIBRARIES="-lrpc" \
+	CC="diet gcc"
+mv -f busybox busybox.initrd
+%{__make} clean
+cp -f Config.h-no-initrd Config.h
+%endif
+
 %if %{with static}
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
-	LDFLAGS="%{rpmldflags} -static"
+	LDFLAGS="%{rpmldflags} -static" \
+	CC="%{__cc}"
 mv -f busybox busybox.static
 %{__make} clean
 %endif
@@ -122,6 +152,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
 %{?with_static:install busybox.static $RPM_BUILD_ROOT%{_bindir}}
+%{?with_initrd:install busybox.initrd $RPM_BUILD_ROOT%{_bindir}}
 
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -157,4 +188,10 @@ rm -rf $RPM_BUILD_ROOT
 %files static
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/busybox.static
+%endif
+
+%if %{with initrd}
+%files initrd
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/busybox.initrd
 %endif
