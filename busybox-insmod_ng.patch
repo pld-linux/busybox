@@ -1,31 +1,54 @@
-diff -ur busybox-0.60.5/Config.h busybox-0.60.5-ng/Config.h
---- busybox-0.60.5/Config.h	2003-07-01 02:56:02.000000000 +0200
-+++ busybox-0.60.5-ng/Config.h	2003-07-01 02:55:01.000000000 +0200
-@@ -57,6 +57,7 @@
- //#define BB_IFCONFIG
- #define BB_INIT
- //#define BB_INSMOD
-+#define BB_INSMOD_NG
- #define BB_KILL
- #define BB_KILLALL
- #define BB_KLOGD
-diff -ur busybox-0.60.5/applets.h busybox-0.60.5-ng/applets.h
---- busybox-0.60.5/applets.h	2003-07-01 02:56:02.000000000 +0200
-+++ busybox-0.60.5-ng/applets.h	2003-07-01 02:54:47.000000000 +0200
-@@ -203,6 +203,9 @@
- #ifdef BB_INSMOD
- 	APPLET(insmod, insmod_main, _BB_DIR_SBIN)
+diff -urN busybox-1.00-pre2.org/include/applets.h busybox-1.00-pre2/include/applets.h
+--- busybox-1.00-pre2.org/include/applets.h	2003-08-02 23:46:48.000000000 +0200
++++ busybox-1.00-pre2/include/applets.h	2003-08-03 00:08:29.000000000 +0200
+@@ -286,6 +286,9 @@
+ #ifdef CONFIG_INSMOD
+ 	APPLET(insmod, insmod_main, _BB_DIR_SBIN, _BB_SUID_NEVER)
  #endif
-+#ifdef BB_INSMOD_NG
-+	APPLET(insmod_ng, insmod_ng_main, _BB_DIR_SBIN)
++#ifdef CONFIG_FEATURE_REALLY_NEW_MODULE_INTERFACE
++	APPLET(insmod_ng, insmod_ng_main, __BB_DIR_SBIN, _BB_SUID_NEVER)
 +#endif
- #ifdef BB_KILL
- 	APPLET(kill, kill_main, _BB_DIR_BIN)
+ #ifdef CONFIG_IP
+ 	APPLET(ip, ip_main, _BB_DIR_BIN, _BB_SUID_NEVER)
  #endif
-diff -ur busybox-0.60.5/insmod.c busybox-0.60.5-ng/insmod.c
---- busybox-0.60.5/insmod.c	2002-09-16 07:30:10.000000000 +0200
-+++ busybox-0.60.5-ng/insmod.c	2003-07-01 02:37:14.000000000 +0200
-@@ -3567,6 +3567,14 @@
+diff -urN busybox-1.00-pre2.org/include/usage.h busybox-1.00-pre2/include/usage.h
+--- busybox-1.00-pre2.org/include/usage.h	2003-08-02 23:46:48.000000000 +0200
++++ busybox-1.00-pre2/include/usage.h	2003-08-03 00:01:40.000000000 +0200
+@@ -1312,6 +1312,11 @@
+ 	"          [ [i|o]seq ] [ [i|o]key KEY ] [ [i|o]csum ]\n" \
+ 	"          [ ttl TTL ] [ tos TOS ] [ [no]pmtudisc ] [ dev PHYS_DEV ]\n"
+ 
++#define insmod_ng_trivial_usage \
++	"MODULE [symbol=value]..."
++#define insmod_ng_full_usage \
++	"Loads the specified kernel modules into the kernel."
++
+ #define kill_trivial_usage \
+ 	"[-signal] process-id [process-id ...]"
+ #define kill_full_usage \
+diff -urN busybox-1.00-pre2.org/modutils/Config.in busybox-1.00-pre2/modutils/Config.in
+--- busybox-1.00-pre2.org/modutils/Config.in	2003-08-02 23:46:49.000000000 +0200
++++ busybox-1.00-pre2/modutils/Config.in	2003-08-03 00:06:09.000000000 +0200
+@@ -33,6 +33,15 @@
+ 	  Support module loading for newer (post 2.1) Linux kernels.
+ endif
+ 
++if CONFIG_FEATURE_NEW_MODULE_INTERFACE
++config CONFIG_FEATURE_REALLY_NEW_MODULE_INTERFACE
++	bool "  Support new (port 2.5) Linux kernels"
++	default y
++	depends on CONFIG_INSMOD
++	help
++	   Support module loading for newer (port 2.5) Linux kernels.
++endif
++
+ config CONFIG_FEATURE_INSMOD_VERSION_CHECKING
+ 	bool "  Module version checking"
+ 	default n
+diff -urN busybox-1.00-pre2.org/modutils/insmod.c busybox-1.00-pre2/modutils/insmod.c
+--- busybox-1.00-pre2.org/modutils/insmod.c	2003-08-02 23:46:49.000000000 +0200
++++ busybox-1.00-pre2/modutils/insmod.c	2003-08-03 00:01:35.000000000 +0200
+@@ -4049,6 +4049,14 @@
  
  	printf("Using %s\n", m_filename);
  
@@ -38,12 +61,11 @@ diff -ur busybox-0.60.5/insmod.c busybox-0.60.5-ng/insmod.c
 +#endif
 +
  	if ((f = obj_load(fp, LOADBITS)) == NULL)
- 		perror_msg_and_die("Could not load the module");
+ 		bb_perror_msg_and_die("Could not load the module");
  
-Only in busybox-0.60.5-ng: insmod.o
-diff -ur busybox-0.60.5/insmod_ng.c busybox-0.60.5-ng/insmod_ng.c
---- busybox-0.60.5/insmod_ng.c	2003-07-01 02:56:12.000000000 +0200
-+++ busybox-0.60.5-ng/insmod_ng.c	2003-07-01 02:54:18.000000000 +0200
+diff -urN busybox-1.00-pre2.org/modutils/insmod_ng.c busybox-1.00-pre2/modutils/insmod_ng.c
+--- busybox-1.00-pre2.org/modutils/insmod_ng.c	1970-01-01 01:00:00.000000000 +0100
++++ busybox-1.00-pre2/modutils/insmod_ng.c	2003-08-03 00:01:35.000000000 +0200
 @@ -0,0 +1,110 @@
 +/* vi: set sw=4 ts=4: */
 +/*
@@ -155,18 +177,14 @@ diff -ur busybox-0.60.5/insmod_ng.c busybox-0.60.5-ng/insmod_ng.c
 +tab-width: 4
 +End:
 +*/
-diff -ur busybox-0.60.5/usage.h busybox-0.60.5-ng/usage.h
---- busybox-0.60.5/usage.h	2003-07-01 02:56:02.000000000 +0200
-+++ busybox-0.60.5-ng/usage.h	2003-07-01 02:55:44.000000000 +0200
-@@ -818,6 +818,11 @@
- 	"\t-L\tLock to prevent simultaneous loads of a module\n" \
- 	"\t-x\tdo not export externs"
+diff -urN busybox-1.00-pre2.org/modutils/Makefile.in busybox-1.00-pre2/modutils/Makefile.in
+--- busybox-1.00-pre2.org/modutils/Makefile.in	2003-08-02 23:46:49.000000000 +0200
++++ busybox-1.00-pre2/modutils/Makefile.in	2003-08-03 00:06:59.000000000 +0200
+@@ -24,6 +24,7 @@
  
-+#define insmod_ng_trivial_usage \
-+	"MODULE [symbol=value]..."
-+#define insmod_ng_full_usage \
-+	"Loads the specified kernel modules into the kernel."
-+
- #define kill_trivial_usage \
- 	"[-signal] process-id [process-id ...]"
- #define kill_full_usage \
+ MODUTILS-y:=
+ MODUTILS-$(CONFIG_INSMOD)		+= insmod.o
++MODUTILS-$(CONFIG_FEATURE_REALLY_NEW_MODULE_INTERFACE)	+= insmod_ng.o
+ MODUTILS-$(CONFIG_LSMOD)		+= lsmod.o
+ MODUTILS-$(CONFIG_MODPROBE)		+= modprobe.o
+ MODUTILS-$(CONFIG_RMMOD)		+= rmmod.o
