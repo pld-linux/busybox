@@ -44,7 +44,7 @@ Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
 Patch0:		%{name}-logconsole.patch
-Patch1:		%{name}-tee.patch
+Patch1:		%{name}-print_ascii.patch
 Patch2:		%{name}-printf-gettext.patch
 Patch3:		%{name}-loadfont.patch
 Patch4:		%{name}-pivot_root.patch
@@ -133,7 +133,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %prep
 %setup -q -n %{name}-%{version}-%{pre}
 %patch0 -p1
-#%patch1 -p1
+%patch1 -p1
 #X %patch2 -p1 // UPDATE ME
 %patch3 -p1
 %patch4 -p1
