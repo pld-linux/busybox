@@ -1,4 +1,5 @@
 Summary:	Set of common unix utils for embeded systems
+Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Name:		busybox
 Version:	0.51
 Release:	10
@@ -35,6 +36,16 @@ customize your embedded systems. To create a working system, just add
 a kernel, a shell (such as ash), and an editor (such as elvis-tiny or
 ae).
 
+%description -l pl
+BusyBox sk³ada ma³e wersje wielu narzêdzi uniksowych w jeden ma³y plik
+wykonywalny. Zapewnia minimalne zastêpniki wiêkszo¶ci narzêdzi
+zawartych w pakietach fileutils, shellutils, findutils, grep, gzip,
+tar itp. BusyBox daje w miarê kompletne ¶rodowisko POSIX dla ma³ych
+lub wbudowanych systemów. Narzêdzia maj± mniej opcji ni¿ ich pe³ne
+odpowiedniki GNU, ale maj± podstawow± funkcjonalno¶æ. Do dzia³aj±cego
+systemu potrzeba jeszcze tylko kernela, shella (np. ash) oraz edytora
+(np. elvis-tiny albo ae).
+
 %package BOOT
 Summary:	busybox for PLD bootdisk
 Group:		Applications
@@ -54,32 +65,41 @@ busybox for PLD bootdisk.
 %patch5 -p1
 
 %build
+cp -f %{SOURCE1} Config.h
 # BOOT
-cp %{SOURCE1} Config.h
+%if %{?BOOT:1}%{!?BOOT:0}
 %{__make} \
 	CFLAGS_EXTRA="-m386 -I%{_libdir}/bootdisk%{_includedir}" \
 	LDFLAGS="-nostdlib -s" \
 	LIBRARIES="%{_libdir}/bootdisk%{_libdir}/crt0.o %{_libdir}/bootdisk%{_libdir}/libc.a -lgcc"
+mv -f busybox busybox-BOOT
+%endif
 
 # TODO make main package dynamically linked
-
+%{__make} \
+	CFLAGS_EXTRA="%{rpmcflags}" \
+	LDFLAGS="%{rpmldflags}"
+	
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__install} -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1}
-%{__install} -d $RPM_BUILD_ROOT%{_libdir}/bootdisk/{bin,%{_libdir}/busybox}
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
-%{__install} busybox $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/
+%if %{?BOOT:1}%{!?BOOT:0}
+install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin
+
+install busybox-BOOT $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/
 
 for i in `cat busybox.links`; do
 	ln -sfn busybox "$RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/`basename $i`"
 done
-%{__install} busybox.links $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}/busybox
+install busybox.links $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}/busybox
 # change sh to lash (see sh_name patch)
 mv -f $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/{sh,lash}
+%endif
 
-%{__install} busybox $RPM_BUILD_ROOT%{_bindir}
-%{__install} busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
-%{__install} docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
+install busybox $RPM_BUILD_ROOT%{_bindir}
+install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
+install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
 echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
 
 gzip -9nf AUTHORS TODO Changelog README
@@ -94,7 +114,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/busybox
 %{_mandir}/man1/*
 
+%if %{?BOOT:1}%{!?BOOT:0}
 %files BOOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/bootdisk/bin/*
 %{_libdir}/bootdisk%{_libdir}/*
+%endif
