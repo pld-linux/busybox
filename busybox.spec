@@ -39,8 +39,9 @@ Patch3:		%{name}-printf-gettext.patch
 Patch4:		%{name}-loadfont.patch
 Patch5:		%{name}-pivot_root.patch
 Patch6:		%{name}-malloc.patch
-Patch7:		%{name}-initrd-config.patch
-Patch8:		%{name}-config.patch
+Patch7:		%{name}-raid_start.patch
+Patch100:	%{name}-config.patch
+Patch101:	%{name}-initrd-config.patch
 URL:		http://www.busybox.net/
 %{?with_fileutl_prov:Provides:	fileutils}
 %{?with_grep_prov:Provides:	grep}
@@ -115,8 +116,9 @@ cp -f Config.h Config-initrd.h
 %patch4 -p1
 %patch5 -p1
 #%patch6 -p1
-%patch7 -p0
-%patch8 -p0
+%patch7 -p1
+%patch100 -p0
+%patch101 -p0
 
 %build
 %if %{with altconfig}
