@@ -87,7 +87,7 @@
 #define BB_NC
 //#define BB_NSLOOKUP
 //#define BB_PIDOF
-//#define BB_PING
+#define BB_PING
 #define BB_PIVOT_ROOT
 #define BB_POWEROFF
 #define BB_PRINTF
@@ -115,7 +115,7 @@
 #define BB_TAR
 #define BB_TEE
 #define BB_TEST
-//#define BB_TELNET
+#define BB_TELNET
 //#define BB_TFTP
 #define BB_TOUCH
 #define BB_TR
