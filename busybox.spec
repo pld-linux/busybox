@@ -1,5 +1,8 @@
 #
-# TODO: sparc64 modules support in sparc(32) version
+# TODO:
+#	- sparc64 modules support in sparc(32) version
+#	- make internal commands work even if busybox is not in /bin/busybox
+# 
 #
 # Conditional build:
 # alternative busybox config file (replaces default one) you should
@@ -70,6 +73,8 @@ BuildRequires:	uClibc-static >= 0.9.21
 %{?with_sh_prov:Provides:	/bin/sh}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+
+%define		_bindir		/bin
 %define		_initrd_bindir	/bin
 
 %description
