@@ -6,7 +6,7 @@ diff -urN busybox-1.00-pre2.org/include/applets.h busybox-1.00-pre2/include/appl
  	APPLET(pwd, pwd_main, _BB_DIR_BIN, _BB_SUID_NEVER)
  #endif
 +#ifdef CONFIG_RAID_START
-+	APPLET(raid_start, raid_start_main, _BB_DIR_SBIN, __BB_SUID_NEVER)
++	APPLET(raid_start, raid_start_main, _BB_DIR_SBIN, _BB_SUID_NEVER)
 +#endif
  #ifdef CONFIG_RDATE
  	APPLET(rdate, rdate_main, _BB_DIR_USR_SBIN, _BB_SUID_NEVER)
