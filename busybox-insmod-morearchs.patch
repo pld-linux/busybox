@@ -1,0 +1,33 @@
+--- busybox-1.00-pre5/modutils/insmod.c.orig	2003-12-26 12:46:30.000000000 +0000
++++ busybox-1.00-pre5/modutils/insmod.c	2003-12-26 12:57:03.000000000 +0000
+@@ -256,7 +256,29 @@
+ #define SHT_RELM        SHT_RELA
+ #define Elf64_RelM      Elf64_Rela
+ #endif
+-	
++
++#if defined(__alpha__)
++#define ELFCLASSM		ELFCLASS64
++#define ELFDATAM		ELFDATA2LSB
++#define MATCH_MACHINE(x)  (x == EM_ALPHA)
++#define SHT_RELM		SHT_RELA
++#define Elf64_RelM		Elf64_Rela
++#endif
++
++#if defined(__sparc64__) || defined(__sparcv9__)
++#define ELFCLASSM		ELFCLASS64
++#define ELFDATAM		ELFDATA2MSB
++#define MATCH_MACHINE(x)  ((x) == EM_SPARCV9 || (x) == EM_SPARC64)
++#define SHT_RELM		SHT_RELA
++#define Elf64_RelM		Elf64_Rela
++#elif defined(__sparc__)
++#define ELFCLASSM		ELFCLASS32
++#define ELFDATAM		ELFDATA2MSB
++#define MATCH_MACHINE(x)  (x == EM_SPARC)
++#define SHT_RELM		SHT_RELA
++#define Elf32_RelM		Elf32_Rela
++#endif
++
+ #ifndef SHT_RELM
+ #error Sorry, but insmod.c does not yet support this architecture...
+ #endif
