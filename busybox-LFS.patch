@@ -116,7 +116,6 @@ diff -Nur busybox-1.00-orig/networking/ftpgetput.c busybox-1.00/networking/ftpge
  
  	if (ftpcmd("SIZE ", server_path, control_stream, buf) == 213) {
 -		unsigned long value=filesize;
--		if (safe_strtoul(buf + 4, &value))
 +		off_t value=filesize;
 +#ifdef CONFIG_LFS
 +		if (safe_strtoull(buf + 4, &value))
