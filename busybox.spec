@@ -4,15 +4,32 @@ Version:	0.50
 Release:	1
 License:	GPL
 Group:		Applications/File
-Patch0:		busybox-0.50.patch
-Patch1:		busybox-logconsole.patch
-Patch2:		busybox-tee.patch
-Source0:	%{name}-%{version}.tar.gz
+Group(de):	Applikationen/Datei
+Group(pl):	Aplikacje/Pliki
+Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
 Source1:	%{name}-config.h
+Patch0:		%{name}-0.50.patch
+Patch1:		%{name}-logconsole.patch
+Patch2:		%{name}-tee.patch
+URL:		http://busybox.lineo.com/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-Ye know..
+BusyBox combines tiny versions of many common UNIX utilities into a
+single small executable. It provides minimalist replacements for most
+of the utilities you usually find in fileutils, shellutils, findutils,
+textutils, grep, gzip, tar, etc. BusyBox provides a fairly complete
+POSIX environment for any small or embedded system. The utilities in
+BusyBox generally have fewer options than their full-featured GNU
+cousins; however, the options that are included provide the expected
+functionality and behave very much like their GNU counterparts.
+
+BusyBox has been written with size-optimization and limited resources
+in mind. It is also extremely modular so you can easily include or
+exclude commands (or features) at compile time. This makes it easy to
+customize your embedded systems. To create a working system, just add
+a kernel, a shell (such as ash), and an editor (such as elvis-tiny or
+ae).
 
 %prep
 %setup -q
@@ -26,9 +43,12 @@ cp %{SOURCE1} Config.h
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d -m 755 $RPM_BUILD_ROOT/usr/lib/bootdisk/{bin,config}
-install -m 755 busybox $RPM_BUILD_ROOT/usr/lib/bootdisk/bin/
-install -m 755 busybox.links $RPM_BUILD_ROOT/usr/lib/bootdisk/config/
+%{__install} -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir}/busybox,%{_mandir}/man1}
+
+%{__install} busybox $RPM_BUILD_ROOT%{_bindir}
+%{__install} busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
+%{__install} docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
+echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
 
 gzip -9nf AUTHORS TODO Changelog README
 
@@ -38,5 +58,6 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc *.gz
-%attr(755,root,root) /usr/lib/bootdisk/bin/*
-/usr/lib/bootdisk/config/*
+%attr(755,root,root) %{_bindir}/*
+%{_libdir}/busybox
+%{_mandir}/man1/*
