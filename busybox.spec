@@ -51,7 +51,7 @@ busybox for PLD bootdisk.
 # BOOT
 cp %{SOURCE1} Config.h
 %{__make} \
-	CFLAGS_EXTRA="-I%{_libdir}/bootdisk%{_includedir}" \
+	CFLAGS_EXTRA="-m386 -I%{_libdir}/bootdisk%{_includedir}" \
 	LDFLAGS="-nostdlib -s" \
 	LIBRARIES="%{_libdir}/bootdisk%{_libdir}/crt0.o %{_libdir}/bootdisk%{_libdir}/libc.a -lgcc"
 
