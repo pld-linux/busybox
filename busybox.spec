@@ -11,7 +11,6 @@ Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
 Source1:	%{name}-config.h
 Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-tee.patch
-Patch2:		%{name}-sh-name.patch
 Patch3:		%{name}-printf-gettext.patch
 Patch4:		%{name}-loadfont.patch
 Patch5:		%{name}-cread.patch
@@ -60,7 +59,6 @@ busybox for PLD bootdisk.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
@@ -97,8 +95,6 @@ for i in `cat busybox.links`; do
 	ln -sfn busybox "$RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/`basename $i`"
 done
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}/busybox
-# change sh to lash (see sh_name patch)
-mv -f $RPM_BUILD_ROOT%{_libdir}/bootdisk/bin/{sh,lash}
 %endif
 
 install busybox $RPM_BUILD_ROOT%{_bindir}
