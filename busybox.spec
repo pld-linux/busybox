@@ -39,18 +39,15 @@ Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
 Patch0:		%{name}-logconsole.patch
-Patch1:		%{name}-print_ascii.patch
-Patch2:		%{name}-printf-gettext.patch
-Patch3:		%{name}-loadfont.patch
-Patch4:		%{name}-pivot_root.patch
-Patch5:		%{name}-malloc.patch
-Patch6:		%{name}-raid_start.patch
-Patch8:		%{name}-force-dietlibc.patch
-Patch9:		%{name}-ash_exec.patch
-Patch10:	%{name}-amd64.patch
-Patch11:	%{name}-kernel_headers.patch
-Patch12:	%{name}-insmod-morearchs.patch
-Patch13:	%{name}-readahead.patch
+Patch1:		%{name}-printf-gettext.patch
+Patch2:		%{name}-loadfont.patch
+Patch3:		%{name}-pivot_root.patch
+Patch4:		%{name}-raid_start.patch
+Patch5:		%{name}-force-dietlibc.patch
+Patch6:		%{name}-ash_exec.patch
+Patch7:		%{name}-kernel_headers.patch
+Patch8:		%{name}-insmod-morearchs.patch
+Patch9:		%{name}-readahead.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
@@ -133,16 +130,15 @@ Statycznie skonsolidowany busybox dla initrd.
 %prep
 %setup -q -n %{name}-%{version}-%{pre}
 %patch0 -p1
-#X %patch2 -p1 // UPDATE ME
+%patch1 -p1
+%patch2 -p1
 %patch3 -p1
 %patch4 -p1
-#%patch5 -p1 // not needed
+%patch5 -p1
 %patch6 -p1
+%patch7 -p1
 %patch8 -p1
 %patch9 -p1
-#%patch10 -p1
-%patch11 -p1
-%patch13 -p1
 
 %build
 install %{SOURCE1} .config
