@@ -48,8 +48,6 @@ Patch7:		%{name}-raid_start.patch
 Patch8:		%{name}-insmod_ng.patch
 Patch9:		%{name}-force-dietlibc.patch
 Patch10:	%{name}-insmod-gpl.patch
-Patch100:	%{name}-config.patch
-Patch101:	%{name}-initrd-config.patch
 URL:		http://www.busybox.net/
 %{?with_fileutl_prov:Provides:	fileutils}
 %{?with_grep_prov:Provides:	grep}
