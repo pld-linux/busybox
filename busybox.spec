@@ -2,11 +2,14 @@ Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Name:		busybox
 Version:	0.60.1
-Release:	14
+Release:	15
 License:	GPL
 Group:		Applications
 Group(de):	Applikationen
+Group(es):	Aplicaciones
 Group(pl):	Aplikacje
+Group(pt):	Aplicações
+Group(pt_BR):	Aplicações
 Source0:	ftp://ftp.lineo.com/pub/busybox/%{name}-%{version}.tar.gz
 Source1:	%{name}-config.h
 Patch0:		%{name}-logconsole.patch
@@ -18,6 +21,7 @@ Patch6:		%{name}-malloc.patch
 Patch7:		%{name}-pivot_root.patch
 URL:		http://busybox.lineo.com/
 %{?BOOT:BuildRequires:	uClibc-devel-BOOT >= 20010521-3}
+%{!?_without_static:BuildRequires:	glibc-static}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -47,14 +51,37 @@ odpowiedniki GNU, ale maj± podstawow± funkcjonalno¶æ. Do dzia³aj±cego
 systemu potrzeba jeszcze tylko kernela, shella (np. ash) oraz edytora
 (np. elvis-tiny albo ae).
 
-%package BOOT
-Summary:	busybox for PLD bootdisk
+%package static
+Summary:	Static busybox
+Summary(pl):	Statycznie linkowany busybox
 Group:		Applications
 Group(de):	Applikationen
+Group(es):	Aplicaciones
 Group(pl):	Aplikacje
+Group(pt):	Aplicações
+Group(pt_BR):	Aplicações
+
+%description static
+Static busybox.
+
+%description static -l pl
+Statycznie linkowany busybox.
+
+%package BOOT
+Summary:	busybox for PLD bootdisk
+Summary(pl):	busybox dla bootkietki PLD
+Group:		Applications
+Group(de):	Applikationen
+Group(es):	Aplicaciones
+Group(pl):	Aplikacje
+Group(pt):	Aplicações
+Group(pt_BR):	Aplicações
 
 %description BOOT
 busybox for PLD bootdisk.
+
+%description BOOT -l pl
+busybox dla bootkietki PLD.
 
 %prep
 %setup -q
@@ -75,9 +102,16 @@ cp -f %{SOURCE1} Config.h
 	LDFLAGS="-nostdlib" \
 	LIBRARIES="%{_libdir}/bootdisk%{_libdir}/crt0.o %{_libdir}/bootdisk%{_libdir}/libc.a -lgcc"
 mv -f busybox busybox-BOOT
+%{__make} clean
 %endif
 
+%if %{?_without_static:0}%{!?_without_static:1}
+%{__make} \
+	CFLAGS_EXTRA="%{rpmcflags}" \
+	LDFLAGS="%{rpmldflags} -static"
+mv -f busybox busybox.static
 %{__make} clean
+%endif
 
 # TODO make main package dynamically linked
 %{__make} \
@@ -99,6 +133,8 @@ done
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}/busybox
 %endif
 
+%{!?_without_static:install busybox.static $RPM_BUILD_ROOT%{_bindir}}
+
 install busybox $RPM_BUILD_ROOT%{_bindir}
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -112,9 +148,15 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc *.gz
-%attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) %{_bindir}/busybox
 %{_libdir}/busybox
 %{_mandir}/man1/*
+
+%if %{?_without_static:0}%{!?_without_static:1}
+%files static
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/busybox.static
+%endif
 
 %if %{?BOOT:1}%{!?BOOT:0}
 %files BOOT
