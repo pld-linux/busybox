@@ -121,7 +121,7 @@ diff -Nur busybox-1.00-orig/networking/ftpgetput.c busybox-1.00/networking/ftpge
 +#ifdef CONFIG_LFS
 +		if (safe_strtoull(buf + 4, &value))
 +#else
-+		if (safe_strtoull(buf + 4, &value))
+ 		if (safe_strtoul(buf + 4, &value))
 +#endif
  			bb_error_msg_and_die("SIZE error: %s", buf + 4);
  		filesize = value;
