@@ -1,6 +1,6 @@
 diff -urN busybox-1.00-pre2.org/include/applets.h busybox-1.00-pre2/include/applets.h
 --- busybox-1.00-pre2.org/include/applets.h	2003-08-02 23:46:48.000000000 +0200
-+++ busybox-1.00-pre2/include/applets.h	2003-08-03 00:08:29.000000000 +0200
++++ busybox-1.00-pre2/include/applets.h	2003-08-03 00:36:17.000000000 +0200
 @@ -286,6 +286,9 @@
  #ifdef CONFIG_INSMOD
  	APPLET(insmod, insmod_main, _BB_DIR_SBIN, _BB_SUID_NEVER)
@@ -13,7 +13,7 @@ diff -urN busybox-1.00-pre2.org/include/applets.h busybox-1.00-pre2/include/appl
  #endif
 diff -urN busybox-1.00-pre2.org/include/usage.h busybox-1.00-pre2/include/usage.h
 --- busybox-1.00-pre2.org/include/usage.h	2003-08-02 23:46:48.000000000 +0200
-+++ busybox-1.00-pre2/include/usage.h	2003-08-03 00:01:40.000000000 +0200
++++ busybox-1.00-pre2/include/usage.h	2003-08-03 00:36:17.000000000 +0200
 @@ -1312,6 +1312,11 @@
  	"          [ [i|o]seq ] [ [i|o]key KEY ] [ [i|o]csum ]\n" \
  	"          [ ttl TTL ] [ tos TOS ] [ [no]pmtudisc ] [ dev PHYS_DEV ]\n"
@@ -28,7 +28,7 @@ diff -urN busybox-1.00-pre2.org/include/usage.h busybox-1.00-pre2/include/usage.
  #define kill_full_usage \
 diff -urN busybox-1.00-pre2.org/modutils/Config.in busybox-1.00-pre2/modutils/Config.in
 --- busybox-1.00-pre2.org/modutils/Config.in	2003-08-02 23:46:49.000000000 +0200
-+++ busybox-1.00-pre2/modutils/Config.in	2003-08-03 00:06:09.000000000 +0200
++++ busybox-1.00-pre2/modutils/Config.in	2003-08-03 00:36:17.000000000 +0200
 @@ -33,6 +33,15 @@
  	  Support module loading for newer (post 2.1) Linux kernels.
  endif
@@ -47,7 +47,7 @@ diff -urN busybox-1.00-pre2.org/modutils/Config.in busybox-1.00-pre2/modutils/Co
  	default n
 diff -urN busybox-1.00-pre2.org/modutils/insmod.c busybox-1.00-pre2/modutils/insmod.c
 --- busybox-1.00-pre2.org/modutils/insmod.c	2003-08-02 23:46:49.000000000 +0200
-+++ busybox-1.00-pre2/modutils/insmod.c	2003-08-03 00:01:35.000000000 +0200
++++ busybox-1.00-pre2/modutils/insmod.c	2003-08-03 00:36:17.000000000 +0200
 @@ -4049,6 +4049,14 @@
  
  	printf("Using %s\n", m_filename);
@@ -65,8 +65,8 @@ diff -urN busybox-1.00-pre2.org/modutils/insmod.c busybox-1.00-pre2/modutils/ins
  
 diff -urN busybox-1.00-pre2.org/modutils/insmod_ng.c busybox-1.00-pre2/modutils/insmod_ng.c
 --- busybox-1.00-pre2.org/modutils/insmod_ng.c	1970-01-01 01:00:00.000000000 +0100
-+++ busybox-1.00-pre2/modutils/insmod_ng.c	2003-08-03 00:01:35.000000000 +0200
-@@ -0,0 +1,110 @@
++++ busybox-1.00-pre2/modutils/insmod_ng.c	2003-08-03 00:37:20.000000000 +0200
+@@ -0,0 +1,112 @@
 +/* vi: set sw=4 ts=4: */
 +/*
 + * insmod for 2.5 kernels implementation for busybox
@@ -132,11 +132,13 @@ diff -urN busybox-1.00-pre2.org/modutils/insmod_ng.c busybox-1.00-pre2/modutils/
 +	struct stat st;
 +	unsigned long len;
 +	void *map;
-+	char *filename, *options = xstrdup("");
++	char *filename, *options = bb_xstrdup("");
 +	
 +	filename = argv[1];
-+	if (!filename)
-+		show_usage();
++	if (!filename) {
++		bb_show_usage();
++		return -1;
++	}
 +
 +	/* Rest is options */
 +	for (i = 2; i < argc; i++) {
@@ -154,17 +156,17 @@ diff -urN busybox-1.00-pre2.org/modutils/insmod_ng.c busybox-1.00-pre2/modutils/
 +	}
 +
 +	if ((fd = open(filename, O_RDONLY, 0)) < 0)
-+		perror_msg_and_die("cannot open module `%s'", filename);
++		bb_perror_msg_and_die("cannot open module `%s'", filename);
 +
 +	fstat(fd, &st);
 +	len = st.st_size;
 +	map = mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0);
 +	if (map == MAP_FAILED)
-+		perror_msg_and_die("cannot mmap `%s'", filename);
++		bb_perror_msg_and_die("cannot mmap `%s'", filename);
 +
 +	ret = init_module_25(map, len, options);
 +	if (ret != 0)
-+		perror_msg_and_die("cannot insert `%s': %s (%li)",
++		bb_perror_msg_and_die("cannot insert `%s': %s (%li)",
 +						   filename, moderror(errno), ret);
 +	
 +	return 0;
@@ -179,7 +181,7 @@ diff -urN busybox-1.00-pre2.org/modutils/insmod_ng.c busybox-1.00-pre2/modutils/
 +*/
 diff -urN busybox-1.00-pre2.org/modutils/Makefile.in busybox-1.00-pre2/modutils/Makefile.in
 --- busybox-1.00-pre2.org/modutils/Makefile.in	2003-08-02 23:46:49.000000000 +0200
-+++ busybox-1.00-pre2/modutils/Makefile.in	2003-08-03 00:06:59.000000000 +0200
++++ busybox-1.00-pre2/modutils/Makefile.in	2003-08-03 00:36:17.000000000 +0200
 @@ -24,6 +24,7 @@
  
  MODUTILS-y:=
