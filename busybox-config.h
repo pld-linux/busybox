@@ -60,7 +60,7 @@
 #define BB_KILL
 #define BB_KILLALL
 #define BB_KLOGD
-//#define BB_LASH
+#define BB_LASH
 //#define BB_LENGTH
 #define BB_LN
 #define BB_LOADACM
@@ -84,7 +84,7 @@
 //#define BB_MSH
 //#define BB_MT
 #define BB_MV
-//#define BB_NC
+#define BB_NC
 //#define BB_NSLOOKUP
 //#define BB_PIDOF
 //#define BB_PING
