@@ -37,6 +37,7 @@ Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
+# Source0-md5:	79d244d5adbb048f1aa0d90ee9e187e4
 %{!?_with_altconfig:Source1:	%{name}-config.h}
 %{?_with_altconfig:Source1:	%{cfgfile}}
 Patch0:		%{name}-logconsole.patch
