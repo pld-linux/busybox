@@ -45,11 +45,11 @@
 //#define BB_HALT
 #define BB_HEAD
 //#define BB_HOSTID
-//#define BB_HOSTNAME
+#define BB_HOSTNAME
 //#define BB_ID
 //#define BB_IFCONFIG
 #define BB_INIT
-//#define BB_INSMOD
+#define BB_INSMOD
 #define BB_KILL
 #define BB_KILLALL
 //#define BB_KLOGD
@@ -61,7 +61,7 @@
 //#define BB_LOGGER
 //#define BB_LOGNAME
 #define BB_LS
-//#define BB_LSMOD
+#define BB_LSMOD
 #define BB_MAKEDEVS
 #define BB_MD5SUM
 #define BB_MKDIR
@@ -72,7 +72,7 @@
 #define BB_MKTEMP
 //#define BB_NC
 #define BB_MORE
-//#define BB_MOUNT
+#define BB_MOUNT
 //#define BB_MT
 //#define BB_NSLOOKUP
 //#define BB_PING
@@ -88,7 +88,7 @@
 #define BB_RESET
 #define BB_RM
 #define BB_RMDIR
-//#define BB_RMMOD
+#define BB_RMMOD
 //#define BB_ROUTE
 //#define BB_RPMUNPACK
 #define BB_SED
@@ -112,7 +112,7 @@
 //#define BB_TTY
 //#define BB_UUENCODE
 //#define BB_UUDECODE
-//#define BB_UMOUNT
+#define BB_UMOUNT
 #define BB_UNIQ
 #define BB_UNAME
 #define BB_UPDATE
