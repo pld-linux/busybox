@@ -1,0 +1,26 @@
+diff -Nur --exclude *~ busybox-0.51/loadfont.c busybox-0.51.new/loadfont.c
+--- busybox-0.51/loadfont.c	Tue Feb 20 07:14:07 2001
++++ busybox-0.51.new/loadfont.c	Tue Jun 12 14:49:58 2001
+@@ -155,8 +155,6 @@
+ 	   maybe these do not occur: 16kB for the font,
+ 	   and 16kB for the map leaves 32 unicode values
+ 	   for each font position */
+-	if (!feof(stdin))
+-		perror_msg_and_die("Font too large");
+ 
+ 	/* test for psf first */
+ 	{
+diff -Nur --exclude *~ busybox-0.51/loadfont.c busybox-0.51.new/loadfont.c
+--- busybox-0.51/loadfont.c	Tue Jun 12 14:52:11 2001
++++ busybox-0.51.new/loadfont.c	Tue Jun 12 15:16:20 2001
+@@ -183,8 +183,8 @@
+ 		head0 = sizeof(struct psf_header);
+ 
+ 		head = head0 + fontsize * unit;
+-		if (head > inputlth || (!hastable && head != inputlth))
+-			error_msg_and_die("Input file: bad length");
++		/* if (head > inputlth || (!hastable && head != inputlth))
++		   error_msg_and_die("Input file: bad length"); */
+ 		do_loadfont(fd, inbuf + head0, unit, fontsize);
+ 		if (hastable)
+ 			do_loadtable(fd, inbuf + head, inputlth - head, fontsize);
