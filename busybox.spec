@@ -8,7 +8,7 @@
 # alternative busybox config file (replaces default one) you should
 # define cfgfile macro, i.e.
 #
-#       rpm --rebuild busybox.*.src.rpm --with altconfig --define "cfgfile bb-emb-config.h"
+#	rpm --rebuild busybox.*.src.rpm --with altconfig --define "cfgfile bb-emb-config.h"
 %bcond_with	altconfig	# use alternative config (defined by cfgfile)
 %bcond_with	linkfl		# creates links to busybox binary and puts them into file list
 # Options below are useful, when you want fileutils and grep providing.
@@ -58,15 +58,15 @@ URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
 %if %{with initrd}
-  %if %{with dietlibc}
+	%if %{with dietlibc}
 BuildRequires:	dietlibc-static
-  %else
-    %if %{with glibc}
+	%else
+		%if %{with glibc}
 BuildRequires:	glibc-static
-    %else
+		%else
 BuildRequires:	uClibc-static >= 0.9.21
-    %endif
-  %endif
+		%endif
+	%endif
 %endif
 %{?with_fileutl_prov:Provides:	fileutils}
 %{?with_grep_prov:Provides:	grep}
@@ -180,7 +180,7 @@ install %{SOURCE3} .config
 
 %if %{with static}
 %{__make} oldconfig
-%{__make}  \
+%{__make} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags} -static" \
 	CC="%{__cc}"
