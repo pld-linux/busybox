@@ -1,11 +1,11 @@
-diff -urN busybox-0.60.1/tee.c busybox-0.60.1.new/tee.c
---- busybox-0.60.1/tee.c	Wed Feb 14 22:23:06 2001
-+++ busybox-0.60.1.new/tee.c	Tue Aug 28 21:55:10 2001
-@@ -52,6 +52,7 @@
- 		}
- 	}
+diff -urN busybox-1.00-pre2.org/coreutils/tee.c busybox-1.00-pre2/coreutils/tee.c
+--- busybox-1.00-pre2.org/coreutils/tee.c	2003-08-02 23:31:11.000000000 +0200
++++ busybox-1.00-pre2/coreutils/tee.c	2003-08-02 23:32:33.000000000 +0200
+@@ -89,6 +89,7 @@
+ #endif
  
+ #else
 +	setvbuf(stdout, NULL, _IONBF, 0);
- 	while ((c = getchar()) != EOF)
- 		for (i = 0; i < nfiles; i++)
- 			putc(c, files[i]);
+ 	while ((c = getchar()) != EOF) {
+ 		for (p=files ; *p ; p++) {
+ 			putc(c, *p);
