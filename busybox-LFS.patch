@@ -24,7 +24,7 @@ diff -Nur busybox-1.00/include/libbb.h.orig busybox-1.00/include/libbb.h
 diff -Nur busybox-1.00/libbb/copyfd.c.orig busybox-1.00/libbb/copyfd.c
 --- busybox-1.00/libbb/copyfd.c.orig	2005-02-15 16:48:45.561625136 +0100
 +++ busybox-1.00/libbb/copyfd.c	2005-02-15 16:39:24.000000000 +0100
-@@ -34,10 +34,11 @@
+@@ -34,10 +34,10 @@
  #endif
  
  
@@ -33,12 +33,11 @@ diff -Nur busybox-1.00/libbb/copyfd.c.orig busybox-1.00/libbb/copyfd.c
  {
  	int status;
 -	size_t xread, wrote, total, size = size2;
-+	off_t total;
-+	size_t xread, wrote, size = size2;
++	off_t xread, wrote, total, size = size2;
  
  	if (src_fd < 0) {
  		return -1;
-@@ -90,7 +91,7 @@
+@@ -90,7 +90,7 @@
  }
  
  
@@ -47,7 +46,7 @@ diff -Nur busybox-1.00/libbb/copyfd.c.orig busybox-1.00/libbb/copyfd.c
  {
  	if (size) {
  		return(bb_full_fd_action(fd1, fd2, size));
-@@ -98,7 +99,7 @@
+@@ -98,7 +98,7 @@
  	return(0);
  }
  
