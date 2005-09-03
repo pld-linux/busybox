@@ -33,12 +33,12 @@ Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
-Version:	1.00
-Release:	3
+Version:	1.01
+Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	5c7ea9b5d3b3677dfcdcec38b281a756
+# Source0-md5:	f250842dae2854a38470ed16a46bba66
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
@@ -58,7 +58,6 @@ Patch12:	%{name}-LFS.patch
 Patch13:	%{name}-ftpput.patch
 #http://www.zelow.no/floppyfw/download/Development/Patches/busybox-snapshot/busybox-lzmacat.diff
 Patch14:	%{name}-lzmacat.diff
-Patch15:	%{name}-cvs-20050604.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
@@ -142,7 +141,6 @@ Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q
-%patch15 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -228,7 +226,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS Changelog README .config
+%doc AUTHORS README .config
 
 %if %{with linkfl}
 %attr(755,root,root) /bin/*

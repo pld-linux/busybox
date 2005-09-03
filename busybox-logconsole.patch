@@ -22,12 +22,12 @@ diff -urN busybox-1.00-pre2/include/libbb.h busybox-1.00-pre2.org/include/libbb.
 diff -urN busybox-1.00-pre2/init/init.c busybox-1.00-pre2.org/init/init.c
 --- busybox-1.00-pre2/init/init.c	2003-08-02 23:40:57.000000000 +0200
 +++ busybox-1.00-pre2.org/init/init.c	2003-08-02 23:45:30.000000000 +0200
-@@ -157,7 +157,7 @@
+@@ -155,7 +155,7 @@
  static char console[CONSOLE_BUFF_SIZE] = _PATH_CONSOLE;
  
  #ifndef CONFIG_SYSLOGD
--static char *log = VC_5;
-+static char *log = VC_12;
+-static char *log_console = VC_5;
++static char *log_console = VC_12;
  #endif
  static sig_atomic_t got_cont = 0;
  static const int LOG = 0x1;
