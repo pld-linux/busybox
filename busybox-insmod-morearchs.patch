@@ -12,7 +12,7 @@
 +#define Elf64_RelM		Elf64_Rela
 +#endif
 +
-+#if defined(__sparc64__) || defined(__sparcv9__)
++#if defined(__sparc__) && defined(__arch64__)
 +#define ELFCLASSM		ELFCLASS64
 +#define ELFDATAM		ELFDATA2MSB
 +#define MATCH_MACHINE(x)  ((x) == EM_SPARCV9 || (x) == EM_SPARC64)
