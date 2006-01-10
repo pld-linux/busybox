@@ -26,8 +26,11 @@
 %bcond_with	dietlibc	# build dietlibc-based initrd version
 %bcond_with	glibc		# build glibc-based initrd version
 #
-%ifnarch %{ix86}
+%ifnarch %{ix86} ppc
 %define with_glibc 1
+%endif
+%ifarch ppc
+%undefine	with_dietlibc
 %endif
 Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
@@ -68,7 +71,11 @@ BuildRequires:	dietlibc-static
 		%if %{with glibc}
 BuildRequires:	glibc-static
 		%else
+%ifarch ppc
+BuildRequires:	uClibc-static > 0.9.28
+%else
 BuildRequires:	uClibc-static >= 0.9.21
+%endif
 		%endif
 	%endif
 %endif
