@@ -1,65 +1,114 @@
-diff -Nur busybox-1.01-orig/include/libbb.h busybox-1.01/include/libbb.h
---- busybox-1.01-orig/include/libbb.h	2005-09-27 09:07:59.097072152 +0200
-+++ busybox-1.01/include/libbb.h	2005-09-27 17:08:02.912226664 +0200
-@@ -138,8 +138,8 @@
- extern char *find_real_root_device_name(void);
- extern char *bb_get_line_from_file(FILE *file);
- extern char *bb_get_chomped_line_from_file(FILE *file);
--extern int bb_copyfd_size(int fd1, int fd2, const off_t size);
--extern int bb_copyfd_eof(int fd1, int fd2);
-+extern off_t bb_copyfd_size(int fd1, int fd2, const off_t size);
-+extern off_t bb_copyfd_eof(int fd1, int fd2);
- extern void  bb_xprint_and_close_file(FILE *file);
- extern int   bb_xprint_file_by_name(const char *filename);
- extern char  bb_process_escape_sequence(const char **ptr);
-@@ -195,6 +195,8 @@
- extern int safe_strtod(char *arg, double* value);
- extern int safe_strtol(char *arg, long* value);
- extern int safe_strtoul(char *arg, unsigned long* value);
-+extern int safe_strtoll(char *arg, long long* value);
-+extern int safe_strtoull(char *arg, unsigned long long* value);
+--- busybox-1.1.0/networking/ftpgetput.c.wiget	2006-01-11 06:43:51.000000000 +0100
++++ busybox-1.1.0/networking/ftpgetput.c	2006-01-18 16:52:42.000000000 +0100
+@@ -139,8 +139,12 @@
+ 	fd_data = xconnect_ftpdata(server, buf);
  
- struct suffix_mult {
- 	const char *suffix;
-diff -Nur busybox-1.01-orig/libbb/copyfd.c busybox-1.01/libbb/copyfd.c
---- busybox-1.01-orig/libbb/copyfd.c	2005-08-17 03:29:14.000000000 +0200
-+++ busybox-1.01/libbb/copyfd.c	2005-09-27 17:11:40.083211656 +0200
-@@ -34,29 +34,25 @@
+ 	if (ftpcmd("SIZE ", server_path, control_stream, buf) == 213) {
+-		unsigned long value=filesize;
++		off_t value=filesize;
++#ifdef CONFIG_LFS
++		if (safe_strtoull(buf + 4, &value))
++#else
+ 		if (safe_strtoul(buf + 4, &value))
++#endif
+ 			bb_error_msg_and_die("SIZE error: %s", buf + 4);
+ 		filesize = value;
+ 	} else {
+@@ -166,7 +170,11 @@
+ 	}
+ 
+ 	if (do_continue) {
++#ifdef CONFIG_LFS
++		sprintf(buf, "REST %lld", (long long)beg_range);
++#else
+ 		sprintf(buf, "REST %ld", (long)beg_range);
++#endif
+ 		if (ftpcmd(buf, NULL, control_stream, buf) != 350) {
+ 			do_continue = 0;
+ 		} else {
+@@ -230,7 +238,11 @@
+ 		fd_local = bb_xopen(local_path, O_RDONLY);
+ 		fstat(fd_local, &sbuf);
+ 
++#ifdef CONFIG_LFS
++		sprintf(buf, "ALLO %llu", (unsigned long long)sbuf.st_size);
++#else
+ 		sprintf(buf, "ALLO %lu", (unsigned long)sbuf.st_size);
++#endif
+ 		response = ftpcmd(buf, NULL, control_stream, buf);
+ 		switch (response) {
+ 		case 200:
+--- busybox-1.1.0/networking/wget.c.wiget	2006-01-11 06:43:51.000000000 +0100
++++ busybox-1.1.0/networking/wget.c	2006-01-18 16:52:42.000000000 +0100
+@@ -386,8 +386,12 @@
+ 			 */
+ 			while ((s = gethdr(buf, sizeof(buf), sfp, &n)) != NULL) {
+ 				if (strcasecmp(buf, "content-length") == 0) {
+-					unsigned long value;
++					off_t value;
++#ifdef CONFIG_LFS
++					if (safe_strtoull(s, &value)) {
++#else
+ 					if (safe_strtoul(s, &value)) {
++#endif
+ 						close_delete_and_die("content-length %s is garbage", s);
+ 					}
+ 					filesize = value;
+@@ -457,8 +461,12 @@
+ 		 * Querying file size
+ 		 */
+ 		if (ftpcmd("SIZE /", target.path, sfp, buf) == 213) {
+-			unsigned long value;
++			off_t value;
++#ifdef CONFIG_LFS
++			if (safe_strtoull(buf+4, &value)) {
++#else
+ 			if (safe_strtoul(buf+4, &value)) {
++#endif
+ 				close_delete_and_die("SIZE value is garbage");
+ 			}
+ 			filesize = value;
+@@ -499,7 +507,12 @@
+ 	 */
+ 	if (chunked) {
+ 		fgets(buf, sizeof(buf), dfp);
++#ifdef CONFIG_LFS
++		filesize = strtoll(buf, (char **) NULL, 16);
++#else
+ 		filesize = strtol(buf, (char **) NULL, 16);
++#endif
++
+ 	}
+ #ifdef CONFIG_FEATURE_WGET_STATUSBAR
+ 	if (quiet_flag==FALSE)
+@@ -521,7 +534,11 @@
+ 		if (chunked) {
+ 			safe_fgets(buf, sizeof(buf), dfp); /* This is a newline */
+ 			safe_fgets(buf, sizeof(buf), dfp);
++#ifdef CONFIG_LFS
++			filesize = strtoll(buf, (char **) NULL, 16);
++#else
+ 			filesize = strtol(buf, (char **) NULL, 16);
++#endif
+ 			if (filesize==0) {
+ 				chunked = 0; /* all done! */
+ 			}
+--- busybox-1.1.0/libbb/copyfd.c.wiget	2006-01-11 06:44:06.000000000 +0100
++++ busybox-1.1.0/libbb/copyfd.c	2006-01-18 17:03:14.000000000 +0100
+@@ -22,10 +22,10 @@
  #endif
  
  
--static size_t bb_full_fd_action(int src_fd, int dst_fd, const size_t size2)
-+static off_t bb_full_fd_action(int src_fd, int dst_fd, const off_t size2)
+-static ssize_t bb_full_fd_action(int src_fd, int dst_fd, size_t size)
++static off_t bb_full_fd_action(int src_fd, int dst_fd, off_t size)
  {
- 	int status;
--	size_t xread, wrote, total, size = size2;
-+	ssize_t xread, wrote;
-+	off_t total, size = size2;
+ 	int status = -1;
+-	size_t total = 0;
++	off_t total = 0;
+ 	RESERVE_CONFIG_BUFFER(buffer,BUFSIZ);
  
- 	if (src_fd < 0) {
- 		return -1;
- 	}
- 
--	if (size == 0) {
--		/* If size is 0 copy until EOF */
--		size = ULONG_MAX;
--	}
--
- 	{
- 		RESERVE_CONFIG_BUFFER(buffer,BUFSIZ);
- 		total = 0;
- 		wrote = 0;
- 		status = -1;
--		while (total < size)
-+		while (total < size || size == 0)
- 		{
- 			xread = BUFSIZ;
--			if (size < (total + BUFSIZ))
-+			if (size < (total + BUFSIZ) && size != 0)
- 				xread = size - total;
- 			xread = bb_full_read(src_fd, buffer, xread);
- 			if (xread > 0) {
-@@ -90,7 +86,7 @@
+ 	if (src_fd < 0) goto out;
+@@ -61,7 +61,7 @@
  }
  
  
@@ -68,7 +117,7 @@ diff -Nur busybox-1.01-orig/libbb/copyfd.c busybox-1.01/libbb/copyfd.c
  {
  	if (size) {
  		return(bb_full_fd_action(fd1, fd2, size));
-@@ -98,7 +94,7 @@
+@@ -69,7 +69,7 @@
  	return(0);
  }
  
@@ -77,21 +126,19 @@ diff -Nur busybox-1.01-orig/libbb/copyfd.c busybox-1.01/libbb/copyfd.c
  {
  	return(bb_full_fd_action(fd1, fd2, 0));
  }
-diff -Nur busybox-1.01-orig/libbb/Makefile.in busybox-1.01/libbb/Makefile.in
---- busybox-1.01-orig/libbb/Makefile.in	2005-08-17 03:29:14.000000000 +0200
-+++ busybox-1.01/libbb/Makefile.in	2005-09-27 17:08:02.913226512 +0200
-@@ -72,7 +72,7 @@
+--- busybox-1.1.0/libbb/Makefile.in.wiget	2006-01-11 06:44:06.000000000 +0100
++++ busybox-1.1.0/libbb/Makefile.in	2006-01-18 16:52:42.000000000 +0100
+@@ -63,7 +63,7 @@
  	xgetularg_bnd.o xgetularg10_bnd.o xgetularg10.o
  
  LIBBB_MSRC4:=$(srcdir)/safe_strtol.c
 -LIBBB_MOBJ4:=safe_strtoi.o safe_strtod.o safe_strtol.o safe_strtoul.o
 +LIBBB_MOBJ4:=safe_strtoi.o safe_strtod.o safe_strtol.o safe_strtoul.o safe_strtoull.o safe_strtoll.o
  
- LIBBB_MOBJS0=$(patsubst %,$(LIBBB_DIR)%, $(LIBBB_MOBJ0))
- LIBBB_MOBJS1=$(patsubst %,$(LIBBB_DIR)%, $(LIBBB_MOBJ1))
-diff -Nur busybox-1.01-orig/libbb/safe_strtol.c busybox-1.01/libbb/safe_strtol.c
---- busybox-1.01-orig/libbb/safe_strtol.c	2005-08-17 03:29:14.000000000 +0200
-+++ busybox-1.01/libbb/safe_strtol.c	2005-09-27 17:08:02.914226360 +0200
+ LIBBB_MSRC5:=$(srcdir)/bb_pwd.c
+ LIBBB_MOBJ5:=bb_xgetpwnam.o bb_xgetgrnam.o bb_getgrgid.o bb_getpwuid.o \
+--- busybox-1.1.0/libbb/safe_strtol.c.wiget	2006-01-11 06:44:06.000000000 +0100
++++ busybox-1.1.0/libbb/safe_strtol.c	2006-01-18 16:52:42.000000000 +0100
 @@ -90,3 +90,38 @@
  }
  #endif
@@ -131,100 +178,25 @@ diff -Nur busybox-1.01-orig/libbb/safe_strtol.c busybox-1.01/libbb/safe_strtol.c
 +	return 0;
 +}
 +#endif
-diff -Nur busybox-1.01-orig/networking/ftpgetput.c busybox-1.01/networking/ftpgetput.c
---- busybox-1.01-orig/networking/ftpgetput.c	2005-08-17 03:29:10.000000000 +0200
-+++ busybox-1.01/networking/ftpgetput.c	2005-09-27 17:08:02.914226360 +0200
-@@ -152,8 +152,12 @@
- 	fd_data = xconnect_ftpdata(server, buf);
+--- busybox-1.1.0/include/libbb.h.wiget	2006-01-18 16:52:42.000000000 +0100
++++ busybox-1.1.0/include/libbb.h	2006-01-18 16:58:00.000000000 +0100
+@@ -136,8 +136,8 @@
+ extern char *bb_get_line_from_file(FILE *file);
+ extern char *bb_get_chomped_line_from_file(FILE *file);
+ extern char *bb_get_chunk_from_file(FILE *file);
+-extern int bb_copyfd_size(int fd1, int fd2, const off_t size);
+-extern int bb_copyfd_eof(int fd1, int fd2);
++extern off_t bb_copyfd_size(int fd1, int fd2, const off_t size);
++extern off_t bb_copyfd_eof(int fd1, int fd2);
+ extern void  bb_xprint_and_close_file(FILE *file);
+ extern int   bb_xprint_file_by_name(const char *filename);
+ extern char  bb_process_escape_sequence(const char **ptr);
+@@ -190,6 +190,8 @@
+ extern int safe_strtod(char *arg, double* value);
+ extern int safe_strtol(char *arg, long* value);
+ extern int safe_strtoul(char *arg, unsigned long* value);
++extern int safe_strtoll(char *arg, long long* value);
++extern int safe_strtoull(char *arg, unsigned long long* value);
  
- 	if (ftpcmd("SIZE ", server_path, control_stream, buf) == 213) {
--		unsigned long value=filesize;
-+		off_t value=filesize;
-+#ifdef CONFIG_LFS
-+		if (safe_strtoull(buf + 4, &value))
-+#else
- 		if (safe_strtoul(buf + 4, &value))
-+#endif
- 			bb_error_msg_and_die("SIZE error: %s", buf + 4);
- 		filesize = value;
- 	}
-@@ -176,7 +180,11 @@
- 	}
- 
- 	if (do_continue) {
-+#ifdef CONFIG_LFS
-+		sprintf(buf, "REST %lld", (long long)beg_range);
-+#else
- 		sprintf(buf, "REST %ld", (long)beg_range);
-+#endif
- 		if (ftpcmd(buf, NULL, control_stream, buf) != 350) {
- 			do_continue = 0;
- 		} else {
-@@ -240,7 +248,11 @@
- 		fd_local = bb_xopen(local_path, O_RDONLY);
- 		fstat(fd_local, &sbuf);
- 
-+#ifdef CONFIG_LFS
-+		sprintf(buf, "ALLO %llu", (unsigned long long)sbuf.st_size);
-+#else
- 		sprintf(buf, "ALLO %lu", (unsigned long)sbuf.st_size);
-+#endif
- 		response = ftpcmd(buf, NULL, control_stream, buf);
- 		switch (response) {
- 		case 200:
-diff -Nur busybox-1.01-orig/networking/wget.c busybox-1.01/networking/wget.c
---- busybox-1.01-orig/networking/wget.c	2005-08-17 03:29:10.000000000 +0200
-+++ busybox-1.01/networking/wget.c	2005-09-27 17:08:02.916226056 +0200
-@@ -389,8 +389,12 @@
- 			 */
- 			while ((s = gethdr(buf, sizeof(buf), sfp, &n)) != NULL) {
- 				if (strcasecmp(buf, "content-length") == 0) {
--					unsigned long value;
-+					off_t value;
-+#ifdef CONFIG_LFS
-+					if (safe_strtoull(s, &value)) {
-+#else
- 					if (safe_strtoul(s, &value)) {
-+#endif
- 						close_delete_and_die("content-length %s is garbage", s);
- 					}
- 					filesize = value;
-@@ -460,8 +464,12 @@
- 		 * Querying file size
- 		 */
- 		if (ftpcmd("SIZE /", target.path, sfp, buf) == 213) {
--			unsigned long value;
-+			off_t value;
-+#ifdef CONFIG_LFS
-+			if (safe_strtoull(buf+4, &value)) {
-+#else
- 			if (safe_strtoul(buf+4, &value)) {
-+#endif
- 				close_delete_and_die("SIZE value is garbage");
- 			}
- 			filesize = value;
-@@ -502,7 +510,12 @@
- 	 */
- 	if (chunked) {
- 		fgets(buf, sizeof(buf), dfp);
-+#ifdef CONFIG_LFS
-+		filesize = strtoll(buf, (char **) NULL, 16);
-+#else
- 		filesize = strtol(buf, (char **) NULL, 16);
-+#endif
-+
- 	}
- #ifdef CONFIG_FEATURE_WGET_STATUSBAR
- 	if (quiet_flag==FALSE)
-@@ -524,7 +537,11 @@
- 		if (chunked) {
- 			safe_fgets(buf, sizeof(buf), dfp); /* This is a newline */
- 			safe_fgets(buf, sizeof(buf), dfp);
-+#ifdef CONFIG_LFS
-+			filesize = strtoll(buf, (char **) NULL, 16);
-+#else
- 			filesize = strtol(buf, (char **) NULL, 16);
-+#endif
- 			if (filesize==0) {
- 				chunked = 0; /* all done! */
- 			}
+ struct suffix_mult {
+ 	const char *suffix;

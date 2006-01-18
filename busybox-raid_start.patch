@@ -1,7 +1,6 @@
-diff -urN busybox-1.00.orig/include/applets.h busybox-1.00/include/applets.h
---- busybox-1.00.orig/include/applets.h	2004-08-27 01:01:34.000000000 +0200
-+++ busybox-1.00/include/applets.h	2005-02-02 21:20:49.047901536 +0100
-@@ -454,6 +454,9 @@
+--- busybox-1.1.0/include/applets.h.wiget	2006-01-11 06:44:14.000000000 +0100
++++ busybox-1.1.0/include/applets.h	2006-01-18 16:44:37.000000000 +0100
+@@ -526,6 +526,9 @@
  #ifdef CONFIG_PWD
  	APPLET(pwd, pwd_main, _BB_DIR_BIN, _BB_SUID_NEVER)
  #endif
@@ -11,10 +10,9 @@ diff -urN busybox-1.00.orig/include/applets.h busybox-1.00/include/applets.h
  #ifdef CONFIG_RDATE
  	APPLET(rdate, rdate_main, _BB_DIR_USR_SBIN, _BB_SUID_NEVER)
  #endif
-diff -urN busybox-1.00.orig/include/usage.h busybox-1.00/include/usage.h
---- busybox-1.00.orig/include/usage.h	2004-09-14 18:23:56.000000000 +0200
-+++ busybox-1.00/include/usage.h	2005-02-02 21:35:31.165799232 +0100
-@@ -1977,6 +1977,12 @@
+--- busybox-1.1.0/include/usage.h.wiget	2006-01-11 06:44:14.000000000 +0100
++++ busybox-1.1.0/include/usage.h	2006-01-18 16:44:37.000000000 +0100
+@@ -2399,6 +2399,12 @@
  	"$ pwd\n" \
  	"/root\n"
  
@@ -27,23 +25,11 @@ diff -urN busybox-1.00.orig/include/usage.h busybox-1.00/include/usage.h
  #define rdate_trivial_usage \
  	"[-sp] HOST"
  #define rdate_full_usage \
-diff -urN busybox-1.00.orig/sysdeps/linux/defconfig busybox-1.00/sysdeps/linux/defconfig
---- busybox-1.00.orig/sysdeps/linux/defconfig	2004-07-20 08:06:56.000000000 +0200
-+++ busybox-1.00/sysdeps/linux/defconfig	2005-02-02 21:20:49.049901232 +0100
-@@ -408,6 +408,7 @@
- # CONFIG_NFSMOUNT is not set
- CONFIG_UMOUNT=y
- # CONFIG_FEATURE_MOUNT_FORCE is not set
-+CONFIG_RAID_START=y
- 
- #
- # Common options for mount/umount
-diff -urN busybox-1.00.orig/util-linux/Config.in busybox-1.00/util-linux/Config.in
---- busybox-1.00.orig/util-linux/Config.in	2004-05-19 13:06:20.000000000 +0200
-+++ busybox-1.00/util-linux/Config.in	2005-02-02 21:20:49.050901080 +0100
-@@ -292,6 +292,12 @@
- 	  NFS filesystems.  Most people using BusyBox will also want to enable
- 	  the 'mount' utility.
+--- busybox-1.1.0/util-linux/Config.in.wiget	2006-01-11 06:44:22.000000000 +0100
++++ busybox-1.1.0/util-linux/Config.in	2006-01-18 16:46:12.000000000 +0100
+@@ -384,6 +384,12 @@
+ 	help
+ 	 Enable mounting of NFS file systems.
  
 +config CONFIG_RAID_START
 +	bool "raid_start"
@@ -51,23 +37,21 @@ diff -urN busybox-1.00.orig/util-linux/Config.in busybox-1.00/util-linux/Config.
 +	help
 +	  Enable support for RAID starting.
 +
- config CONFIG_NFSMOUNT
- 	bool "  Support mounting NFS file systems"
+ config CONFIG_UMOUNT
+ 	bool "umount"
  	default n
-diff -urN busybox-1.00.orig/util-linux/Makefile.in busybox-1.00/util-linux/Makefile.in
---- busybox-1.00.orig/util-linux/Makefile.in	2004-10-08 09:46:08.000000000 +0200
-+++ busybox-1.00/util-linux/Makefile.in	2005-02-02 21:20:49.051900928 +0100
-@@ -39,6 +39,7 @@
- UTILLINUX-$(CONFIG_MKSWAP)		+=mkswap.o
- UTILLINUX-$(CONFIG_MORE)		+=more.o
- UTILLINUX-$(CONFIG_MOUNT)		+=mount.o
+--- busybox-1.1.0/util-linux/Makefile.in.wiget	2006-01-11 06:44:22.000000000 +0100
++++ busybox-1.1.0/util-linux/Makefile.in	2006-01-18 16:45:04.000000000 +0100
+@@ -29,6 +29,7 @@
+ UTILLINUX-$(CONFIG_MKSWAP)        +=mkswap.o
+ UTILLINUX-$(CONFIG_MORE)          +=more.o
+ UTILLINUX-$(CONFIG_MOUNT)         +=mount.o
 +UTILLINUX-$(CONFIG_RAID_START)		+=raid_start.o
- UTILLINUX-$(CONFIG_NFSMOUNT)		+=nfsmount.o
- UTILLINUX-$(CONFIG_PIVOT_ROOT)		+=pivot_root.o
- UTILLINUX-$(CONFIG_RDATE)		+=rdate.o
-diff -urN busybox-1.00.orig/util-linux/raid_start.c busybox-1.00/util-linux/raid_start.c
---- busybox-1.00.orig/util-linux/raid_start.c	1970-01-01 01:00:00.000000000 +0100
-+++ busybox-1.00/util-linux/raid_start.c	2005-02-02 21:20:49.053900624 +0100
+ UTILLINUX-$(CONFIG_FEATURE_MOUNT_NFS)	+=nfsmount.o
+ UTILLINUX-$(CONFIG_PIVOT_ROOT)    +=pivot_root.o
+ UTILLINUX-$(CONFIG_RDATE)         +=rdate.o
+--- /dev/null	2006-01-12 23:49:35.000000000 +0100
++++ busybox-1.1.0/util-linux/raid_start.c	2006-01-18 16:44:37.000000000 +0100
 @@ -0,0 +1,72 @@
 +/* vi: set sw=4 ts=4: */
 +/*
