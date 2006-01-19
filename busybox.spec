@@ -37,7 +37,7 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.1.0
-Release:	0.1
+Release:	0.9
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -165,8 +165,6 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch14 -p1 -b .wiget
 
 %build
-install %{SOURCE1} .config
-
 %if %{with initrd}
 install %{SOURCE2} .config
 %{__make} oldconfig
@@ -186,14 +184,17 @@ install %{SOURCE2} .config
 
 mv -f busybox busybox.initrd
 %{__make} clean
-install %{SOURCE1} .config
-%endif
-
-%if %{with altconfig}
-install %{SOURCE3} .config
 %endif
 
 %if %{with static}
+%if %{with altconfig}
+grep -v CONFIG_STATIC < %{SOURCE3} > .config
+echo "CONFIG_STATIC=y" >> .config
+%else
+grep -v CONFIG_STATIC < %{SOURCE1} > .config
+echo "CONFIG_STATIC=y" >> .config
+%endif
+
 %{__make} oldconfig
 %{__make} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
@@ -201,6 +202,12 @@ install %{SOURCE3} .config
 	CC="%{__cc}"
 mv -f busybox busybox.static
 %{__make} clean
+%endif
+
+%if %{with altconfig}
+install %{SOURCE3} .config
+%else
+install %{SOURCE1} .config
 %endif
 
 %{__make} oldconfig
