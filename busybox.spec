@@ -37,7 +37,7 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.1.0
-Release:	0.9
+Release:	0.10
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -61,6 +61,7 @@ Patch12:	%{name}-LFS.patch
 Patch13:	%{name}-ftpput.patch
 #http://www.zelow.no/floppyfw/download/Development/Patches/busybox-snapshot/busybox-lzmacat.diff
 Patch14:	%{name}-lzmacat.diff
+Patch15:	%{name}-mdev.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
@@ -163,6 +164,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch12 -p1
 #patch13 -p1 # applied
 %patch14 -p1 -b .wiget
+%patch15 -p1
 
 %build
 %if %{with initrd}
