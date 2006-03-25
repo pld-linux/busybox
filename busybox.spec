@@ -36,31 +36,24 @@ Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
-Version:	1.01
+Version:	1.1.1
 Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	f250842dae2854a38470ed16a46bba66
+# Source0-md5:	ff1ade47255c643b68c9113c267ce712
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
 Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-printf-gettext.patch
 Patch2:		%{name}-loadfont.patch
-Patch3:		%{name}-pivot_root.patch
-Patch4:		%{name}-raid_start.patch
-Patch5:		%{name}-force-dietlibc.patch
-Patch6:		%{name}-ash_exec.patch
-Patch7:		%{name}-kernel_headers.patch
-Patch8:		%{name}-insmod-morearchs.patch
-Patch9:		%{name}-dhcp.patch
-Patch10:	%{name}-switchroot.patch
-Patch11:	%{name}-fix_64_archs.patch
-Patch12:	%{name}-LFS.patch
-Patch13:	%{name}-ftpput.patch
-#http://www.zelow.no/floppyfw/download/Development/Patches/busybox-snapshot/busybox-lzmacat.diff
-Patch14:	%{name}-lzmacat.diff
+Patch3:		%{name}-force-dietlibc.patch
+Patch4:		%{name}-ash_exec.patch
+Patch5:		%{name}-kernel_headers.patch
+Patch6:		%{name}-insmod-morearchs.patch
+Patch7:		%{name}-dhcp.patch
+Patch8:		%{name}-fix_64_archs.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
@@ -157,12 +150,6 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
 
 %build
 install %{SOURCE1} .config
