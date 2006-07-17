@@ -36,19 +36,18 @@ Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
-Version:	1.1.3
+Version:	1.2.0
 Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	19a0b475169335f17e421cf644616fe7
+# Source0-md5:	0a3e5d47adc4debda22726295f40a6f2
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
 Patch0:		%{name}-logconsole.patch
 Patch1:		%{name}-printf-gettext.patch
 Patch2:		%{name}-loadfont.patch
-Patch3:		%{name}-force-dietlibc.patch
 Patch4:		%{name}-ash_exec.patch
 Patch5:		%{name}-kernel_headers.patch
 Patch6:		%{name}-insmod-morearchs.patch
@@ -65,9 +64,9 @@ BuildRequires:	dietlibc-static
 BuildRequires:	glibc-static
 		%else
 %ifarch ppc
-BuildRequires:	uClibc-static > 0.9.28
+BuildRequires:	uClibc-static >= 2:0.9.29
 %else
-BuildRequires:	uClibc-static >= 0.9.21
+BuildRequires:	uClibc-static >= 2:0.9.21
 %endif
 		%endif
 	%endif
@@ -144,7 +143,6 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
