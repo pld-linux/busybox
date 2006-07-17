@@ -45,9 +45,10 @@ Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
-Patch0:		%{name}-logconsole.patch
-Patch1:		%{name}-printf-gettext.patch
-Patch2:		%{name}-loadfont.patch
+Patch0:		%{name}-fixes.patch
+Patch1:		%{name}-logconsole.patch
+Patch2:		%{name}-printf-gettext.patch
+Patch3:		%{name}-loadfont.patch
 Patch4:		%{name}-ash_exec.patch
 Patch5:		%{name}-kernel_headers.patch
 Patch6:		%{name}-insmod-morearchs.patch
@@ -140,9 +141,10 @@ Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch0 -p0
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
