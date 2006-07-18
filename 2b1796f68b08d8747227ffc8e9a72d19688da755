@@ -1,0 +1,1 @@
+- BuildRequires for uClibc-devel-BOOT only when %{BOOT is defined.
