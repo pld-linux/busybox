@@ -1,8 +1,6 @@
-#
 # TODO:
 #	- sparc64 modules support in sparc(32) version
 #	- make internal commands work even if busybox is not in /bin/busybox
-# 
 #
 # Conditional build:
 # alternative busybox config file (replaces default one) you should
@@ -17,7 +15,7 @@
 %bcond_with	grep_prov	# adds grep providing
 # Option below is useful, when busybox is built with shell support.
 %bcond_with	sh_prov		# adds /bin/sh providing
-# WARNING! Shell, filetuils and grep providing may depend on config file!
+# WARNING! Shell, fileutils and grep providing may depend on config file!
 # Fileutils, grep and shell provided with busybox have not such
 # functionality as their GNU countenders.
 #
