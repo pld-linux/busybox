@@ -1,0 +1,5 @@
+- added more %description,
+- added full Source url,
+- move busybox executable to %{_bindir},
+- added man page for busybox,
+- some style fixes in %install.
