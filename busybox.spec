@@ -21,10 +21,10 @@
 #
 %bcond_without	static		# don't build static version
 %bcond_without	initrd		# don't build initrd version
-%bcond_with	dietlibc	# build dietlibc-based initrd version
+#%%bcond_with	dietlibc	# build dietlibc-based initrd version
 %bcond_with	glibc		# build glibc-based initrd version
 #
-%ifnarch %{ix86} ppc
+%ifnarch %{ix86} %{x8664} ppc
 %define with_glibc 1
 %endif
 %ifarch ppc
@@ -62,7 +62,7 @@ BuildRequires:	dietlibc-static
 		%if %{with glibc}
 BuildRequires:	glibc-static
 		%else
-%ifarch ppc
+%ifarch ppc %{x8664}
 BuildRequires:	uClibc-static >= 2:0.9.29
 %else
 BuildRequires:	uClibc-static >= 2:0.9.21
@@ -156,7 +156,7 @@ install %{SOURCE1} .config
 install %{SOURCE2} .config
 %{__make} oldconfig
 %{__make} \
-	CFLAGS_EXTRA="%{rpmcflags} -D_BSD_SOURCE" \
+	CROSS_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
 	LDFLAGS="%{rpmldflags} -static" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
