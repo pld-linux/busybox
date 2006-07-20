@@ -1,39 +1,39 @@
---- busybox-1.00-pre10/modutils/insmod.c.orig	Tue Apr  6 13:56:26 2004
-+++ busybox-1.00-pre10/modutils/insmod.c	Fri May 14 16:39:38 2004
-@@ -248,6 +248,36 @@
- #define ELFCLASSM	ELFCLASS32
+--- busybox-1.2.0/modutils/insmod.c.orig	2006-07-01 00:42:04.000000000 +0200
++++ busybox-1.2.0/modutils/insmod.c	2006-07-20 19:42:23.188629500 +0200
+@@ -249,7 +249,17 @@
  #endif
  
-+#if defined(__alpha__)
-+#define ELFCLASSM		ELFCLASS64
-+#define ELFDATAM		ELFDATA2LSB
-+#define MATCH_MACHINE(x)  (x == EM_ALPHA)
-+#define SHT_RELM		SHT_RELA
-+#define Elf64_RelM		Elf64_Rela
-+#endif
-+
-+#if defined(__sparc__) && defined(__arch64__)
-+#define ELFCLASSM		ELFCLASS64
-+#define ELFDATAM		ELFDATA2MSB
-+#define MATCH_MACHINE(x)  ((x) == EM_SPARCV9 || (x) == EM_SPARC64)
-+#define SHT_RELM		SHT_RELA
-+#define Elf64_RelM		Elf64_Rela
-+#elif defined(__sparc__)
-+#define ELFCLASSM		ELFCLASS32
-+#define ELFDATAM		ELFDATA2MSB
-+#define MATCH_MACHINE(x)  (x == EM_SPARC)
-+#define SHT_RELM		SHT_RELA
-+#define Elf32_RelM		Elf32_Rela
-+#endif
-+
-+#if defined(__x86_64__)
-+#define ELFCLASSM       ELFCLASS64
-+#define ELFDATAM        ELFDATA2LSB
-+#define MATCH_MACHINE(x)  (x == EM_X86_64)
-+#define SHT_RELM        SHT_RELA
-+#define Elf64_RelM      Elf64_Rela
-+#endif
-+
- #ifndef SHT_RELM
- #error Sorry, but insmod.c does not yet support this architecture...
+ /* S390 */
+-#if defined(__s390__)
++#if defined(__s390x__)
++#define MATCH_MACHINE(x) (x == EM_S390)
++#define SHT_RELM	SHT_RELA
++#define Elf64_RelM	Elf64_Rela
++#define ELFCLASSM	ELFCLASS64
++#define CONFIG_USE_PLT_ENTRIES
++#define CONFIG_PLT_ENTRY_SIZE 8
++#define CONFIG_USE_GOT_ENTRIES
++#define CONFIG_GOT_ENTRY_SIZE 8
++#define CONFIG_USE_SINGLE
++#elif defined(__s390__)
+ #define MATCH_MACHINE(x) (x == EM_S390)
+ #define SHT_RELM	SHT_RELA
+ #define Elf32_RelM	Elf32_Rela
+@@ -283,10 +293,17 @@
+ 
+ /* Sparc */
+ #if defined(__sparc__)
++#  if defined(__arch64__)
++#define MATCH_MACHINE(x) ((x) == EM_SPARCV9 || (x) == EM_SPARC64)
++#define SHT_RELM       SHT_RELA
++#define Elf64_RelM     Elf64_Rela
++#define ELFCLASSM      ELFCLASS64
++#  else
+ #define MATCH_MACHINE(x) (x == EM_SPARC)
+ #define SHT_RELM       SHT_RELA
+ #define Elf32_RelM     Elf32_Rela
+ #define ELFCLASSM      ELFCLASS32
++#  endif
  #endif
+ 
+ /* v850e */
