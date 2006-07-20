@@ -1,5 +1,5 @@
 # TODO:
-#	- sparc64 modules support in sparc(32) version
+#	- sparc64 modules support in sparc(32), x86_64 modules support in i386 version
 #	- make internal commands work even if busybox is not in /bin/busybox
 #
 # Conditional build:
