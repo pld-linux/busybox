@@ -34,16 +34,15 @@ Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
-Version:	1.2.0
+Version:	1.2.1
 Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	0a3e5d47adc4debda22726295f40a6f2
+# Source0-md5:	362b3dc0f2023ddfda901dc1f1a74391
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
-Patch0:		%{name}-fixes.patch
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
 Patch3:		%{name}-loadfont.patch
@@ -139,7 +138,6 @@ Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q
-%patch0 -p0
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
