@@ -1,6 +1,7 @@
 # TODO:
 #	- sparc64 modules support in sparc(32), x86_64 modules support in i386 version
-#	- make internal commands work even if busybox is not in /bin/busybox
+#	- make internal commands work even if busybox is not in /bin/busybox (initrd)
+#	  or when /proc is not mounted (static / normal)
 #
 # Conditional build:
 # alternative busybox config file (replaces default one) you should
