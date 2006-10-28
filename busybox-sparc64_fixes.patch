@@ -1,0 +1,12 @@
+diff -Nur busybox-1.2.2/modutils/insmod.c busybox-1.2.2.sparc64_fixes/modutils/insmod.c
+--- busybox-1.2.2/modutils/insmod.c	2006-10-28 18:53:12.000000000 +0300
++++ busybox-1.2.2.sparc64_fixes/modutils/insmod.c	2006-10-28 18:53:13.000000000 +0300
+@@ -294,7 +294,7 @@
+ /* Sparc */
+ #if defined(__sparc__)
+ #  if defined(__arch64__)
+-#define MATCH_MACHINE(x) ((x) == EM_SPARCV9 || (x) == EM_SPARC64)
++#define MATCH_MACHINE(x) ((x) == EM_SPARCV9 )
+ #define SHT_RELM       SHT_RELA
+ #define Elf64_RelM     Elf64_Rela
+ #define ELFCLASSM      ELFCLASS64
