@@ -25,7 +25,7 @@
 #%%bcond_with	dietlibc	# build dietlibc-based initrd version
 %bcond_with	glibc		# build glibc-based initrd version
 #
-%ifnarch %{ix86} %{x8664} ppc
+%ifnarch %{ix86} %{x8664} ppc sparc64
 %define with_glibc 1
 %endif
 %ifarch ppc
@@ -52,6 +52,7 @@ Patch5:		%{name}-kernel_headers.patch
 Patch6:		%{name}-insmod-morearchs.patch
 Patch7:		%{name}-dhcp.patch
 Patch8:		%{name}-fix_64_archs.patch
+Patch9:		%{name}-sparc64_fixes.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
@@ -62,10 +63,14 @@ BuildRequires:	dietlibc-static
 		%if %{with glibc}
 BuildRequires:	glibc-static
 		%else
-%ifarch ppc %{x8664}
-BuildRequires:	uClibc-static >= 2:0.9.29
+%if "%{_target_base_arch}" != "%{_arch}"
+BuildRequires:	cross%{_target_base_arch}-uClibc-static
 %else
+	%ifarch ppc %{x8664}
+BuildRequires:	uClibc-static >= 2:0.9.29
+	%else
 BuildRequires:	uClibc-static >= 2:0.9.21
+	%endif
 %endif
 		%endif
 	%endif
@@ -75,9 +80,14 @@ BuildRequires:	uClibc-static >= 2:0.9.21
 %{?with_sh_prov:Provides:	/bin/sh}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-
 %define		_bindir		/bin
 %define		_initrd_bindir	/bin
+
+%if "%{_target_base_arch}" != "%{_arch}"
+	%define CrossOpts CROSS="%{_target_cpu}-pld-linux-"
+%else
+	%define CrossOpts %{nil}
+%endif
 
 %description
 BusyBox combines tiny versions of many common UNIX utilities into a
@@ -147,6 +157,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 
 %build
 %if %{with initrd}
@@ -160,8 +171,12 @@ install %{SOURCE2} .config
 	CC="diet gcc"
 %else
 %if %{with glibc}
+	%{CrossOpts} \
 	CC="%{__cc}"
 %else
+    %if "%{_target_base_arch}" != "%{_arch}"
+	CROSS="%{_target_cpu}-uclibc-" \
+    %endif
 	CC="%{_target_cpu}-uclibc-gcc"
 %endif
 %endif
@@ -180,6 +195,7 @@ install %{SOURCE1} .config
 %if %{with static}
 %{__make} oldconfig
 %{__make} \
+	%{CrossOpts} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags} -static" \
 	CC="%{__cc}"
@@ -189,6 +205,7 @@ mv -f busybox busybox.static
 
 %{__make} oldconfig
 %{__make} \
+	%{CrossOpts} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}" \
 	CC="%{__cc}"
