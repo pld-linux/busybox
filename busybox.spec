@@ -52,7 +52,6 @@ Patch5:		%{name}-kernel_headers.patch
 Patch6:		%{name}-insmod-morearchs.patch
 Patch7:		%{name}-dhcp.patch
 Patch8:		%{name}-fix_64_archs.patch
-Patch9:		%{name}-sparc64_fixes.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 %{?with_static:BuildRequires:	glibc-static}
@@ -157,7 +156,6 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
 
 %build
 %if %{with initrd}
