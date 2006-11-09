@@ -24,7 +24,7 @@
  /* Sparc */
  #if defined(__sparc__)
 +#  if defined(__arch64__)
-+#define MATCH_MACHINE(x) ((x) == EM_SPARCV9 || (x) == EM_SPARC64)
++#define MATCH_MACHINE(x) (x == EM_SPARCV9)
 +#define SHT_RELM       SHT_RELA
 +#define Elf64_RelM     Elf64_Rela
 +#define ELFCLASSM      ELFCLASS64
