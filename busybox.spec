@@ -35,12 +35,12 @@ Summary:	Set of common unix utils for embeded systems
 Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
-Version:	1.2.2
+Version:	1.3.1
 Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	ae8a4c65b9464c8ece3483a3d3b9544c
+# Source0-md5:	571531cfa83726947ccb566de017ad4f
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
@@ -52,8 +52,11 @@ Patch5:		%{name}-kernel_headers.patch
 Patch6:		%{name}-insmod-morearchs.patch
 Patch7:		%{name}-dhcp.patch
 Patch8:		%{name}-fix_64_archs.patch
+Patch9:		%{name}-LFS.patch
+Patch10:	%{name}-noshadow.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
+BuildRequires:	perl-tools-pod
 %{?with_static:BuildRequires:	glibc-static}
 %if %{with initrd}
 	%if %{with dietlibc}
@@ -81,6 +84,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir		/bin
 %define		_initrd_bindir	/bin
+# ld is used to link applets
+%define		filterout_ld	-Wl,--as-needed
 
 %if "%{_target_base_arch}" != "%{_arch}"
 	%define CrossOpts CROSS="%{_target_cpu}-pld-linux-"
@@ -156,8 +161,11 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
+%patch10 -p1
 
 %build
+install -d built
 %if %{with initrd}
 install %{SOURCE2} .config
 %{__make} oldconfig
@@ -179,7 +187,7 @@ install %{SOURCE2} .config
 %endif
 %endif
 
-mv -f busybox busybox.initrd
+mv -f busybox built/busybox.initrd
 %{__make} clean
 %endif
 
@@ -197,7 +205,7 @@ install %{SOURCE1} .config
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags} -static" \
 	CC="%{__cc}"
-mv -f busybox busybox.static
+mv -f busybox built/busybox.static
 %{__make} clean
 %endif
 
@@ -207,13 +215,14 @@ mv -f busybox busybox.static
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}" \
 	CC="%{__cc}"
+%{__make} busybox.links docs/BusyBox.1
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_initrd_bindir},%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
-%{?with_static:install busybox.static $RPM_BUILD_ROOT%{_bindir}}
-%{?with_initrd:install busybox.initrd $RPM_BUILD_ROOT%{_initrd_bindir}/initrd-busybox}
+%{?with_static:install built/busybox.static $RPM_BUILD_ROOT%{_bindir}}
+%{?with_initrd:install built/busybox.initrd $RPM_BUILD_ROOT%{_initrd_bindir}/initrd-busybox}
 
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
