@@ -1,23 +1,18 @@
-diff -ur busybox-1.00.orig/coreutils/printf.c busybox-1.00/coreutils/printf.c
---- busybox-1.00.orig/coreutils/printf.c	2004-09-15 02:05:23.000000000 +0000
-+++ busybox-1.00/coreutils/printf.c	2004-11-11 18:16:33.724386928 +0000
-@@ -47,8 +47,13 @@
+--- busybox-1.3.1/coreutils/printf.c.orig	2006-12-27 05:54:50.000000000 +0100
++++ busybox-1.3.1/coreutils/printf.c	2006-12-30 12:28:27.605589427 +0100
+@@ -38,6 +38,9 @@
  
  //   19990508 Busy Boxed! Dave Cinege
  
 +// on by default
 +#define BB_FEATURE_PRINTF_GETTEXT
 +
- #include <unistd.h>
- #include <stdio.h>
-+#include <sys/mman.h>
-+#include <sys/stat.h>
- #include <sys/types.h>
- #include <string.h>
- #include <errno.h>
-@@ -66,18 +71,137 @@
- static void print_direc __P( (char *start, size_t length,
- 			int field_width, int precision, char *argument));
+ #include "busybox.h"
+ 
+ static int print_formatted(char *format, int argc, char **argv);
+@@ -109,18 +112,137 @@
+ 	}
+ }
  
 +/*
 + * Very pure gettext added by Michal Moskal <malekith@pld-linux.org>
@@ -136,7 +131,7 @@ diff -ur busybox-1.00.orig/coreutils/printf.c busybox-1.00/coreutils/printf.c
 +	int opt;
 +	const char *nls_file = NULL;
  
--	if (argc <= 1 || **(argv + 1) == '-') {
+-	if (argc <= 1 || argv[1][0] == '-') {
 -		bb_show_usage();
 -	}
 +	while ((opt = getopt(argc, argv, "n:")) != -1)
