@@ -36,7 +36,7 @@ Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
 Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.3.1
-Release:	1
+Release:	2
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -54,6 +54,7 @@ Patch7:		%{name}-dhcp.patch
 Patch8:		%{name}-fix_64_archs.patch
 Patch9:		%{name}-LFS.patch
 Patch10:	%{name}-noshadow.patch
+Patch11:	%{name}-noerror.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
@@ -162,6 +163,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 %build
 install -d built
