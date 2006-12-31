@@ -57,6 +57,7 @@ Patch10:	%{name}-noshadow.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
+BuildRequires:	rpmbuild(macros) >= 1.333
 %{?with_static:BuildRequires:	glibc-static}
 %if %{with initrd}
 	%if %{with dietlibc}
@@ -84,8 +85,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir		/bin
 %define		_initrd_bindir	/bin
-# ld is used to link applets
-%define		filterout_ld	-Wl,--as-needed
 
 %if "%{_target_base_arch}" != "%{_arch}"
 	%define CrossOpts CROSS="%{_target_cpu}-pld-linux-"
@@ -171,7 +170,7 @@ install %{SOURCE2} .config
 %{__make} oldconfig
 %{__make} \
 	CROSS_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
-	LDFLAGS="%{rpmldflags} -static" \
+	LDFLAGS="%{ld_rpmldflags} -static" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
 	CC="diet gcc"
@@ -203,7 +202,7 @@ install %{SOURCE1} .config
 %{__make} \
 	%{CrossOpts} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
-	LDFLAGS="%{rpmldflags} -static" \
+	LDFLAGS="%{ld_rpmldflags} -static" \
 	CC="%{__cc}"
 mv -f busybox built/busybox.static
 %{__make} clean
@@ -213,7 +212,7 @@ mv -f busybox built/busybox.static
 %{__make} \
 	%{CrossOpts} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
-	LDFLAGS="%{rpmldflags}" \
+	LDFLAGS="%{ld_rpmldflags}" \
 	CC="%{__cc}"
 %{__make} busybox.links docs/BusyBox.1
 
