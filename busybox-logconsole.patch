@@ -25,9 +25,9 @@ diff -urN busybox-1.00-pre2/init/init.c busybox-1.00-pre2.org/init/init.c
 @@ -155,7 +155,7 @@
  static char console[CONSOLE_BUFF_SIZE] = _PATH_CONSOLE;
  
- #ifndef CONFIG_SYSLOGD
+ #if !ENABLE_SYSLOGD
 -static char *log_console = VC_5;
 +static char *log_console = VC_12;
  #endif
+ #if !ENABLE_DEBUG_INIT
  static sig_atomic_t got_cont = 0;
- static const int LOG = 0x1;
