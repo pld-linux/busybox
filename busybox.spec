@@ -32,8 +32,8 @@
 %undefine	with_dietlibc
 %endif
 Summary:	Set of common unix utils for embeded systems
-Summary(pl.UTF-8):   Zestaw narzędzi uniksowych dla systemów wbudowanych
-Summary(pt_BR.UTF-8):   BusyBox é um conjunto de utilitários UNIX em um único binário
+Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
+Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.4.0
 Release:	1
@@ -128,7 +128,7 @@ implementadas comportam-se de maneira similar aos equivalentes GNU.
 
 %package static
 Summary:	Static busybox
-Summary(pl.UTF-8):   Statycznie skonsolidowany busybox
+Summary(pl.UTF-8):	Statycznie skonsolidowany busybox
 Group:		Applications
 
 %description static
@@ -139,7 +139,7 @@ Statycznie skonsolidowany busybox.
 
 %package initrd
 Summary:	Static busybox for initrd
-Summary(pl.UTF-8):   Statycznie skonsolidowany busybox dla initrd
+Summary(pl.UTF-8):	Statycznie skonsolidowany busybox dla initrd
 Group:		Applications
 Conflicts:	geninitrd < 3075
 
