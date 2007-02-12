@@ -33,8 +33,8 @@
 %undefine	with_dietlibc
 %endif
 Summary:	Set of common unix utils for embeded systems
-Summary(pl):	Zestaw narzêdzi uniksowych dla systemów wbudowanych
-Summary(pt_BR):	BusyBox é um conjunto de utilitários UNIX em um único binário
+Summary(pl.UTF-8):   Zestaw narzÄ™dzi uniksowych dla systemÃ³w wbudowanych
+Summary(pt_BR.UTF-8):   BusyBox Ã© um conjunto de utilitÃ¡rios UNIX em um Ãºnico binÃ¡rio
 Name:		busybox
 Version:	1.1.0
 Release:	0.10
@@ -106,45 +106,45 @@ customize your embedded systems. To create a working system, just add
 a kernel, a shell (such as ash), and an editor (such as elvis-tiny or
 ae).
 
-%description -l pl
-BusyBox sk³ada ma³e wersje wielu narzêdzi uniksowych w jeden ma³y plik
-wykonywalny. Zapewnia minimalne zastêpniki wiêkszo¶ci narzêdzi
+%description -l pl.UTF-8
+BusyBox skÅ‚ada maÅ‚e wersje wielu narzÄ™dzi uniksowych w jeden maÅ‚y plik
+wykonywalny. Zapewnia minimalne zastÄ™pniki wiÄ™kszoÅ›ci narzÄ™dzi
 zawartych w pakietach fileutils, shellutils, findutils, grep, gzip,
-tar itp. BusyBox daje w miarê kompletne ¶rodowisko POSIX dla ma³ych
-lub wbudowanych systemów. Narzêdzia maj± mniej opcji ni¿ ich pe³ne
-odpowiedniki GNU, ale maj± podstawow± funkcjonalno¶æ. Do dzia³aj±cego
+tar itp. BusyBox daje w miarÄ™ kompletne Å›rodowisko POSIX dla maÅ‚ych
+lub wbudowanych systemÃ³w. NarzÄ™dzia majÄ… mniej opcji niÅ¼ ich peÅ‚ne
+odpowiedniki GNU, ale majÄ… podstawowÄ… funkcjonalnoÅ›Ä‡. Do dziaÅ‚ajÄ…cego
 systemu potrzeba jeszcze tylko kernela, shella (np. ash) oraz edytora
 (np. elvis-tiny albo ae).
 
-%description -l pt_BR
-BusyBox combina versões reduzidas de muitos utilitários UNIX num único
-executável, fornecendo substitutos minimalistas para muitos dos
-executáveis encontrados em pacotes como fileutils, shellutils,
-findutils, textutils, grep, gzip, tar, etc. Os utilitários do BusyBox
-em geral têm menos opções que os utilitários GNU, mas as opções
+%description -l pt_BR.UTF-8
+BusyBox combina versÃµes reduzidas de muitos utilitÃ¡rios UNIX num Ãºnico
+executÃ¡vel, fornecendo substitutos minimalistas para muitos dos
+executÃ¡veis encontrados em pacotes como fileutils, shellutils,
+findutils, textutils, grep, gzip, tar, etc. Os utilitÃ¡rios do BusyBox
+em geral tÃªm menos opÃ§Ãµes que os utilitÃ¡rios GNU, mas as opÃ§Ãµes
 implementadas comportam-se de maneira similar aos equivalentes GNU.
 
 %package static
 Summary:	Static busybox
-Summary(pl):	Statycznie skonsolidowany busybox
+Summary(pl.UTF-8):   Statycznie skonsolidowany busybox
 Group:		Applications
 
 %description static
 Static busybox.
 
-%description static -l pl
+%description static -l pl.UTF-8
 Statycznie skonsolidowany busybox.
 
 %package initrd
 Summary:	Static busybox for initrd
-Summary(pl):	Statycznie skonsolidowany busybox dla initrd
+Summary(pl.UTF-8):   Statycznie skonsolidowany busybox dla initrd
 Group:		Applications
 Conflicts:	geninitrd < 3075
 
 %description initrd
 Static busybox for initrd.
 
-%description initrd -l pl
+%description initrd -l pl.UTF-8
 Statycznie skonsolidowany busybox dla initrd.
 
 %prep
