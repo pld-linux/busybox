@@ -1,0 +1,267 @@
+diff -urN busybox-1.00-rc3.org/include/applets.h busybox-1.00-rc3/include/applets.h
+--- busybox-1.00-rc3.org/include/applets.h	2004-09-25 18:10:24.215527160 +0200
++++ busybox-1.00-rc3/include/applets.h	2004-09-25 19:07:03.622283988 +0200
+@@ -547,6 +547,9 @@
+ #ifdef CONFIG_SWAPONOFF
+ 	APPLET(swapon, swap_on_off_main, _BB_DIR_SBIN, _BB_SUID_NEVER)
+ #endif
++#ifdef CONFIG_SWITCHROOT
++	APPLET(switchroot, switchroot_main, _BB_DIR_SBIN, _BB_SUID_NEVER)
++#endif
+ #ifdef CONFIG_SYNC
+ 	APPLET(sync, sync_main, _BB_DIR_BIN, _BB_SUID_NEVER)
+ #endif
+diff -urN busybox-1.00-rc3.org/include/usage.h busybox-1.00-rc3/include/usage.h
+--- busybox-1.00-rc3.org/include/usage.h	2004-09-25 18:10:24.213527588 +0200
++++ busybox-1.00-rc3/include/usage.h	2004-09-25 19:09:49.403769193 +0200
+@@ -2261,6 +2261,11 @@
+ 	"Options:\n" \
+ 	"\t-a\tStart swapping on all swap devices"
+ 
++#define switchroot_trivial_usage \
++	"NEW_ROOT"
++#define switchroot_full_usage \
++	"Make NEW_ROOT the new root file system."
++ 
+ #define sync_trivial_usage \
+ 	""
+ #define sync_full_usage \
+diff -urN busybox-1.00-rc3.org/util-linux/Config.in busybox-1.00-rc3/util-linux/Config.in
+--- busybox-1.00-rc3.org/util-linux/Config.in	2004-09-25 18:10:25.736201391 +0200
++++ busybox-1.00-rc3/util-linux/Config.in	2004-09-25 18:30:59.861818921 +0200
+@@ -261,6 +261,12 @@
+ 	  of wild and crazy things with your Linux system and is far more
+ 	  powerful than 'chroot'.
+ 
++config CONFIG_SWITCHROOT
++	bool "switchroot"
++	default n
++	help
++	  Utility for changing root (like 'chroot' but) for initramfs.
++
+ config CONFIG_RDATE
+ 	bool "rdate"
+ 	default n
+diff -urN busybox-1.00-rc3.org/util-linux/Makefile.in busybox-1.00-rc3/util-linux/Makefile.in
+--- busybox-1.00-rc3.org/util-linux/Makefile.in	2004-09-25 18:10:25.771193895 +0200
++++ busybox-1.00-rc3/util-linux/Makefile.in	2004-09-25 18:31:52.266592428 +0200
+@@ -41,6 +41,7 @@
+ UTILLINUX-$(CONFIG_RAID_START)		+=raid_start.o
+ UTILLINUX-$(CONFIG_NFSMOUNT)		+=nfsmount.o
+ UTILLINUX-$(CONFIG_PIVOT_ROOT)		+=pivot_root.o
++UTILLINUX-$(CONFIG_SWITCHROOT)		+=switchroot.o
+ UTILLINUX-$(CONFIG_RDATE)		+=rdate.o
+ UTILLINUX-$(CONFIG_SWAPONOFF)		+=swaponoff.o
+ UTILLINUX-$(CONFIG_UMOUNT)		+=umount.o
+diff -urN busybox-1.00-rc3.org/util-linux/switchroot.c busybox-1.00-rc3/util-linux/switchroot.c
+--- busybox-1.00-rc3.org/util-linux/switchroot.c	1970-01-01 01:00:00.000000000 +0100
++++ busybox-1.00-rc3/util-linux/switchroot.c	2004-09-25 19:03:58.933849154 +0200
+@@ -0,0 +1,208 @@
++/* vi: set sw=4 ts=4: */
++/*
++ * switchroot.c - Change root file system (initramfs).
++ * based on GPL v2 nash from RH.
++ * 
++ */
++#include <stdlib.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <string.h>
++#include <ctype.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <errno.h>
++#include <sys/mount.h>
++#include "busybox.h"
++
++#ifndef	MS_MOVE
++#define	MS_MOVE	8192
++#endif
++
++#define	MAX_INIT_ARGS	32
++
++char * getArg(char * cmd, char * end, char ** arg) {
++    char quote = '\0';
++
++    if (cmd >= end) return NULL;
++
++    while (isspace(*cmd) && cmd < end) cmd++;
++    if (cmd >= end) return NULL;
++
++    if (*cmd == '"')
++        cmd++, quote = '"';
++    else if (*cmd == '\'')
++        cmd++, quote = '\'';
++
++    if (quote) {
++        *arg = cmd;
++
++        /* This doesn't support \ escapes */
++        while (cmd < end && *cmd != quote) cmd++;
++
++        if (cmd == end) {
++            bb_error_msg("error: quote mismatch for %s\n", *arg);
++            return NULL;
++        }
++
++        *cmd = '\0';
++        cmd++;
++    } else {
++        *arg = cmd;
++        while (!isspace(*cmd) && cmd < end) cmd++;
++        *cmd = '\0';
++    }
++
++    cmd++;
++
++    while (isspace(*cmd)) cmd++;
++
++    return cmd;
++}
++
++#ifdef __powerpc__
++#define CMDLINESIZE 256
++#else
++#define CMDLINESIZE 1024
++#endif
++
++/* get the contents of the kernel command line from /proc/cmdline */
++static char * getKernelCmdLine(void) {
++    int fd, i;
++    char * buf;
++
++    fd = open("/proc/cmdline", O_RDONLY, 0);
++    if (fd < 0) {
++        bb_error_msg("getKernelCmdLine: failed to open /proc/cmdline: %d\n", errno);
++        return NULL;
++    }
++
++    buf = malloc(CMDLINESIZE);
++    if (!buf)
++        return buf;
++
++    i = read(fd, buf, CMDLINESIZE);
++    if (i < 0) {
++        bb_error_msg("getKernelCmdLine: failed to read /proc/cmdline: %d\n", errno);
++        close(fd);
++        return NULL;
++    }
++
++    close(fd);
++    if (i == 0)
++        buf[0] = '\0';
++    else
++        buf[i - 1] = '\0';
++    return buf;
++}
++
++/* get the start of a kernel arg "arg".  returns everything after it
++ * (useful for things like getting the args to init=).  so if you only
++ * want one arg, you need to terminate it at the n */
++static char * getKernelArg(char * arg) {
++    char * start, * cmdline;
++
++    cmdline = start = getKernelCmdLine();
++    if (start == NULL) return NULL;
++    while (*start) {
++        if (isspace(*start)) {
++            start++;
++            continue;
++        }
++        if (strncmp(start, arg, strlen(arg)) == 0) {
++            return start + strlen(arg);
++        }
++        while (*++start && !isspace(*start))
++            ;
++    }
++
++    return NULL;
++}
++
++int switchroot_main(int argc, char **argv) {
++    char * new;
++    const char * initprogs[] = { "/sbin/init", "/etc/init",
++                                 "/bin/init", "/bin/sh", NULL };
++    char * init, * cmdline = NULL;
++    char ** initargs;
++    int fd, i = 0;
++
++    if (argc != 1)
++		bb_show_usage();
++
++	new = argv[1];
++
++    if (chdir(new)) {
++	    bb_perror_msg_and_die("chdir(%s) failed: %d\n", new, errno);
++    }
++
++    if ((fd = open("/dev/console", O_RDWR)) < 0) {
++		bb_error_msg("ERROR opening /dev/console!!!!: %d\n", errno);
++    }
++
++    if (dup2(fd, 0) != 0) bb_error_msg("error dup2'ing fd of %d to 0\n", fd);
++    if (dup2(fd, 1) != 1) bb_error_msg("error dup2'ing fd of %d to 1\n", fd);
++    if (dup2(fd, 2) != 2) bb_error_msg("error dup2'ing fd of %d to 2\n", fd);
++    if (fd > 2)
++        close(fd);
++
++    init = getKernelArg("init=");
++    if (init == NULL)
++        cmdline = getKernelCmdLine();
++
++    if (mount(".", "/", NULL, MS_MOVE, NULL)) {
++	    bb_perror_msg_and_die("switchroot: mount failed: %d\n", errno);
++    }
++
++    if (chroot(".") || chdir("/")) {
++        bb_perror_msg_and_die("switchroot: chroot() failed: %d\n", errno);
++    }
++
++    if (init == NULL) {
++        int j;
++        for (j = 0; initprogs[j] != NULL; j++) {
++            if (!access(initprogs[j], X_OK)) {
++                init = strdup(initprogs[j]);
++                break;
++            }
++        }
++    }
++
++    initargs = (char **)malloc(sizeof(char *)*(MAX_INIT_ARGS+1));
++    if (cmdline && init) {
++        initargs[i++] = strdup(init);
++    } else {
++        cmdline = init;
++        initargs[0] = NULL;
++    }
++
++    if (cmdline != NULL) {
++        char * chptr, * start;
++
++        start = chptr = cmdline;
++        for (; (i < MAX_INIT_ARGS) && (*start != '\0'); i++) {
++            while (*chptr && !isspace(*chptr)) chptr++;
++            if (*chptr != '\0') *(chptr++) = '\0';
++            initargs[i] = strdup(start);
++            start = chptr;
++        }
++    }
++
++    initargs[i] = NULL;
++
++    if (access(initargs[0], X_OK)) {
++		bb_error_msg("WARNING: can't access %s\n", initargs[0]);
++    }
++    execv(initargs[0], initargs);
++	bb_error_msg_and_die("exec of init (%s) failed!!!: %d\n", initargs[0], errno);
++    return 1;
++}
++
++/*
++Local Variables:
++c-file-style: "linux"
++c-basic-offset: 4
++tab-width: 4
++End:
++*/
