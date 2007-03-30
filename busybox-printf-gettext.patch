@@ -10,8 +10,8 @@
  #include "busybox.h"
  
  static int print_formatted(char *format, int argc, char **argv);
-@@ -109,18 +112,137 @@
- 	}
+@@ -288,19 +288,135 @@
+ 	return save_argc - argc;
  }
  
 +/*
@@ -53,10 +53,9 @@
 +
 +static u_int32_t swap(u_int32_t i)
 +{
-+	return (i << 24) | ((i & 0xff00) << 8) | 
-+	       ((i >> 8) & 0xff00) | (i >> 24);
++	return (i << 24) | ((i & 0xff00) << 8) |
++		((i >> 8) & 0xff00) | (i >> 24);
 +}
-+
 +#define swap_if(a) ((has_to_swap) ? swap(a) : (a))
 +
 +static char *getmsg(const char *filename, const char *msgid)
@@ -69,7 +68,7 @@
 +	struct string_desc *orig_tab, *trans_tab = NULL;
 +	int act = -1;
 +	char *ret = (char*)msgid;
-+		
++
 +	if (filename == NULL || stat(filename, &st))
 +		return ret;
 +
@@ -78,7 +77,7 @@
 +		return ret;
 +
 +	ptr = (struct mo_file_header *) mmap(NULL, st.st_size, PROT_READ,
-+					     MAP_PRIVATE, fd, 0);
++			MAP_PRIVATE, fd, 0);
 +	close(fd);
 +
 +	if (ptr == (void*)-1)
@@ -92,19 +91,18 @@
 +	/* FIXME: use hash table */
 +
 +	orig_tab = (struct string_desc *)
-+	    ((char *) ptr + swap_if(ptr->orig_tab_offset));
++		((char *) ptr + swap_if(ptr->orig_tab_offset));
 +	trans_tab = (struct string_desc *)
-+	    ((char *) ptr + swap_if(ptr->trans_tab_offset));
++		((char *) ptr + swap_if(ptr->trans_tab_offset));
 +
 +	bottom = 0;
 +	top = swap_if(ptr->nstrings);
 +	while (bottom < top) {
 +		int cmp_val;
-+
 +		act = (bottom + top) / 2;
 +		cmp_val =
-+		    strcmp(msgid,
-+			   ((char *) ptr + swap_if(orig_tab[act].offset)));
++			strcmp(msgid,
++					((char *) ptr + swap_if(orig_tab[act].offset)));
 +		if (cmp_val < 0)
 +			top = act;
 +		else if (cmp_val > 0)
@@ -114,7 +112,7 @@
 +		act = -1;
 +	}
 +
-+      oops:
++oops:
 +	if (act != -1)
 +		ret = strdup(((char *) ptr + swap_if(trans_tab[act].offset)));
 +	munmap(ptr, st.st_size);
@@ -124,11 +122,12 @@
 +# define getmsg(a,b) (b)
 +#endif
 +
+ int printf_main(int argc, char **argv);
  int printf_main(int argc, char **argv)
  {
  	char *format;
- 	int args_used;
-+	int opt;
+-	int args_used;
++	int args_used, opt;
 +	const char *nls_file = NULL;
  
 -	if (argc <= 1 || argv[1][0] == '-') {
@@ -136,12 +135,12 @@
 -	}
 +	while ((opt = getopt(argc, argv, "n:")) != -1)
 +		switch (opt) {
-+		case 'n':
-+			nls_file = optarg;
-+			break;
-+		default:
-+			bb_show_usage();
-+			break;
++			case 'n':
++				nls_file = optarg;
++				break;
++			default:
++				bb_show_usage();
++				break;
 +		}
 +
 +	format = getmsg(nls_file, argv[optind++]);
