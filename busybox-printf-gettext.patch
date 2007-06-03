@@ -1,5 +1,6 @@
---- busybox-1.3.1/coreutils/printf.c.orig	2006-12-27 05:54:50.000000000 +0100
-+++ busybox-1.3.1/coreutils/printf.c	2006-12-30 12:28:27.605589427 +0100
+diff -urN busybox-1.6.0.org/coreutils/printf.c busybox-1.6.0/coreutils/printf.c
+--- busybox-1.6.0.org/coreutils/printf.c	2007-06-01 13:48:34.000000000 +0200
++++ busybox-1.6.0/coreutils/printf.c	2007-06-03 20:27:45.511646939 +0200
 @@ -38,6 +38,9 @@
  
  //   19990508 Busy Boxed! Dave Cinege
@@ -7,10 +8,10 @@
 +// on by default
 +#define BB_FEATURE_PRINTF_GETTEXT
 +
- #include "busybox.h"
+ #include "libbb.h"
  
- static int print_formatted(char *format, int argc, char **argv);
-@@ -288,19 +288,135 @@
+ typedef void (*converter)(const char *arg, void *result);
+@@ -285,19 +288,137 @@
  	return save_argc - argc;
  }
  
@@ -57,7 +58,6 @@
 +		((i >> 8) & 0xff00) | (i >> 24);
 +}
 +#define swap_if(a) ((has_to_swap) ? swap(a) : (a))
-+
 +static char *getmsg(const char *filename, const char *msgid)
 +{
 +	int fd;
@@ -129,10 +129,7 @@
 -	int args_used;
 +	int args_used, opt;
 +	const char *nls_file = NULL;
- 
--	if (argc <= 1 || argv[1][0] == '-') {
--		bb_show_usage();
--	}
++
 +	while ((opt = getopt(argc, argv, "n:")) != -1)
 +		switch (opt) {
 +			case 'n':
@@ -142,8 +139,11 @@
 +				bb_show_usage();
 +				break;
 +		}
-+
 +	format = getmsg(nls_file, argv[optind++]);
+ 
+ 	if (argc <= 1 || argv[1][0] == '-') {
+ 		bb_show_usage();
+ 	}
  
 -	format = argv[1];
 -	argc -= 2;
