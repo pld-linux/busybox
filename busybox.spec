@@ -22,25 +22,22 @@
 #
 %bcond_without	static		# don't build static version
 %bcond_without	initrd		# don't build initrd version
-#%%bcond_with	dietlibc	# build dietlibc-based initrd version
+%bcond_with	dietlibc	# build dietlibc-based initrd version
 %bcond_with	glibc		# build glibc-based initrd version
 #
 %ifnarch %{ix86} %{x8664} ppc sparc64
 %define with_glibc 1
 %endif
-%ifarch ppc
-%undefine	with_dietlibc
-%endif
 Summary:	Set of common unix utils for embeded systems
 Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
-Version:	1.5.1
+Version:	1.6.0
 Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	30df6f796b350fd126c07cff7c33b538
+# Source0-md5:	b587dd978fed23467b42ef959b6aa449
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
