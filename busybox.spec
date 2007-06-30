@@ -32,12 +32,12 @@ Summary:	Set of common unix utils for embeded systems
 Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
-Version:	1.6.0
-Release:	3
+Version:	1.6.1
+Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	b587dd978fed23467b42ef959b6aa449
+# Source0-md5:	c99a523b403d04772ac5f8dec52f107e
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
@@ -49,7 +49,6 @@ Patch5:		%{name}-kernel_headers.patch
 Patch6:		%{name}-insmod-morearchs.patch
 Patch7:		%{name}-dhcp.patch
 Patch8:		%{name}-fix_64_archs.patch
-Patch9:		%{name}-echo.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
@@ -156,7 +155,6 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
 
 %build
 install -d built
