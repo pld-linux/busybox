@@ -33,7 +33,7 @@ Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.8.1
-Release:	1
+Release:	2
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -49,6 +49,10 @@ Patch5:		%{name}-kernel_headers.patch
 Patch6:		%{name}-insmod-morearchs.patch
 Patch7:		%{name}-dhcp.patch
 Patch8:		%{name}-fix_64_archs.patch
+Patch9:		%{name}-1.8.1-inetd.patch
+Patch10:	%{name}-1.8.1-tar_z.patch
+Patch11:	%{name}-1.8.1-tr.patch
+Patch12:	%{name}-1.8.1-trylink.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
@@ -155,6 +159,10 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
 
 %build
 install -d built
