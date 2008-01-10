@@ -32,12 +32,12 @@ Summary:	Set of common unix utils for embeded systems
 Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
-Version:	1.8.2
+Version:	1.9.0
 Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	5794c6187c7cc8176c52b96af9bf2478
+# Source0-md5:	2a6e0df1fd2a77caa541a7e8002851cb
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
@@ -49,6 +49,9 @@ Patch5:		%{name}-kernel_headers.patch
 Patch6:		%{name}-insmod-morearchs.patch
 Patch7:		%{name}-dhcp.patch
 Patch8:		%{name}-fix_64_archs.patch
+Patch100:	http://busybox.net/downloads/fixes-1.9.0/busybox-1.9.0-allno.patch
+Patch101:	http://busybox.net/downloads/fixes-1.9.0/busybox-1.9.0-iproute.patch
+Patch102:	http://busybox.net/downloads/fixes-1.9.0/busybox-1.9.0-nameif.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
@@ -147,6 +150,9 @@ Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q
+%patch100 -p1
+%patch101 -p1
+%patch102 -p1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
