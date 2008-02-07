@@ -28,7 +28,7 @@
 %ifnarch %{ix86} %{x8664} ppc sparc64
 %define with_glibc 1
 %endif
-Summary:	Set of common unix utils for embeded systems
+Summary:	Set of common Unix utilities for embeded systems
 Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
