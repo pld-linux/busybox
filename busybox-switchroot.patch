@@ -1,12 +1,13 @@
 diff -urN busybox-1.00-rc3.org/include/applets.h busybox-1.00-rc3/include/applets.h
 --- busybox-1.00-rc3.org/include/applets.h	2004-09-25 18:10:24.215527160 +0200
 +++ busybox-1.00-rc3/include/applets.h	2004-09-25 19:07:03.622283988 +0200
-@@ -547,6 +547,9 @@
+@@ -547,6 +547,10 @@
  #ifdef CONFIG_SWAPONOFF
  	APPLET(swapon, swap_on_off_main, _BB_DIR_SBIN, _BB_SUID_NEVER)
  #endif
 +#ifdef CONFIG_SWITCHROOT
 +	APPLET(switchroot, switchroot_main, _BB_DIR_SBIN, _BB_SUID_NEVER)
++	APPLET(switch_root, switchroot_main, _BB_DIR_SBIN, _BB_SUID_NEVER)
 +#endif
  #ifdef CONFIG_SYNC
  	APPLET(sync, sync_main, _BB_DIR_BIN, _BB_SUID_NEVER)
@@ -14,13 +15,18 @@ diff -urN busybox-1.00-rc3.org/include/applets.h busybox-1.00-rc3/include/applet
 diff -urN busybox-1.00-rc3.org/include/usage.h busybox-1.00-rc3/include/usage.h
 --- busybox-1.00-rc3.org/include/usage.h	2004-09-25 18:10:24.213527588 +0200
 +++ busybox-1.00-rc3/include/usage.h	2004-09-25 19:09:49.403769193 +0200
-@@ -2261,6 +2261,11 @@
+@@ -2261,6 +2261,16 @@
  	"Options:\n" \
  	"\t-a\tStart swapping on all swap devices"
  
 +#define switchroot_trivial_usage \
 +	"NEW_ROOT"
 +#define switchroot_full_usage \
++	"Make NEW_ROOT the new root file system."
++ 
++#define switch_root_trivial_usage \
++	"NEW_ROOT"
++#define switch_root_full_usage \
 +	"Make NEW_ROOT the new root file system."
 + 
  #define sync_trivial_usage \
