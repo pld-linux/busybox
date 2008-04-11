@@ -25,7 +25,7 @@
 %bcond_with	dietlibc	# build dietlibc-based initrd version
 %bcond_with	glibc		# build glibc-based initrd version
 #
-%ifnarch %{ix86} %{x8664} ppc sparc64
+%ifnarch %{ix86} %{x8664} ppc
 %define with_glibc 1
 %endif
 Summary:	Set of common Unix utilities for embeded systems
