@@ -19,16 +19,14 @@ diff -urN busybox-1.00-pre2/include/libbb.h busybox-1.00-pre2.org/include/libbb.
  #if defined(__sh__) || defined(__H8300H__) || defined(__H8300S__)
  #  define SC_0 "/dev/ttySC0"
  #  define SC_1 "/dev/ttySC1"
-diff -urN busybox-1.00-pre2/init/init.c busybox-1.00-pre2.org/init/init.c
---- busybox-1.00-pre2/init/init.c	2003-08-02 23:40:57.000000000 +0200
-+++ busybox-1.00-pre2.org/init/init.c	2003-08-02 23:45:30.000000000 +0200
-@@ -85,7 +85,7 @@
+--- busybox/init/init.c.orig	2008-04-19 04:03:13.000000000 +0000
++++ busybox.o/init/init.c	2008-04-26 17:09:58.075653000 +0000
+@@ -64,7 +64,7 @@
+ /* Static variables */
  static struct init_action *init_action_list = NULL;
  
- #if !ENABLE_FEATURE_INIT_SYSLOG
 -static const char *log_console = VC_5;
 +static const char *log_console = VC_12;
- #endif
- #if !ENABLE_DEBUG_INIT
  static sig_atomic_t got_cont = 0;
-
+ 
+ enum {
