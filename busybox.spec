@@ -24,6 +24,7 @@
 %bcond_without	initrd		# don't build initrd version
 %bcond_with	dietlibc	# build dietlibc-based initrd version
 %bcond_with	glibc		# build glibc-based initrd version
+%bcond_with	verbose
 #
 %ifnarch %{ix86} %{x8664} ppc
 %define with_glibc 1
@@ -86,6 +87,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %else
 	%define CrossOpts %{nil}
 %endif
+
+%define		filterout_ld	-Wl,-z,-combreloc
 
 %description
 BusyBox combines tiny versions of many common UNIX utilities into a
@@ -162,6 +165,7 @@ install -d built
 install %{SOURCE2} .config
 %{__make} oldconfig
 %{__make} \
+	%{?with_verbose:V=1} \
 	CROSS_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
 	LDFLAGS="%{ld_rpmldflags} -static" \
 %if %{with dietlibc}
@@ -193,6 +197,7 @@ install %{SOURCE1} .config
 %if %{with static}
 %{__make} oldconfig
 %{__make} \
+	%{?with_verbose:V=1} \
 	%{CrossOpts} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{ld_rpmldflags} -static" \
@@ -203,6 +208,7 @@ mv -f busybox built/busybox.static
 
 %{__make} oldconfig
 %{__make} \
+	%{?with_verbose:V=1} \
 	%{CrossOpts} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{ld_rpmldflags}" \
