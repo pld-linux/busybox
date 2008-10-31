@@ -12,6 +12,8 @@ Source2:	%{name}-system.config
 Patch0:		%{name}-grep.patch
 Patch1:		%{name}-modprobe.patch
 Patch2:		%{name}-standalone.patch
+Patch3:		%{name}-vi.patch
+Patch4:		%{name}-lineedit.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
@@ -67,6 +69,8 @@ Busybox for CRI system images.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
 
 %build
 install -d built
