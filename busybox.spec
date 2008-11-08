@@ -14,12 +14,14 @@ Patch1:		%{name}-modprobe.patch
 Patch2:		%{name}-standalone.patch
 Patch3:		%{name}-vi.patch
 Patch4:		%{name}-lineedit.patch
+Patch5:		%{name}-basename.patch
+Patch6:		%{name}-login.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.333
 BuildRequires:	uClibc-static >= 2:0.9.21
-ExclusiveArch:	i586
+#ExclusiveArch:	i586
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir		/bin
@@ -71,6 +73,8 @@ Busybox for CRI system images.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
+%patch6 -p1
 
 %build
 install -d built
