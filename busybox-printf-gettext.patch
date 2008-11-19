@@ -1,6 +1,5 @@
-diff -urN busybox-1.6.0.org/coreutils/printf.c busybox-1.6.0/coreutils/printf.c
---- busybox-1.6.0.org/coreutils/printf.c	2007-06-01 13:48:34.000000000 +0200
-+++ busybox-1.6.0/coreutils/printf.c	2007-06-03 20:27:45.511646939 +0200
+--- busybox-1.12.2/coreutils/printf.c	2008-09-28 20:04:18.000000000 +0200
++++ busybox-1.12.2.patch/coreutils/printf.c	2008-11-19 13:00:54.187842550 +0100
 @@ -38,6 +38,9 @@
  
  //   19990508 Busy Boxed! Dave Cinege
@@ -10,9 +9,9 @@ diff -urN busybox-1.6.0.org/coreutils/printf.c busybox-1.6.0/coreutils/printf.c
 +
  #include "libbb.h"
  
- typedef void (*converter)(const char *arg, void *result);
-@@ -285,19 +288,137 @@
- 	return save_argc - argc;
+ /* A note on bad input: neither bash 3.2 nor coreutils 6.10 stop on it.
+@@ -334,10 +337,131 @@
+ 	return argv;
  }
  
 +/*
@@ -122,12 +121,11 @@ diff -urN busybox-1.6.0.org/coreutils/printf.c busybox-1.6.0/coreutils/printf.c
 +# define getmsg(a,b) (b)
 +#endif
 +
- int printf_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
- int printf_main(int argc, char **argv)
+ int printf_main(int argc UNUSED_PARAM, char **argv)
  {
  	char *format;
--	int args_used;
-+	int args_used, opt;
+ 	char **argv2;
++	int opt;
 +	const char *nls_file = NULL;
 +
 +	while ((opt = getopt(argc, argv, "n:")) != -1)
@@ -139,17 +137,19 @@ diff -urN busybox-1.6.0.org/coreutils/printf.c busybox-1.6.0/coreutils/printf.c
 +				bb_show_usage();
 +				break;
 +		}
++
 +	format = getmsg(nls_file, argv[optind++]);
  
- 	if (argc <= 1 || argv[1][0] == '-') {
+ 	/* We must check that stdout is not closed.
+ 	 * The reason for this is highly non-obvious.
+@@ -362,8 +486,8 @@
+ 	if (!argv[1])
  		bb_show_usage();
- 	}
  
 -	format = argv[1];
--	argc -= 2;
--	argv += 2;
-+	argc -= optind;
-+	argv += optind;
+-	argv2 = argv + 2;
++    argv += optind;
++	argv2 = argv;
  
  	do {
- 		args_used = print_formatted(format, argc, argv);
+ 		argv = argv2;

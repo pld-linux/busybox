@@ -1,0 +1,11 @@
+--- busybox-1.12.2/miscutils/inotifyd.c.org	2008-11-19 12:52:28.714759776 +0100
++++ busybox-1.12.2/miscutils/inotifyd.c	2008-11-19 12:52:49.514757748 +0100
+@@ -28,6 +28,8 @@
+  */
+ 
+ #include "libbb.h"
++#define HAVE_ARCH_STRUCT_FLOCK
++#define HAVE_ARCH_STRUCT_FLOCK64
+ #include <linux/inotify.h>
+ 
+ static volatile smallint signalled;
