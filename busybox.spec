@@ -35,7 +35,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.12.3
-Release:	1
+Release:	2
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -90,7 +90,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 	%define CrossOpts %{nil}
 %endif
 
-%define		filterout_ld	-Wl,-z,(-combreloc|relro)
+%define		filterout_ld	-Wl,-z,(combreloc|relro)
 
 %description
 BusyBox combines tiny versions of many common UNIX utilities into a
