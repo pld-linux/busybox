@@ -1,27 +1,20 @@
 #
 Summary:	Set of common unix utils for embeded systems
 Name:		busybox
-Version:	1.12.1
+Version:	1.12.4
 Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	dc2e5e00d6fee8229ae92884c68733a7
+# Source0-md5:	5b8c427bf596732d6b6156672e6e093f
 Source1:	%{name}-initrd.config
 Source2:	%{name}-system.config
-Patch0:		%{name}-grep.patch
-Patch1:		%{name}-modprobe.patch
-Patch2:		%{name}-standalone.patch
-Patch3:		%{name}-vi.patch
-Patch4:		%{name}-lineedit.patch
-Patch5:		%{name}-basename.patch
-Patch6:		%{name}-login.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.333
 BuildRequires:	uClibc-static >= 2:0.9.21
-#ExclusiveArch:	i586
+ExclusiveArch:	i586
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir		/bin
@@ -68,13 +61,6 @@ Busybox for CRI system images.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
 
 %build
 install -d built
