@@ -35,7 +35,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.12.4
-Release:	2
+Release:	3
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -46,12 +46,12 @@ Source2:	%{name}-initrd.config
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
 Patch3:		%{name}-loadfont.patch
-Patch4:		%{name}-ash_exec.patch
-Patch5:		%{name}-kernel_headers.patch
-Patch6:		%{name}-insmod-morearchs.patch
-Patch7:		%{name}-dhcp.patch
-Patch8:		%{name}-fix_64_archs.patch
-Patch9:		%{name}-inotify.patch
+Patch4:		%{name}-kernel_headers.patch
+Patch5:		%{name}-insmod-morearchs.patch
+Patch6:		%{name}-dhcp.patch
+Patch7:		%{name}-fix_64_archs.patch
+Patch8:		%{name}-inotify.patch
+Patch9:		%{name}-ash-export-PATH.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
