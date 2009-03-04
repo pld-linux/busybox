@@ -22,6 +22,7 @@
 #
 %bcond_without	static		# don't build static version
 %bcond_without	initrd		# don't build initrd version
+%bcond_with	full_initrd	# build full featured initrd version
 %bcond_with	dietlibc	# build dietlibc-based initrd version
 %bcond_with	glibc		# build glibc-based initrd version
 %bcond_with	verbose
@@ -165,7 +166,11 @@ Statycznie skonsolidowany busybox dla initrd.
 %build
 install -d built
 %if %{with initrd}
+%if %{with full_initrd}
+install %{SOURCE1} .config
+%else
 install %{SOURCE2} .config
+%endif
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
