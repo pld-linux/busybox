@@ -22,9 +22,8 @@
 #
 %bcond_without	static		# don't build static version
 %bcond_without	initrd		# don't build initrd version
-%bcond_with	full_initrd	# build full featured initrd version
-%bcond_with	dietlibc	# build dietlibc-based initrd version
-%bcond_with	glibc		# build glibc-based initrd version
+%bcond_with	dietlibc	# build dietlibc-based initrd and static versions
+%bcond_with	glibc		# build glibc-based initrd and static versions
 %bcond_with	verbose
 #
 %ifnarch %{ix86} %{x8664} ppc
@@ -36,7 +35,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.12.4
-Release:	3
+Release:	4
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -57,8 +56,7 @@ URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.333
-%{?with_static:BuildRequires:	glibc-static}
-%if %{with initrd}
+%if %{with initrd} || %{with static}
 	%if %{with dietlibc}
 BuildRequires:	dietlibc-static
 	%else
@@ -166,11 +164,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %build
 install -d built
 %if %{with initrd}
-%if %{with full_initrd}
-install %{SOURCE1} .config
-%else
 install %{SOURCE2} .config
-%endif
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
@@ -206,10 +200,23 @@ install %{SOURCE1} .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	%{CrossOpts} \
-	CFLAGS_EXTRA="%{rpmcflags}" \
+	CROSS_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
 	LDFLAGS="%{ld_rpmldflags} -static" \
+%if %{with dietlibc}
+	LIBRARIES="-lrpc" \
+	CC="diet gcc"
+%else
+%if %{with glibc}
+	%{CrossOpts} \
 	CC="%{__cc}"
+%else
+    %if "%{_target_base_arch}" != "%{_arch}"
+	CROSS="%{_target_cpu}-uclibc-" \
+    %endif
+	CC="%{_target_cpu}-uclibc-gcc"
+%endif
+%endif
+
 mv -f busybox built/busybox.static
 %{__make} clean
 %endif
