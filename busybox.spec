@@ -10,6 +10,12 @@
 #	rpm --rebuild busybox.*.src.rpm --with altconfig --define "cfgfile bb-emb-config.h"
 %bcond_with	altconfig	# use alternative config (defined by cfgfile)
 %bcond_with	linkfl		# creates links to busybox binary and puts them into file list
+%bcond_without	static		# don't build static version
+%bcond_without	initrd		# don't build initrd version
+%bcond_with	dietlibc	# build dietlibc-based initrd and static versions
+%bcond_with	glibc		# build glibc-based initrd and static versions
+%bcond_with	verbose		# verbose build
+#
 # Options below are useful, when you want fileutils and grep providing.
 # For example, ash package requires fileutils and grep.
 %bcond_with	fileutl_prov	# adds fileutils providing
@@ -20,12 +26,6 @@
 # Fileutils, grep and shell provided with busybox have not such
 # functionality as their GNU countenders.
 #
-%bcond_without	static		# don't build static version
-%bcond_without	initrd		# don't build initrd version
-%bcond_with	dietlibc	# build dietlibc-based initrd and static versions
-%bcond_with	glibc		# build glibc-based initrd and static versions
-%bcond_with	verbose
-#
 %ifnarch %{ix86} %{x8664} ppc
 %define with_glibc 1
 %endif
@@ -34,12 +34,12 @@ Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 # stable line only
-Version:	1.12.4
-Release:	4
+Version:	1.13.3
+Release:	0.1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	5b8c427bf596732d6b6156672e6e093f
+# Source0-md5:	0cde6d2790e790837d6d7e82faae3ca1
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
@@ -50,7 +50,6 @@ Patch4:		%{name}-kernel_headers.patch
 Patch5:		%{name}-insmod-morearchs.patch
 Patch6:		%{name}-dhcp.patch
 Patch7:		%{name}-fix_64_archs.patch
-Patch8:		%{name}-inotify.patch
 Patch9:		%{name}-ash-export-PATH.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
@@ -158,7 +157,6 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-%patch8 -p1
 %patch9 -p1
 
 %build
