@@ -27,6 +27,6 @@ diff -urN busybox-1.00-pre2/include/libbb.h busybox-1.00-pre2.org/include/libbb.
  
 -static const char *log_console = VC_5;
 +static const char *log_console = VC_12;
- static sig_atomic_t got_cont = 0;
  
  enum {
+ 	L_LOG = 0x1,

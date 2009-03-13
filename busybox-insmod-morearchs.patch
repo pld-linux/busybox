@@ -1,5 +1,5 @@
---- busybox-1.2.0/modutils/insmod.c.orig	2006-07-01 00:42:04.000000000 +0200
-+++ busybox-1.2.0/modutils/insmod.c	2006-07-20 19:42:23.188629500 +0200
+--- busybox-1.2.0/modutils/modutils-24.c.orig	2006-07-01 00:42:04.000000000 +0200
++++ busybox-1.2.0/modutils/modutils-24.c	2006-07-20 19:42:23.188629500 +0200
 @@ -249,7 +249,17 @@
  #endif
  
