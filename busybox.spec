@@ -66,9 +66,9 @@ BuildRequires:	glibc-static
 BuildRequires:	cross%{_target_base_arch}-uClibc-static
 %else
 	%ifarch ppc %{x8664}
-BuildRequires:	uClibc-static >= 2:0.9.29
+BuildRequires:	uClibc-static >= 3:0.9.30.1
 	%else
-BuildRequires:	uClibc-static >= 2:0.9.21
+BuildRequires:	uClibc-static >= 3:0.9.30.1
 	%endif
 %endif
 		%endif
@@ -87,8 +87,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %else
 	%define CrossOpts %{nil}
 %endif
-
-%define		filterout_ld	-Wl,-z,(combreloc|relro)
 
 %description
 BusyBox combines tiny versions of many common UNIX utilities into a
