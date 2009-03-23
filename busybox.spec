@@ -139,7 +139,7 @@ Statycznie skonsolidowany busybox.
 Summary:	Static busybox for initrd
 Summary(pl.UTF-8):	Statycznie skonsolidowany busybox dla initrd
 Group:		Applications
-Conflicts:	geninitrd < 3075
+Conflicts:	geninitrd <= 10000.3
 
 %description initrd
 Static busybox for initrd.
