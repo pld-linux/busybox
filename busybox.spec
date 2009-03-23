@@ -80,7 +80,6 @@ BuildRequires:	uClibc-static >= 3:0.9.30.1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir		/bin
-%define		_initrd_bindir	/bin
 
 %if "%{_target_base_arch}" != "%{_arch}"
 	%define CrossOpts CROSS="%{_target_cpu}-pld-linux-"
@@ -233,7 +232,10 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_initrd_bindir},%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
 %{?with_static:install built/busybox.static $RPM_BUILD_ROOT%{_bindir}}
-%{?with_initrd:install built/busybox.initrd $RPM_BUILD_ROOT%{_initrd_bindir}/initrd-busybox}
+%if %{with initrd}
+install -d $RPM_BUILD_ROOT%{_libdir}/initrd
+install built/busybox.initrd $RPM_BUILD_ROOT%{_libdir}/initrd/busybox
+%endif
 
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -275,5 +277,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with initrd}
 %files initrd
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_initrd_bindir}/initrd-busybox
+%attr(755,root,root) %{_libdir}/initrd/busybox
 %endif
