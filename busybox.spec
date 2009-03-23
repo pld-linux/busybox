@@ -169,7 +169,7 @@ install %{SOURCE2} .config
 	LDFLAGS="%{ld_rpmldflags} -static" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
-	CC="diet gcc"
+	CC="diet %{__cc}"
 %else
 %if %{with glibc}
 	%{CrossOpts} \
@@ -201,7 +201,7 @@ install %{SOURCE1} .config
 	LDFLAGS="%{ld_rpmldflags} -static" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
-	CC="diet gcc"
+	CC="diet %{__cc}"
 %else
 %if %{with glibc}
 	%{CrossOpts} \
