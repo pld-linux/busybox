@@ -277,5 +277,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with initrd}
 %files initrd
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/initrd/busybox
+%attr(755,root,root) %{_libdir}/initrd/initrd-busybox
 %endif
