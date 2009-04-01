@@ -234,7 +234,7 @@ install -d $RPM_BUILD_ROOT{%{_initrd_bindir},%{_bindir},%{_mandir}/man1,%{_libdi
 %{?with_static:install built/busybox.static $RPM_BUILD_ROOT%{_bindir}}
 %if %{with initrd}
 install -d $RPM_BUILD_ROOT%{_libdir}/initrd
-install built/busybox.initrd $RPM_BUILD_ROOT%{_libdir}/initrd/busybox
+install built/busybox.initrd $RPM_BUILD_ROOT%{_libdir}/initrd/initrd-busybox
 %endif
 
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
