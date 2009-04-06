@@ -35,7 +35,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.13.3
-Release:	2
+Release:	3
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -139,7 +139,7 @@ Statycznie skonsolidowany busybox.
 Summary:	Static busybox for initrd
 Summary(pl.UTF-8):	Statycznie skonsolidowany busybox dla initrd
 Group:		Applications
-Conflicts:	geninitrd <= 10000.3
+Conflicts:	geninitrd < 10000.10
 
 %description initrd
 Static busybox for initrd.
