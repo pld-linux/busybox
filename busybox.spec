@@ -229,7 +229,7 @@ mv -f busybox built/busybox.static
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_initrd_bindir},%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
 %{?with_static:install built/busybox.static $RPM_BUILD_ROOT%{_bindir}}
 %if %{with initrd}
