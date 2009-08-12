@@ -14,7 +14,7 @@ BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.333
 BuildRequires:	uClibc-static >= 2:0.9.21
-#ExclusiveArch:	i586
+ExclusiveArch:	i586
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir		/bin
