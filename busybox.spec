@@ -1,12 +1,12 @@
 #
 Summary:	Set of common unix utils for embeded systems
 Name:		busybox
-Version:	1.12.4
+Version:	1.14.3
 Release:	1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	5b8c427bf596732d6b6156672e6e093f
+# Source0-md5:	d170bf5f97a41aec3a505eab690d5699
 Source1:	%{name}-initrd.config
 Source2:	%{name}-system.config
 URL:		http://www.busybox.net/
@@ -14,7 +14,7 @@ BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.333
 BuildRequires:	uClibc-static >= 2:0.9.21
-ExclusiveArch:	i586
+#ExclusiveArch:	i586
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir		/bin
