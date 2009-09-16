@@ -123,6 +123,7 @@
 +
  int printf_main(int argc UNUSED_PARAM, char **argv)
  {
+ 	int conv_err;
  	char *format;
  	char **argv2;
 +	int opt;
@@ -141,7 +142,6 @@
 +	format = getmsg(nls_file, argv[optind++]);
  
  	/* We must check that stdout is not closed.
- 	 * The reason for this is highly non-obvious.
 @@ -362,8 +486,8 @@
  	if (!argv[1])
  		bb_show_usage();
