@@ -1,0 +1,881 @@
+It turns out that uClibc-0.9.28, the one we have in Ac, and the one we
+use to compile busybox does not support %m. Consider the following code:
+
+$ cat a.c
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void)
+{
+        if (open("/etc/shadow", O_RDWR) <0)
+                printf("error: %m\n");
+        return 0;
+}
+$
+
+How it is expeceted to behave:
+$ i686-pld-linux-gcc -o a.gcc a.c
+$ ./a.gcc
+error: Permission denied
+$
+
+Hot it behaves when compiled against uClibc:
+$ i686-uclibc-gcc -o a.uclibc a.c
+$ ./a.uclibc
+m
+$
+
+And against dietlibc:
+$ i686-dietlibc-gcc -o a.diet a.c
+/usr/lib/dietlibc/lib-i386/libc.a(vprintf.o): In function `vprintf':
+vprintf.c:(.text+0x3d): warning: warning: the printf functions add several kilobytes of bloat.
+$ ./a
+error:
+$
+
+On the other hand, uClibc-0.9.29, the one we have in Th is not affected:
+$ i686-uclibc-gcc -o a.uclibc.th a.c
+$ ./a.uclibc.th
+error: Permission denied
+$
+
+So, the real problem is uClibc-0.9.28 not supporting %m - glibc extension
+to printf, which outputs strerror(errno).
+
+
+Since 0.9.29 breaks ABI, it is not a best idea to backport it to Ac. We could
+build busybox against glibc by default, or try to fix busybox to 
+use strerror(errno), which seems to be best option.
+
+ archival/tar.c                  |    2 +-
+ console-tools/dumpkmap.c        |    2 +-
+ include/applets.h               |    1 +
+ include/usage.h                 |    5 +++++
+ init/init.c                     |    6 +++---
+ libbb/loop.h                    |    5 -----
+ libbb/messages.c                |    2 +-
+ loginutils/getty.c              |   16 ++++++++--------
+ miscutils/crond.c               |    4 ++--
+ miscutils/devfsd.c              |   26 +++++++++++++-------------
+ miscutils/rx.c                  |    8 ++++----
+ networking/inetd.c              |   32 ++++++++++++++++----------------
+ networking/nameif.c             |    6 +++---
+ networking/udhcp/arpping.c      |    2 +-
+ networking/udhcp/clientpacket.c |    3 ++-
+ networking/udhcp/clientsocket.c |    5 +++--
+ networking/udhcp/dhcpc.c        |    4 ++--
+ networking/udhcp/dhcpd.c        |    4 ++--
+ networking/udhcp/packet.c       |    6 +++---
+ networking/udhcp/pidfile.c      |    3 ++-
+ networking/udhcp/script.c       |    3 ++-
+ networking/udhcp/signalpipe.c   |    3 ++-
+ networking/udhcp/socket.c       |   10 +++++-----
+ scripts/mkdep.c                 |    3 ++-
+ shell/ash.c                     |   10 +++++-----
+ shell/hush.c                    |    2 +-
+ shell/lash.c                    |    8 ++++----
+ sysklogd/klogd.c                |    2 +-
+ 28 files changed, 95 insertions(+), 88 deletions(-)
+
+diff -bur busybox-1.00.orig/archival/tar.c busybox-1.00/archival/tar.c
+--- busybox-1.00.orig/archival/tar.c	2008-03-23 19:33:42.754498034 +0100
++++ busybox-1.00/archival/tar.c	2008-03-23 21:35:32.165477470 +0100
+@@ -292,7 +292,7 @@
+ 	if ((size =
+ 		 bb_full_write(tbInfo->tarFd, (char *) &header,
+ 					sizeof(struct TarHeader))) < 0) {
+-		bb_error_msg(bb_msg_io_error, real_name);
++		bb_error_msg(bb_msg_io_error, real_name, strerror(errno));
+ 		return (FALSE);
+ 	}
+ 	/* Pad the header up to the tar block size */
+diff -bur busybox-1.00.orig/console-tools/dumpkmap.c busybox-1.00/console-tools/dumpkmap.c
+--- busybox-1.00.orig/console-tools/dumpkmap.c	2008-03-23 19:33:42.754498034 +0100
++++ busybox-1.00/console-tools/dumpkmap.c	2008-03-23 21:35:32.165477470 +0100
+@@ -77,7 +77,7 @@
+ 				ke.kb_table = i;
+ 				if (ioctl(fd, KDGKBENT, &ke) < 0) {
+ 
+-					bb_error_msg("ioctl returned: %m, %s, %s, %xqq", (char *)&ke.kb_index,(char *)&ke.kb_table,(int)&ke.kb_value);
++					bb_error_msg("ioctl returned: %s, %s, %s, %xqq", strerror(errno), (char *)&ke.kb_index,(char *)&ke.kb_table,(int)&ke.kb_value);
+ 					}
+ 				else {
+ 					write(1,(void*)&ke.kb_value,2);
+diff -bur busybox-1.00.orig/init/init.c busybox-1.00/init/init.c
+--- busybox-1.00.orig/init/init.c	2008-03-23 19:33:43.211186531 +0100
++++ busybox-1.00/init/init.c	2008-03-23 21:35:32.165477470 +0100
+@@ -615,7 +615,7 @@
+ 		execv(cmdpath, cmd);
+ 
+ 		/* We're still here?  Some error happened. */
+-		message(LOG | CONSOLE, "Bummer, could not run '%s': %m", cmdpath);
++		message(LOG | CONSOLE, "Bummer, could not run '%s': %s", cmdpath, strerror(errno));
+ 		_exit(-1);
+ 	}
+ 	sigprocmask(SIG_SETMASK, &omask, NULL);
+@@ -771,8 +771,8 @@
+ 			messageD(CONSOLE | LOG, "Trying to re-exec %s", a->command);
+ 			execl(a->command, a->command, NULL);
+ 
+-			message(CONSOLE | LOG, "exec of '%s' failed: %m",
+-					a->command);
++			message(CONSOLE | LOG, "exec of '%s' failed: %s",
++					a->command, strerror(errno));
+ 			sync();
+ 			sleep(2);
+ 			init_reboot(RB_HALT_SYSTEM);
+diff -bur busybox-1.00.orig/libbb/messages.c busybox-1.00/libbb/messages.c
+--- busybox-1.00.orig/libbb/messages.c	2008-03-23 19:33:43.251188442 +0100
++++ busybox-1.00/libbb/messages.c	2008-03-23 21:35:32.175477946 +0100
+@@ -31,7 +31,7 @@
+ 	const char * const bb_msg_invalid_date = "invalid date `%s'";
+ #endif
+ #ifdef L_io_error
+-	const char * const bb_msg_io_error = "%s: input/output error -- %m";
++	const char * const bb_msg_io_error = "%s: input/output error -- %s";
+ #endif
+ #ifdef L_write_error
+ 	const char * const bb_msg_write_error = "Write Error";
+diff -bur busybox-1.00.orig/loginutils/getty.c busybox-1.00/loginutils/getty.c
+--- busybox-1.00.orig/loginutils/getty.c	2008-03-23 19:33:43.454531498 +0100
++++ busybox-1.00/loginutils/getty.c	2008-03-23 21:35:32.175477946 +0100
+@@ -370,7 +370,7 @@
+ 	/* Let the login program take care of password validation. */
+ 
+ 	(void) execl(options.login, options.login, "--", logname, (char *) 0);
+-	error("%s: can't exec %s: %m", options.tty, options.login);
++	error("%s: can't exec %s: %s", options.tty, options.login, strerror(errno));
+ }
+ 
+ /* parse-args - parse command-line arguments */
+@@ -561,9 +561,9 @@
+ 		/* Sanity checks... */
+ 
+ 		if (chdir("/dev"))
+-			error("/dev: chdir() failed: %m");
++			error("/dev: chdir() failed: %s", strerror(errno));
+ 		if (stat(tty, &st) < 0)
+-			error("/dev/%s: %m", tty);
++			error("/dev/%s: %s", tty, strerror(errno));
+ 		if ((st.st_mode & S_IFMT) != S_IFCHR)
+ 			error("/dev/%s: not a character device", tty);
+ 
+@@ -574,7 +574,7 @@
+ 
+ 		debug("open(2)\n");
+ 		if (open(tty, O_RDWR | O_NONBLOCK, 0) != 0)
+-			error("/dev/%s: cannot open as standard input: %m", tty);
++			error("/dev/%s: cannot open as standard input: %s", tty, strerror(errno));
+ 
+ 	} else {
+ 
+@@ -590,7 +590,7 @@
+ 	/* Set up standard output and standard error file descriptors. */
+ 	debug("duping\n");
+ 	if (dup(0) != 1 || dup(0) != 2)	/* set up stdout and stderr */
+-		error("%s: dup problem: %m", tty);	/* we have a problem */
++		error("%s: dup problem: %s", tty, strerror(errno));	/* we have a problem */
+ 
+ 	/*
+ 	 * The following ioctl will fail if stdin is not a tty, but also when
+@@ -602,7 +602,7 @@
+ 	 */
+ 
+ 	if (ioctl(0, TCGETA, tp) < 0)
+-		error("%s: ioctl: %m", tty);
++		error("%s: ioctl: %s", tty, strerror(errno));
+ 
+ 	/*
+ 	 * It seems to be a terminal. Set proper protections and ownership. Mode
+@@ -815,7 +815,7 @@
+ 			if (read(0, &c, 1) < 1) {
+ 				if (errno == EINTR || errno == EIO)
+ 					exit(0);
+-				error("%s: read: %m", op->tty);
++				error("%s: read: %s", op->tty, strerror(errno));
+ 			}
+ 			/* Do BREAK handling elsewhere. */
+ 
+@@ -940,7 +940,7 @@
+ 	/* Finally, make the new settings effective */
+ 
+ 	if (ioctl(0, TCSETA, tp) < 0)
+-		error("%s: ioctl: TCSETA: %m", op->tty);
++		error("%s: ioctl: TCSETA: %s", op->tty, strerror(errno));
+ }
+ 
+ /* caps_lock - string contains upper case without lower case */
+diff -bur busybox-1.00.orig/miscutils/crond.c busybox-1.00/miscutils/crond.c
+--- busybox-1.00.orig/miscutils/crond.c	2008-03-23 19:33:43.457864989 +0100
++++ busybox-1.00/miscutils/crond.c	2008-03-23 21:35:32.175477946 +0100
+@@ -330,9 +330,9 @@
+ 		return (-1);
+ 	}
+ 	if (chdir(pas->pw_dir) < 0) {
+-		crondlog("\011chdir failed: %s: %m", pas->pw_dir);
++		crondlog("\011chdir failed: %s: %s", pas->pw_dir, strerror(errno));
+ 		if (chdir(TMPDIR) < 0) {
+-			crondlog("\011chdir failed: %s: %m", TMPDIR);
++			crondlog("\011chdir failed: %s: %s", TMPDIR, strerror(errno));
+ 			return (-1);
+ 		}
+ 	}
+diff -bur busybox-1.00.orig/miscutils/devfsd.c busybox-1.00/miscutils/devfsd.c
+--- busybox-1.00.orig/miscutils/devfsd.c	2008-03-23 19:33:43.467865469 +0100
++++ busybox-1.00/miscutils/devfsd.c	2008-03-23 21:35:32.175477946 +0100
+@@ -329,7 +329,7 @@
+ {
+ #ifdef CONFIG_DEVFSD_VERBOSE
+ 	if (ioctl (fd, request, event_mask_flag) == -1)
+-		msg_logger(die, LOG_ERR, "ioctl(): %m\n");
++		msg_logger(die, LOG_ERR, "ioctl(): %s\n" strerror(errno));
+ #else
+ 	if (ioctl (fd, request, event_mask_flag) == -1)
+ 		exit(EXIT_FAILURE);
+@@ -366,7 +366,7 @@
+ 	{
+ 		execvp (arg0, arg);
+ #ifdef CONFIG_DEVFSD_VERBOSE
+-		msg_logger(DIE, LOG_ERR, "execvp(): %s: %m\n", arg0);
++		msg_logger(DIE, LOG_ERR, "execvp(): %s: %s\n", arg0, strerror(errno));
+ #else
+ 		exit(EXIT_FAILURE);
+ #endif
+@@ -466,7 +466,7 @@
+ 
+ 	if (chdir (mount_point) != 0)
+ #ifdef CONFIG_DEVFSD_VERBOSE
+-		bb_error_msg_and_die( " %s: %m", mount_point);
++		bb_error_msg_and_die( " %s: %s", mount_point, strerror(errno));
+ #else
+ 		exit(EXIT_FAILURE);
+ #endif
+@@ -602,7 +602,7 @@
+ 	}
+ read_config_file_err:
+ #ifdef CONFIG_DEVFSD_VERBOSE
+-	msg_logger(((optional ==  0 ) && (errno == ENOENT))? DIE : NO_DIE, LOG_ERR, "read config file: %s: %m\n", path);
++	msg_logger(((optional ==  0 ) && (errno == ENOENT))? DIE : NO_DIE, LOG_ERR, "read config file: %s: %s\n", path, strerror(errno));
+ #else
+ 	if(optional ==  0  && errno == ENOENT)
+ 		exit(EXIT_FAILURE);
+@@ -812,7 +812,7 @@
+ 		return (c_sighup);
+ 	}
+ #ifdef CONFIG_DEVFSD_VERBOSE
+-	msg_logger( NO_DIE, LOG_ERR, "read error on control file: %m\n");
++	msg_logger( NO_DIE, LOG_ERR, "read error on control file: %s\n", strerror(errno));
+ #endif
+ 	/* This is to shut up a compiler warning */
+ 	exit(EXIT_FAILURE);
+@@ -908,7 +908,7 @@
+ 		 chown (info->devname, entry->u.permissions.uid, entry->u.permissions.gid) != 0)
+ 	{
+ #ifdef CONFIG_DEVFSD_VERBOSE
+-			msg_logger( NO_DIE, LOG_ERR, "chmod() or chown(): %s: %m\n",info->devname);
++			msg_logger( NO_DIE, LOG_ERR, "chmod() or chown(): %s: %s\n",info->devname, strerror(errno));
+ #endif
+ 		return;
+ 	}
+@@ -1040,7 +1040,7 @@
+ 		new_mode |= S_ISVTX;
+ #ifdef CONFIG_DEBUG
+ 	if ( !copy_inode (destination, &dest_stat, new_mode, source, &source_stat) && (errno != EEXIST))
+-		msg_logger( NO_DIE, LOG_ERR, "copy_inode(): %s to %s: %m\n", source, destination);
++		msg_logger( NO_DIE, LOG_ERR, "copy_inode(): %s to %s: %s\n", source, destination, strerror(errno));
+ #else
+ 	copy_inode (destination, &dest_stat, new_mode, source, &source_stat);
+ #endif
+@@ -1146,7 +1146,7 @@
+ 		case AC_RMNEWCOMPAT:
+ #ifdef CONFIG_DEBUG
+ 			if (unlink (compat_name) != 0)
+-				msg_logger( NO_DIE, LOG_ERR, "unlink(): %s: %m\n", compat_name);
++				msg_logger( NO_DIE, LOG_ERR, "unlink(): %s: %s\n", compat_name, strerror(errno));
+ #else
+ 			unlink (compat_name);
+ #endif
+@@ -1395,7 +1395,7 @@
+ 
+ 	if (gethostname (hostname, STRING_LENGTH - 1) != 0)
+ #ifdef CONFIG_DEVFSD_VERBOSE
+-		msg_logger( DIE, LOG_ERR, "gethostname(): %m\n");
++		msg_logger( DIE, LOG_ERR, "gethostname(): %s\n", strerror(errno));
+ #else
+ 		exit(EXIT_FAILURE);
+ #endif
+@@ -1471,7 +1471,7 @@
+ 	if((dp = opendir( dir_name))==NULL)
+ 	{
+ #ifdef CONFIG_DEBUG
+-		msg_logger( NO_DIE, LOG_ERR, "opendir(): %s: %m\n", dir_name);
++		msg_logger( NO_DIE, LOG_ERR, "opendir(): %s: %s\n", dir_name, strerror(errno));
+ #endif
+ 		return;
+ 	}
+@@ -1489,7 +1489,7 @@
+ 		if (lstat (path, &statbuf) != 0)
+ 		{
+ #ifdef CONFIG_DEBUG
+-			msg_logger( NO_DIE, LOG_ERR, "%s: %m\n", path);
++			msg_logger( NO_DIE, LOG_ERR, "%s: %s\n", path, strerror(errno));
+ #endif
+ 			continue;
+ 		}
+@@ -1529,7 +1529,7 @@
+ 		if (errno != EEXIST)
+ 		{
+ #ifdef CONFIG_DEBUG
+-			msg_logger( NO_DIE, LOG_ERR, "mksymlink(): %s to %s: %m\n", oldpath, newpath);
++			msg_logger( NO_DIE, LOG_ERR, "mksymlink(): %s to %s: %s\n", oldpath, newpath, strerror(errno));
+ #endif
+ 			return (-1);
+ 		}
+@@ -1550,7 +1550,7 @@
+ 	if (bb_make_directory( dirname((char *)path), -1, FILEUTILS_RECUR )==-1)
+ 	{
+ #ifdef CONFIG_DEBUG
+-		msg_logger( NO_DIE, LOG_ERR, "make_dir_tree(): %s: %m\n", path);
++		msg_logger( NO_DIE, LOG_ERR, "make_dir_tree(): %s: %s\n", path, strerror(errno));
+ #endif
+ 		return (FALSE);
+ 	}
+diff -bur busybox-1.00.orig/miscutils/rx.c busybox-1.00/miscutils/rx.c
+--- busybox-1.00.orig/miscutils/rx.c	2008-03-23 19:33:43.467865469 +0100
++++ busybox-1.00/miscutils/rx.c	2008-03-23 21:35:32.175477946 +0100
+@@ -238,7 +238,7 @@
+ 		length += blockLength;
+ 
+ 		if (bb_full_write(filefd, blockBuf, blockLength) < 0) {
+-			note_error("write to file failed: %m");
++			note_error("write to file failed: %s", strerror(errno));
+ 			goto fatal;
+ 		}
+ 
+@@ -304,14 +304,14 @@
+ 	fn = argv[1];
+ 	ttyfd = open("/dev/tty", O_RDWR);
+ 	if (ttyfd < 0)
+-			bb_error_msg_and_die("%s: open on /dev/tty failed: %m\n", argv[0]);
++			bb_error_msg_and_die("%s: open on /dev/tty failed: %s\n", argv[0], strerror(errno));
+ 
+ 	filefd = open(fn, O_RDWR|O_CREAT|O_TRUNC, 0666);
+ 	if (filefd < 0)
+-			bb_error_msg_and_die("%s: open on %s failed: %m\n", argv[0], fn);
++			bb_error_msg_and_die("%s: open on %s failed: %s\n", argv[0], fn, strerror(errno));
+ 
+ 	if (tcgetattr(ttyfd, &tty) < 0)
+-			bb_error_msg_and_die("%s: tcgetattr failed: %m\n", argv[0]);
++			bb_error_msg_and_die("%s: tcgetattr failed: %s\n", argv[0], strerror(errno));
+ 
+ 	orig_tty = tty;
+ 
+diff -bur busybox-1.00.orig/networking/inetd.c busybox-1.00/networking/inetd.c
+--- busybox-1.00.orig/networking/inetd.c	2008-03-23 19:33:43.607872161 +0100
++++ busybox-1.00/networking/inetd.c	2008-03-23 21:35:32.178811440 +0100
+@@ -284,7 +284,7 @@
+ 	char *ms = strdup(s);
+ 
+ 	if(ms == NULL)
+-		syslog_err_and_discard_dg(SOCK_STREAM, "strdup: %m");
++		syslog_err_and_discard_dg(SOCK_STREAM, "strdup: %s", strerror(errno));
+ 	return ms;
+ }
+ 
+@@ -471,16 +471,16 @@
+ 	int on = 1;
+ 
+ 	if ((sep->se_fd = socket(sep->se_family, sep->se_socktype, 0)) < 0) {
+-		syslog(LOG_ERR, "%s/%s: socket: %m",
+-		    sep->se_service, sep->se_proto);
++		syslog(LOG_ERR, "%s/%s: socket: %s",
++		    sep->se_service, sep->se_proto, strerror(errno));
+ 		return;
+ 	}
+ 	if (setsockopt(sep->se_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&on,
+ 			    sizeof(on)) < 0)
+-		syslog(LOG_ERR, "setsockopt (SO_REUSEADDR): %m");
++		syslog(LOG_ERR, "setsockopt (SO_REUSEADDR): %s", strerror(errno));
+ 	if (bind(sep->se_fd, &sep->se_ctrladdr, sep->se_ctrladdr_size) < 0) {
+-		syslog(LOG_ERR, "%s/%s: bind: %m",
+-		    sep->se_service, sep->se_proto);
++		syslog(LOG_ERR, "%s/%s: bind: %s",
++		    sep->se_service, sep->se_proto, strerror(errno));
+ 		(void) close(sep->se_fd);
+ 		sep->se_fd = -1;
+ 		if (!timingout) {
+@@ -502,7 +502,7 @@
+ 			struct rlimit rl;
+ 
+ 			if (getrlimit(RLIMIT_NOFILE, &rl) < 0) {
+-				syslog(LOG_ERR, "getrlimit: %m");
++				syslog(LOG_ERR, "getrlimit: %s", strerror(errno));
+ 				return;
+ 			}
+ 			rl.rlim_cur = rl.rlim_max < (rl.rlim_cur + FD_CHUNK) ? rl.rlim_max : (rl.rlim_cur + FD_CHUNK);
+@@ -518,7 +518,7 @@
+ 			}
+ 
+ 			if (setrlimit(RLIMIT_NOFILE, &rl) < 0) {
+-				syslog(LOG_ERR, "setrlimit: %m");
++				syslog(LOG_ERR, "setrlimit: %s", strerror(errno));
+ 				return;
+ 			}
+ 
+@@ -545,7 +545,7 @@
+ 	} else {
+ 		fconfig = fopen(CONFIG, "r");
+ 		if (fconfig == NULL) {
+-			syslog(LOG_ERR, "%s: %m", CONFIG);
++			syslog(LOG_ERR, "%s: %s", CONFIG, strerror(errno));
+ 			return;
+ 		}
+ 	}
+@@ -792,7 +792,7 @@
+ 
+ #ifdef RLIMIT_NOFILE
+ 	if (getrlimit(RLIMIT_NOFILE, &rlim_ofile) < 0) {
+-		syslog(LOG_ERR, "getrlimit: %m");
++		syslog(LOG_ERR, "getrlimit: %s", strerror(errno));
+ 	} else {
+ 		rlim_ofile_cur = rlim_ofile.rlim_cur;
+ 		if (rlim_ofile_cur == RLIM_INFINITY)    /* ! */
+@@ -850,7 +850,7 @@
+ 		n = select(maxsock + 1, &readable, (fd_set *)0, (fd_set *)0, (struct timeval *)0);
+ 		if (n <= 0) {
+ 			if (n < 0 && errno != EINTR) {
+-				syslog(LOG_WARNING, "select: %m");
++				syslog(LOG_WARNING, "select: %s", strerror(errno));
+ 			}
+ 			sleep(1);
+ 			continue;
+@@ -868,8 +868,8 @@
+ 						if (errno == EINTR || errno == EWOULDBLOCK) {
+ 							continue;
+ 						}
+-						syslog(LOG_WARNING, "accept (for %s): %m",
+-						sep->se_service);
++						syslog(LOG_WARNING, "accept (for %s): %s",
++						sep->se_service, strerror(errno));
+ 						continue;
+ 					}
+ 				} else {
+@@ -910,7 +910,7 @@
+ 					}
+ 					pid = fork();
+ 					if (pid < 0) {
+-						syslog(LOG_ERR, "fork: %m");
++						syslog(LOG_ERR, "fork: %s", strerror(errno));
+ 						if (sep->se_socktype == SOCK_STREAM) {
+ 							close(ctrl);
+ 						}
+@@ -973,7 +973,7 @@
+ #ifdef RLIMIT_NOFILE
+ 						if (rlim_ofile.rlim_cur != rlim_ofile_cur) {
+ 							if (setrlimit(RLIMIT_NOFILE, &rlim_ofile) < 0) {
+-								syslog(LOG_ERR,"setrlimit: %m");
++								syslog(LOG_ERR,"setrlimit: %s", strerror(errno));
+ 							}
+ 						}
+ #endif
+@@ -985,7 +985,7 @@
+ 						sigaction(SIGPIPE, &sa, NULL);
+ 
+ 						execv(sep->se_server, sep->se_argv);
+-						syslog_err_and_discard_dg(sep->se_socktype, "execv %s: %m", sep->se_server);
++						syslog_err_and_discard_dg(sep->se_socktype, "execv %s: %s", sep->se_server, strerror(errno));
+ 					}
+ 				}
+ 				if (!sep->se_wait && sep->se_socktype == SOCK_STREAM) {
+diff -bur busybox-1.00.orig/networking/nameif.c busybox-1.00/networking/nameif.c
+--- busybox-1.00.orig/networking/nameif.c	2008-03-23 19:33:43.624539627 +0100
++++ busybox-1.00/networking/nameif.c	2008-03-23 21:35:32.178811440 +0100
+@@ -172,7 +172,7 @@
+ 	}
+ 
+ 	if ((ctl_sk = socket(PF_INET, SOCK_DGRAM, 0)) == -1)
+-		serror("socket: %m");
++		serror("socket: %s", strerror(errno));
+ 
+ 	while (clist) {
+ 		struct ifreq ifr;
+@@ -200,8 +200,8 @@
+ 
+ 		strcpy(ifr.ifr_newname, ch->ifname);
+ 		if (ioctl(ctl_sk, SIOCSIFNAME, &ifr) < 0)
+-			serror("cannot change ifname %s to %s: %m",
+-				   ifr.ifr_name, ch->ifname);
++			serror("cannot change ifname %s to %s: %s",
++				   ifr.ifr_name, ch->ifname, strerror(errno));
+ 
+ 		/* Remove list entry of renamed interface */
+ 		if (ch->prev != NULL) {
+diff -bur busybox-1.00.orig/networking/udhcp/arpping.c busybox-1.00/networking/udhcp/arpping.c
+--- busybox-1.00.orig/networking/udhcp/arpping.c	2008-03-23 19:33:43.664541535 +0100
++++ busybox-1.00/networking/udhcp/arpping.c	2008-03-23 21:35:32.178811440 +0100
+@@ -85,7 +85,7 @@
+ 		FD_SET(s, &fdset);
+ 		tm.tv_sec = timeout;
+ 		if (select(s + 1, &fdset, (fd_set *) NULL, (fd_set *) NULL, &tm) < 0) {
+-			DEBUG(LOG_ERR, "Error on ARPING request: %m");
++			DEBUG(LOG_ERR, "Error on ARPING request: %s", strerror(errno));
+ 			if (errno != EINTR) rv = 0;
+ 		} else if (FD_ISSET(s, &fdset)) {
+ 			if (recv(s, &arp, sizeof(arp), 0) < 0 ) rv = 0;
+diff -bur busybox-1.00.orig/networking/udhcp/clientpacket.c busybox-1.00/networking/udhcp/clientpacket.c
+--- busybox-1.00.orig/networking/udhcp/clientpacket.c	2008-03-23 19:33:43.664541535 +0100
++++ busybox-1.00/networking/udhcp/clientpacket.c	2008-03-23 21:35:32.178811440 +0100
+@@ -36,6 +36,7 @@
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <fcntl.h>
++#include <errno.h>
+ 
+ 
+ #include "dhcpd.h"
+@@ -55,7 +56,7 @@
+ 
+ 		fd = open("/dev/urandom", 0);
+ 		if (fd < 0 || read(fd, &seed, sizeof(seed)) < 0) {
+-			LOG(LOG_WARNING, "Could not load seed from /dev/urandom: %m");
++			LOG(LOG_WARNING, "Could not load seed from /dev/urandom: %s", strerror(errno));
+ 			seed = time(0);
+ 		}
+ 		if (fd >= 0) close(fd);
+diff -bur busybox-1.00.orig/networking/udhcp/clientsocket.c busybox-1.00/networking/udhcp/clientsocket.c
+--- busybox-1.00.orig/networking/udhcp/clientsocket.c	2008-03-23 19:33:43.664541535 +0100
++++ busybox-1.00/networking/udhcp/clientsocket.c	2008-03-23 21:37:00.379694612 +0100
+@@ -33,6 +33,7 @@
+ #include <linux/if_packet.h>
+ #include <linux/if_ether.h>
+ #endif
++#include <errno.h>
+ 
+ #include "clientsocket.h"
+ #include "common.h"
+@@ -45,7 +46,7 @@
+ 
+ 	DEBUG(LOG_INFO, "Opening raw socket on ifindex %d", ifindex);
+ 	if ((fd = socket(PF_PACKET, SOCK_DGRAM, htons(ETH_P_IP))) < 0) {
+-		DEBUG(LOG_ERR, "socket call failed: %m");
++		DEBUG(LOG_ERR, "socket call failed: %s", strerror(errno));
+ 		return -1;
+ 	}
+ 
+@@ -53,7 +54,7 @@
+ 	sock.sll_protocol = htons(ETH_P_IP);
+ 	sock.sll_ifindex = ifindex;
+ 	if (bind(fd, (struct sockaddr *) &sock, sizeof(sock)) < 0) {
+-		DEBUG(LOG_ERR, "bind call failed: %m");
++		DEBUG(LOG_ERR, "bind call failed: %s", strerror(errno));
+ 		close(fd);
+ 		return -1;
+ 	}
+diff -bur busybox-1.00.orig/networking/udhcp/dhcpc.c busybox-1.00/networking/udhcp/dhcpc.c
+--- busybox-1.00.orig/networking/udhcp/dhcpc.c	2008-03-23 19:33:43.681209000 +0100
++++ busybox-1.00/networking/udhcp/dhcpc.c	2008-03-23 21:35:32.178811440 +0100
+@@ -299,7 +299,7 @@
+ 			else
+ 				fd = raw_socket(client_config.ifindex);
+ 			if (fd < 0) {
+-				LOG(LOG_ERR, "FATAL: couldn't listen on socket, %m");
++				LOG(LOG_ERR, "FATAL: couldn't listen on socket, %s", strerror(errno));
+ 				return 0;
+ 			}
+ 		}
+@@ -409,7 +409,7 @@
+ 			else len = get_raw_packet(&packet, fd);
+ 
+ 			if (len == -1 && errno != EINTR) {
+-				DEBUG(LOG_INFO, "error on read, %m, reopening socket");
++				DEBUG(LOG_INFO, "error on read, %s, reopening socket", strerror(errno));
+ 				change_mode(listen_mode); /* just close and reopen */
+ 			}
+ 			if (len < 0) continue;
+diff -bur busybox-1.00.orig/networking/udhcp/dhcpd.c busybox-1.00/networking/udhcp/dhcpd.c
+--- busybox-1.00.orig/networking/udhcp/dhcpd.c	2008-03-23 19:33:43.681209000 +0100
++++ busybox-1.00/networking/udhcp/dhcpd.c	2008-03-23 21:35:32.182144933 +0100
+@@ -115,7 +115,7 @@
+ 
+ 		if (server_socket < 0)
+ 			if ((server_socket = listen_socket(INADDR_ANY, SERVER_PORT, server_config.interface)) < 0) {
+-				LOG(LOG_ERR, "FATAL: couldn't create server socket, %m");
++				LOG(LOG_ERR, "FATAL: couldn't create server socket, %s", strerror(errno));
+ 				return 2;
+ 			}
+ 
+@@ -154,7 +154,7 @@
+ 
+ 		if ((bytes = get_packet(&packet, server_socket)) < 0) { /* this waits for a packet - idle */
+ 			if (bytes == -1 && errno != EINTR) {
+-				DEBUG(LOG_INFO, "error on read, %m, reopening socket");
++				DEBUG(LOG_INFO, "error on read, %s, reopening socket", strerror(errno));
+ 				close(server_socket);
+ 				server_socket = -1;
+ 			}
+diff -bur busybox-1.00.orig/networking/udhcp/packet.c busybox-1.00/networking/udhcp/packet.c
+--- busybox-1.00.orig/networking/udhcp/packet.c	2008-03-23 19:33:43.681209000 +0100
++++ busybox-1.00/networking/udhcp/packet.c	2008-03-23 21:35:32.182144933 +0100
+@@ -123,7 +123,7 @@
+ 	struct udp_dhcp_packet packet;
+ 
+ 	if ((fd = socket(PF_PACKET, SOCK_DGRAM, htons(ETH_P_IP))) < 0) {
+-		DEBUG(LOG_ERR, "socket call failed: %m");
++		DEBUG(LOG_ERR, "socket call failed: %s", strerror(errno));
+ 		return -1;
+ 	}
+ 
+@@ -136,7 +136,7 @@
+ 	dest.sll_halen = 6;
+ 	memcpy(dest.sll_addr, dest_arp, 6);
+ 	if (bind(fd, (struct sockaddr *)&dest, sizeof(struct sockaddr_ll)) < 0) {
+-		DEBUG(LOG_ERR, "bind call failed: %m");
++		DEBUG(LOG_ERR, "bind call failed: %s", strerror(errno));
+ 		close(fd);
+ 		return -1;
+ 	}
+@@ -159,7 +159,7 @@
+ 
+ 	result = sendto(fd, &packet, sizeof(struct udp_dhcp_packet), 0, (struct sockaddr *) &dest, sizeof(dest));
+ 	if (result <= 0) {
+-		DEBUG(LOG_ERR, "write on socket failed: %m");
++		DEBUG(LOG_ERR, "write on socket failed: %s", strerror(errno));
+ 	}
+ 	close(fd);
+ 	return result;
+diff -bur busybox-1.00.orig/networking/udhcp/pidfile.c busybox-1.00/networking/udhcp/pidfile.c
+--- busybox-1.00.orig/networking/udhcp/pidfile.c	2008-03-23 19:33:43.681209000 +0100
++++ busybox-1.00/networking/udhcp/pidfile.c	2008-03-23 21:35:32.182144933 +0100
+@@ -21,6 +21,7 @@
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <errno.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <stdio.h>
+@@ -44,7 +45,7 @@
+ 
+ 	pid_fd = open(pidfile, O_CREAT | O_WRONLY, 0644);
+ 	if (pid_fd < 0) {
+-		LOG(LOG_ERR, "Unable to open pidfile %s: %m\n", pidfile);
++		LOG(LOG_ERR, "Unable to open pidfile %s: %s\n", pidfile, strerror(errno));
+ 	} else {
+ 		lockf(pid_fd, F_LOCK, 0);
+ 		if (!saved_pidfile)
+diff -bur busybox-1.00.orig/networking/udhcp/script.c busybox-1.00/networking/udhcp/script.c
+--- busybox-1.00.orig/networking/udhcp/script.c	2008-03-23 19:33:43.681209000 +0100
++++ busybox-1.00/networking/udhcp/script.c	2008-03-23 21:35:32.182144933 +0100
+@@ -19,6 +19,7 @@
+  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+ 
++#include <errno.h>
+ #include <string.h>
+ #include <unistd.h>
+ #include <stdio.h>
+@@ -227,7 +228,7 @@
+ 		/* exec script */
+ 		execle(client_config.script, client_config.script,
+ 		       name, NULL, envp);
+-		LOG(LOG_ERR, "script %s failed: %m", client_config.script);
++		LOG(LOG_ERR, "script %s failed: %s", client_config.script, strerror(errno));
+ 		exit(1);
+ 	}
+ }
+diff -bur busybox-1.00.orig/networking/udhcp/signalpipe.c busybox-1.00/networking/udhcp/signalpipe.c
+--- busybox-1.00.orig/networking/udhcp/signalpipe.c	2008-03-23 19:33:43.681209000 +0100
++++ busybox-1.00/networking/udhcp/signalpipe.c	2008-03-23 21:35:32.182144933 +0100
+@@ -19,6 +19,7 @@
+  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+ 
++#include <errno.h>
+ #include <unistd.h>
+ #include <signal.h>
+ #include <sys/types.h>
+@@ -34,7 +35,7 @@
+ static void signal_handler(int sig)
+ {
+ 	if (send(signal_pipe[1], &sig, sizeof(sig), MSG_DONTWAIT) < 0)
+-		DEBUG(LOG_ERR, "Could not send signal: %m");
++		DEBUG(LOG_ERR, "Could not send signal: %s", strerror(errno));
+ }
+ 
+ 
+diff -bur busybox-1.00.orig/networking/udhcp/socket.c busybox-1.00/networking/udhcp/socket.c
+--- busybox-1.00.orig/networking/udhcp/socket.c	2008-03-23 19:33:43.681209000 +0100
++++ busybox-1.00/networking/udhcp/socket.c	2008-03-23 21:35:32.182144933 +0100
+@@ -61,7 +61,7 @@
+ 				*addr = our_ip->sin_addr.s_addr;
+ 				DEBUG(LOG_INFO, "%s (our ip) = %s", ifr.ifr_name, inet_ntoa(our_ip->sin_addr));
+ 			} else {
+-				LOG(LOG_ERR, "SIOCGIFADDR failed, is the interface up and configured?: %m");
++				LOG(LOG_ERR, "SIOCGIFADDR failed, is the interface up and configured?: %s", strerror(errno));
+ 				return -1;
+ 			}
+ 		}
+@@ -70,7 +70,7 @@
+ 			DEBUG(LOG_INFO, "adapter index %d", ifr.ifr_ifindex);
+ 			*ifindex = ifr.ifr_ifindex;
+ 		} else {
+-			LOG(LOG_ERR, "SIOCGIFINDEX failed!: %m");
++			LOG(LOG_ERR, "SIOCGIFINDEX failed!: %s", strerror(errno));
+ 			return -1;
+ 		}
+ 		if (ioctl(fd, SIOCGIFHWADDR, &ifr) == 0) {
+@@ -78,11 +78,11 @@
+ 			DEBUG(LOG_INFO, "adapter hardware address %02x:%02x:%02x:%02x:%02x:%02x",
+ 				arp[0], arp[1], arp[2], arp[3], arp[4], arp[5]);
+ 		} else {
+-			LOG(LOG_ERR, "SIOCGIFHWADDR failed!: %m");
++			LOG(LOG_ERR, "SIOCGIFHWADDR failed!: %s", strerror(errno));
+ 			return -1;
+ 		}
+ 	} else {
+-		LOG(LOG_ERR, "socket failed!: %m");
++		LOG(LOG_ERR, "socket failed!: %s", strerror(errno));
+ 		return -1;
+ 	}
+ 	close(fd);
+@@ -99,7 +99,7 @@
+ 
+ 	DEBUG(LOG_INFO, "Opening listen socket on 0x%08x:%d %s", ip, port, inf);
+ 	if ((fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+-		DEBUG(LOG_ERR, "socket call failed: %m");
++		DEBUG(LOG_ERR, "socket call failed: %s", strerror(errno));
+ 		return -1;
+ 	}
+ 
+diff -bur busybox-1.00.orig/scripts/mkdep.c busybox-1.00/scripts/mkdep.c
+--- busybox-1.00.orig/scripts/mkdep.c	2008-03-23 19:33:43.697876463 +0100
++++ busybox-1.00/scripts/mkdep.c	2008-03-23 21:35:32.182144933 +0100
+@@ -31,6 +31,7 @@
+  */
+ 
+ #include <ctype.h>
++#include <errno.h>
+ #include <fcntl.h>
+ #include <limits.h>
+ #include <stdio.h>
+@@ -228,7 +229,7 @@
+ 	if (strcmp(name, ".")) {
+ 		name2 = realpath(name, resolved_path);
+ 		if (!name2) {
+-			fprintf(stderr, "realpath(%s) failed, %m\n", name);
++			fprintf(stderr, "realpath(%s) failed, %s\n", name, strerror(errno));
+ 			exit(1);
+ 		}
+ 	}
+diff -bur busybox-1.00.orig/shell/ash.c busybox-1.00/shell/ash.c
+--- busybox-1.00.orig/shell/ash.c	2008-03-23 19:33:43.717877420 +0100
++++ busybox-1.00/shell/ash.c	2008-03-23 21:35:32.188811920 +0100
+@@ -6617,7 +6617,7 @@
+ 		} else
+ 			pid = number(*argv);
+ 		if (kill(pid, signo) != 0) {
+-			sh_warnx("%m\n");
++			sh_warnx("%s\n", strerror(errno));
+ 			i = 1;
+ 		}
+ 	} while (*++argv);
+@@ -7740,7 +7740,7 @@
+ xtcsetpgrp(int fd, pid_t pgrp)
+ {
+ 	if (tcsetpgrp(fd, pgrp))
+-		error("Cannot set tty process group (%m)");
++		error("Cannot set tty process group (%s)", strerror(errno));
+ }
+ #endif /* JOBS */
+ 
+@@ -11137,7 +11137,7 @@
+ 				if (i != EBADF) {
+ 					close(newfd);
+ 					errno = i;
+-					error("%d: %m", fd);
++					error("%d: %s", fd, strerror(errno));
+ 					/* NOTREACHED */
+ 				}
+ 			} else {
+@@ -11220,7 +11220,7 @@
+ 		if (errno == EMFILE)
+ 			return EMPTY;
+ 		else
+-			error("%d: %m", from);
++			error("%d: %s", from, strerror(errno));
+ 	}
+ 	return newfd;
+ }
+@@ -12892,7 +12892,7 @@
+ 		if (how & SOFT)
+ 			limit.rlim_cur = val;
+ 		if (setrlimit(l->cmd, &limit) < 0)
+-			error("error setting limit (%m)");
++			error("error setting limit (%s)", strerror(errno));
+ 	} else {
+ 		printlim(how, &limit, l);
+ 	}
+diff -bur busybox-1.00.orig/shell/hush.c busybox-1.00/shell/hush.c
+--- busybox-1.00.orig/shell/hush.c	2008-03-23 19:33:43.717877420 +0100
++++ busybox-1.00/shell/hush.c	2008-03-23 21:35:32.192145409 +0100
+@@ -676,7 +676,7 @@
+ 		} else
+ 			res = -1;
+ 		if (res)
+-			fprintf(stderr, "read: %m\n");
++			fprintf(stderr, "read: %s\n", strerror(errno));
+ 		free(var);      /* So not move up to avoid breaking errno */
+ 		return res;
+ 	} else {
+diff -bur busybox-1.00.orig/shell/lash.c busybox-1.00/shell/lash.c
+--- busybox-1.00.orig/shell/lash.c	2008-03-23 19:33:43.717877420 +0100
++++ busybox-1.00/shell/lash.c	2008-03-23 21:35:32.195478903 +0100
+@@ -247,7 +247,7 @@
+ 	else
+ 		newdir = child->argv[1];
+ 	if (chdir(newdir)) {
+-		printf("cd: %s: %m\n", newdir);
++		printf("cd: %s: %s\n", newdir, strerror(errno));
+ 		return EXIT_FAILURE;
+ 	}
+ 	cwd = xgetcwd((char *)cwd);
+@@ -397,7 +397,7 @@
+ 	}
+ 	res = putenv(v);
+ 	if (res)
+-		fprintf(stderr, "export: %m\n");
++		fprintf(stderr, "export: %s\n", strerror(errno));
+ #ifdef CONFIG_FEATURE_SH_FANCY_PROMPT
+ 	if (strncmp(v, "PS1=", 4)==0)
+ 		PS1 = getenv("PS1");
+@@ -439,7 +439,7 @@
+ 		if((s = strdup(string)))
+ 			res = putenv(s);
+ 		if (res)
+-			fprintf(stderr, "read: %m\n");
++			fprintf(stderr, "read: %s\n", strerror(errno));
+ 	}
+ 	else
+ 		fgets(string, sizeof(string), stdin);
+@@ -1289,7 +1289,7 @@
+ 
+ 	/* Do not use bb_perror_msg_and_die() here, since we must not
+ 	 * call exit() but should call _exit() instead */
+-	fprintf(stderr, "%s: %m\n", child->argv[0]);
++	fprintf(stderr, "%s: %s\n", child->argv[0], strerror(errno));
+ 	_exit(EXIT_FAILURE);
+ }
+ 
+diff -bur busybox-1.00.orig/sysklogd/klogd.c busybox-1.00/sysklogd/klogd.c
+--- busybox-1.00.orig/sysklogd/klogd.c	2008-03-23 19:33:43.721210913 +0100
++++ busybox-1.00/sysklogd/klogd.c	2008-03-23 21:35:32.195478903 +0100
+@@ -83,7 +83,7 @@
+ 		if (n < 0) {
+ 			if (errno == EINTR)
+ 				continue;
+-			syslog(LOG_ERR, "klogd: Error return from sys_sycall: %d - %m.\n", errno);
++			syslog(LOG_ERR, "klogd: Error return from sys_sycall: %d - %s.\n", errno, strerror(errno));
+ 			exit(EXIT_FAILURE);
+ 		}
+ 
