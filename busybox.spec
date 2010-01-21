@@ -35,7 +35,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.15.3
-Release:	1
+Release:	2
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -139,7 +139,7 @@ Statycznie skonsolidowany busybox.
 Summary:	Static busybox for initrd
 Summary(pl.UTF-8):	Statycznie skonsolidowany busybox dla initrd
 Group:		Applications
-Conflicts:	geninitrd < 10000.10
+Conflicts:	geninitrd < 10000.20
 
 %description initrd
 Static busybox for initrd.
@@ -234,7 +234,7 @@ install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 %{?with_static:install built/busybox.static $RPM_BUILD_ROOT%{_bindir}}
 %if %{with initrd}
 install -d $RPM_BUILD_ROOT%{_libdir}/initrd
-install built/busybox.initrd $RPM_BUILD_ROOT%{_libdir}/initrd/initrd-busybox
+install built/busybox.initrd $RPM_BUILD_ROOT%{_libdir}/initrd/busybox
 %endif
 
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
@@ -277,5 +277,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with initrd}
 %files initrd
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/initrd/initrd-busybox
+%attr(755,root,root) %{_libdir}/initrd/busybox
 %endif
