@@ -35,7 +35,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.15.3
-Release:	3
+Release:	4
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
