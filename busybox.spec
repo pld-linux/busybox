@@ -138,7 +138,7 @@ Statycznie skonsolidowany busybox.
 %package initrd
 Summary:	Static busybox for initrd
 Summary(pl.UTF-8):	Statycznie skonsolidowany busybox dla initrd
-Group:		Applications
+Group:		Base
 Conflicts:	geninitrd < 10000.20
 
 %description initrd
