@@ -1,13 +1,16 @@
 # TODO:
-#	- sparc64 modules support in sparc(32), x86_64 modules support in i386 version
-#	- make internal commands work even if busybox is not in /bin/busybox (initrd)
-#	  or when /proc is not mounted (static / normal)
+# - review patch 3. Updated to 1.17.3, but the code changed so much it's unclear
+#   if it still serves a purpose
+# - sparc64 modules support in sparc(32), x86_64 modules support in i386 version
+# - make internal commands work even if busybox is not in /bin/busybox (initrd)
+#   or when /proc is not mounted (static / normal)
 #
 # Conditional build:
 # alternative busybox config file (replaces default one) you should
 # define cfgfile macro, i.e.
 #
 #	rpm --rebuild busybox.*.src.rpm --with altconfig --define "cfgfile bb-emb-config.h"
+#
 %bcond_with	altconfig	# use alternative config (defined by cfgfile)
 %bcond_with	linkfl		# creates links to busybox binary and puts them into file list
 %bcond_without	static		# don't build static version
@@ -15,7 +18,6 @@
 %bcond_with	dietlibc	# build dietlibc-based initrd and static versions
 %bcond_with	glibc		# build glibc-based initrd and static versions
 %bcond_with	verbose		# verbose build
-#
 # Options below are useful, when you want fileutils and grep providing.
 # For example, ash package requires fileutils and grep.
 %bcond_with	fileutl_prov	# adds fileutils providing
@@ -34,12 +36,12 @@ Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 # stable line only
-Version:	1.16.2
-Release:	1
+Version:	1.17.3
+Release:	0.1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	2ba980f720a5bdce4ec05423519acc35
+# Source0-md5:	a2ce1a951571da8c6e0eaf75b1acef60
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
@@ -74,9 +76,9 @@ BuildRequires:	uClibc-static >= 3:0.9.30.1
 		%endif
 	%endif
 %endif
+%{?with_sh_prov:Provides:	/bin/sh}
 %{?with_fileutl_prov:Provides:	fileutils}
 %{?with_grep_prov:Provides:	grep}
-%{?with_sh_prov:Provides:	/bin/sh}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir		/bin
@@ -151,7 +153,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %setup -q
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
+#%patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
@@ -175,9 +177,9 @@ install %{SOURCE2} .config
 	%{CrossOpts} \
 	CC="%{__cc}"
 %else
-    %if "%{_target_base_arch}" != "%{_arch}"
+	%if "%{_target_base_arch}" != "%{_arch}"
 	CROSS="%{_target_cpu}-uclibc-" \
-    %endif
+	%endif
 	CC="%{_target_cpu}-uclibc-gcc"
 %endif
 %endif
@@ -207,9 +209,9 @@ install %{SOURCE1} .config
 	%{CrossOpts} \
 	CC="%{__cc}"
 %else
-    %if "%{_target_base_arch}" != "%{_arch}"
+	%if "%{_target_base_arch}" != "%{_arch}"
 	CROSS="%{_target_cpu}-uclibc-" \
-    %endif
+	%endif
 	CC="%{_target_cpu}-uclibc-gcc"
 %endif
 %endif
@@ -257,7 +259,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS README .config
 
 %if %{with linkfl}
-%attr(755,root,root) /bin/*
+%attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_sbindir}/*

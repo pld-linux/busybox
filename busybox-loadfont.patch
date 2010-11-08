@@ -1,13 +1,12 @@
---- busybox-1.12.2/console-tools/loadfont.c~	2008-11-19 12:27:34.314700966 +0100
-+++ busybox-1.12.2/console-tools/loadfont.c	2008-11-19 12:28:35.598028789 +0100
-@@ -115,8 +115,10 @@
- 		head0 = sizeof(struct psf_header);
+--- busybox-1.17.3/console-tools/loadfont.c.orig	2010-10-09 22:57:13.000000000 +0300
++++ busybox-1.17.3/console-tools/loadfont.c	2010-11-08 21:30:00.827185361 +0200
+@@ -274,9 +274,6 @@
+ 	table = font + fontsize * charsize;
+ 	buffer += len;
  
- 		head = head0 + fontsize * unit;
-+		/*
- 		if (head > len || (!hastable && head != len))
- 			bb_error_msg_and_die("input file: bad length");
-+		*/
- 	} else {
- 		/* file with three code pages? */
- 		if (len == 9780) {
+-	if (table > buffer || (!has_table && table != buffer))
+-		bb_error_msg_and_die("input file: bad length");
+-
+ 	do_loadfont(fd, font, height, width, charsize, fontsize);
+ 
+ 	if (has_table)
