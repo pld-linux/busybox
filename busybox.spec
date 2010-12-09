@@ -36,15 +36,18 @@ Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 # stable line only
-Version:	1.17.3
+Version:	1.18.0
 Release:	0.1
 License:	GPL
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	a2ce1a951571da8c6e0eaf75b1acef60
+# Source0-md5:	7a8150a10558a5292fa1f52f1c65b0f5
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
+Patch100:	busybox-1.18.0-buildsys.patch
+Patch101:	busybox-1.18.0-runsvdir.patch
+Patch102:	busybox-1.18.0-sha.patch
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
 Patch3:		%{name}-loadfont.patch
@@ -151,6 +154,9 @@ Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q
+%patch100 -p1
+%patch101 -p1
+%patch102 -p1
 %patch1 -p1
 %patch2 -p1
 #%patch3 -p1
@@ -227,7 +233,7 @@ mv -f busybox built/busybox.static
 	CFLAGS_EXTRA="%{rpmcflags}" \
 	LDFLAGS="%{ld_rpmldflags}" \
 	CC="%{__cc}"
-%{__make} busybox.links docs/BusyBox.1
+%{__make} busybox.links docs/busybox.1
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -240,8 +246,7 @@ install built/busybox.initrd $RPM_BUILD_ROOT%{_libdir}/initrd/busybox
 %endif
 
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
-install docs/BusyBox.1 $RPM_BUILD_ROOT%{_mandir}/man1
-echo ".so BusyBox.1" > $RPM_BUILD_ROOT%{_mandir}/man1/busybox.1
+install docs/busybox.1 $RPM_BUILD_ROOT%{_mandir}/man1
 
 # install links to busybox binary, when linkfl is defined
 %if %{with linkfl}
