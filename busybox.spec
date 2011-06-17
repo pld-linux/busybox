@@ -13,6 +13,7 @@
 #
 %bcond_with	altconfig	# use alternative config (defined by cfgfile)
 %bcond_with	linkfl		# creates links to busybox binary and puts them into file list
+%bcond_without	dynamic		# don't build dynamic (base) version
 %bcond_without	static		# don't build static version
 %bcond_without	initrd		# don't build initrd version
 %bcond_with	dietlibc	# build dietlibc-based initrd and static versions
@@ -168,7 +169,7 @@ install %{SOURCE2} .config
 %{__make} \
 	%{?with_verbose:V=1} \
 	CROSS_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
-	LDFLAGS="%{ld_rpmldflags} -static" \
+	LDFLAGS="%{rpmldflags} -static" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
 	CC="diet %{__cc}"
@@ -188,7 +189,6 @@ mv -f busybox built/busybox.initrd
 %{__make} clean
 %endif
 
-
 %if %{with altconfig}
 install %{SOURCE3} .config
 %else
@@ -200,7 +200,7 @@ install %{SOURCE1} .config
 %{__make} \
 	%{?with_verbose:V=1} \
 	CROSS_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
-	LDFLAGS="%{ld_rpmldflags} -static" \
+	LDFLAGS="%{rpmldflags} -static" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
 	CC="diet %{__cc}"
@@ -220,25 +220,32 @@ mv -f busybox built/busybox.static
 %{__make} clean
 %endif
 
+%if %{with dynamic}
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
 	%{CrossOpts} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
-	LDFLAGS="%{ld_rpmldflags}" \
+	LDFLAGS="%{rpmldflags}" \
 	CC="%{__cc}"
 %{__make} busybox.links docs/busybox.1
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 
-%{?with_static:install built/busybox.static $RPM_BUILD_ROOT%{_bindir}}
+%if %{with static}
+install -d $RPM_BUILD_ROOT%{_bindir}
+install built/busybox.static $RPM_BUILD_ROOT%{_bindir}
+%endif
+
 %if %{with initrd}
 install -d $RPM_BUILD_ROOT%{_libdir}/initrd
 install built/busybox.initrd $RPM_BUILD_ROOT%{_libdir}/initrd/busybox
 %endif
 
+%if %{with dynamic}
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1,%{_libdir}/busybox}
 install busybox.links $RPM_BUILD_ROOT%{_libdir}/busybox
 install docs/busybox.1 $RPM_BUILD_ROOT%{_mandir}/man1
 
@@ -249,10 +256,12 @@ install docs/busybox.1 $RPM_BUILD_ROOT%{_mandir}/man1
 %else
 install busybox $RPM_BUILD_ROOT%{_bindir}
 %endif
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%if %{with dynamic}
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS README .config
@@ -268,6 +277,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_libdir}/busybox
 %{_mandir}/man1/*
+%endif
 
 %if %{with static}
 %files static
