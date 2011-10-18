@@ -1,0 +1,13 @@
+--- busybox-1.19.2/scripts/gen_build_files.sh~	2011-08-22 04:57:50.000000000 +0200
++++ busybox-1.19.2/scripts/gen_build_files.sh	2011-10-18 18:17:34.041556654 +0200
+@@ -29,7 +29,9 @@
+ 		printf "%s\n" "${header}"
+ 		if grep -qs '^INSERT$' "${src}"; then
+ 			sed -n '1,/^INSERT$/p' "${src}"
+-			printf "%s\n" "${insert}"
++			cat << EOF
++			${insert}
++EOF
+ 			sed -n '/^INSERT$/,$p' "${src}"
+ 		else
+ 			if [ -n "${insert}" ]; then

@@ -62,6 +62,7 @@ Patch5:		%{name}-insmod-morearchs.patch
 Patch6:		%{name}-dhcp.patch
 Patch7:		%{name}-fix_64_archs.patch
 Patch9:		%{name}-ash-export-PATH.patch
+Patch10:	%{name}-toolongcmd.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
@@ -177,6 +178,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch6 -p1
 %patch7 -p1
 %patch9 -p1
+%patch10 -p1
 
 %build
 install -d built
