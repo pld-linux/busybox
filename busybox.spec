@@ -37,23 +37,15 @@ Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 # stable line only
-Version:	1.19.2
-Release:	2
+Version:	1.19.3
+Release:	1
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	50267054345f1a0b77fe65f6e0e5ba29
+# Source0-md5:	c3938e1ac59602387009bbf1dd1af7f6
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
-Patch100:	busybox-1.19.2-android.patch
-Patch101:	busybox-1.19.2-buildsys.patch
-Patch102:	busybox-1.19.2-chpasswd.patch
-Patch103:	busybox-1.19.2-crond.patch
-Patch104:	busybox-1.19.2-inetd.patch
-Patch105:	busybox-1.19.2-syslogd.patch
-Patch106:	busybox-1.19.2-tail.patch
-Patch107:	busybox-1.19.2-tftp.patch
 Patch0:		%{name}-git.patch
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
@@ -161,16 +153,7 @@ Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q
-%patch100 -p1
-%patch101 -p1
-%patch102 -p1
-%patch103 -p1
-%patch104 -p1
-%patch105 -p1
-%patch106 -p1
-%patch107 -p1
 %patch0 -p1
-
 %patch1 -p1
 %patch2 -p1
 #%patch3 -p1
