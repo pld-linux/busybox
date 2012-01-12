@@ -46,6 +46,12 @@ Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
+Patch100:	http://busybox.net/downloads/fixes-1.19.3/busybox-1.19.3-getty.patch
+# Patch100-md5:	5ed72ca85b8fba4598d64a550210b31f
+Patch101:	http://busybox.net/downloads/fixes-1.19.3/busybox-1.19.3-modinfo.patch
+# Patch101-md5:	41636628e481f22b8774b6bee1eebfb1
+Patch102:	http://busybox.net/downloads/fixes-1.19.3/busybox-1.19.3-wget.patch
+# Patch102-md5:	cb48bffc0e1e3be527cd4ff67324a2a2
 Patch0:		%{name}-git.patch
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
@@ -153,6 +159,9 @@ Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q
+%patch100 -p1
+%patch101 -p1
+%patch102 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
