@@ -1,13 +1,13 @@
---- busybox-1.17.3/networking/udhcp/common.c~	2010-10-09 22:57:14.000000000 +0300
-+++ busybox-1.17.3/networking/udhcp/common.c	2010-11-08 21:36:56.660518687 +0200
+--- busybox-1.20.2/networking/udhcp/common.c~	2012-06-26 15:35:45.000000000 +0200
++++ busybox-1.20.2/networking/udhcp/common.c	2013-01-02 22:06:43.349795477 +0100
 @@ -32,8 +32,8 @@
- 	{ OPTION_STRING               | OPTION_REQ, 0x0c }, /* DHCP_HOST_NAME     */
+ 	{ OPTION_STRING_HOST          | OPTION_REQ, 0x0c }, /* DHCP_HOST_NAME     */
  	{ OPTION_U16                              , 0x0d }, /* DHCP_BOOT_SIZE     */
- 	{ OPTION_STRING               | OPTION_REQ, 0x0f }, /* DHCP_DOMAIN_NAME   */
+ 	{ OPTION_STRING_HOST          | OPTION_REQ, 0x0f }, /* DHCP_DOMAIN_NAME   */
 -	{ OPTION_IP                               , 0x10 }, /* DHCP_SWAP_SERVER   */
 -	{ OPTION_STRING                           , 0x11 }, /* DHCP_ROOT_PATH     */
 +	{ OPTION_IP                   | OPTION_REQ, 0x10 }, /* DHCP_SWAP_SERVER   */
 +	{ OPTION_STRING               | OPTION_REQ, 0x11 }, /* DHCP_ROOT_PATH     */
  	{ OPTION_U8                               , 0x17 }, /* DHCP_IP_TTL        */
  	{ OPTION_U16                              , 0x1a }, /* DHCP_MTU           */
- 	{ OPTION_IP                   | OPTION_REQ, 0x1c }, /* DHCP_BROADCAST     */
+ //TODO: why do we request DHCP_BROADCAST? Can't we assume that

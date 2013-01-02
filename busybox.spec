@@ -37,22 +37,22 @@ Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 # stable line only
-Version:	1.19.3
-Release:	1
+Version:	1.20.2
+Release:	0.1
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	c3938e1ac59602387009bbf1dd1af7f6
+# Source0-md5:	e025414bc6cd79579cc7a32a45d3ae1c
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
-Patch100:	http://busybox.net/downloads/fixes-1.19.3/busybox-1.19.3-getty.patch
-# Patch100-md5:	5ed72ca85b8fba4598d64a550210b31f
-Patch101:	http://busybox.net/downloads/fixes-1.19.3/busybox-1.19.3-modinfo.patch
-# Patch101-md5:	41636628e481f22b8774b6bee1eebfb1
-Patch102:	http://busybox.net/downloads/fixes-1.19.3/busybox-1.19.3-wget.patch
-# Patch102-md5:	cb48bffc0e1e3be527cd4ff67324a2a2
-Patch0:		%{name}-git.patch
+Patch100:	http://busybox.net/downloads/fixes-1.20.2/busybox-1.20.2-kernel_ver.patch
+# Patch100-md5:	3386a2bf992f2284b86608498f4cb822
+Patch101:	http://busybox.net/downloads/fixes-1.20.2/busybox-1.20.2-pkg-config-selinux.patch
+# Patch101-md5:	a1b6587697c70808808f3693c4610884
+Patch102:	http://busybox.net/downloads/fixes-1.20.2/busybox-1.20.2-sys-resource.patch
+# Patch102-md5:	cfb5d5d7ed1414b5749f2c2ec0bf066a
+
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
 Patch3:		%{name}-loadfont.patch
@@ -162,7 +162,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch100 -p1
 %patch101 -p1
 %patch102 -p1
-%patch0 -p1
+
 %patch1 -p1
 %patch2 -p1
 #%patch3 -p1
