@@ -64,7 +64,7 @@ Patch9:		%{name}-ash-export-PATH.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
-BuildRequires:	rpmbuild(macros) >= 1.333
+BuildRequires:	rpmbuild(macros) >= 1.652
 %if %{with initrd} || %{with static}
 	%if %{with dietlibc}
 BuildRequires:	dietlibc-static
