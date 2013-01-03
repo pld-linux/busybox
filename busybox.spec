@@ -38,7 +38,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.20.2
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -72,7 +72,7 @@ BuildRequires:	dietlibc-static
 		%if %{with glibc}
 BuildRequires:	glibc-static
 		%else
-%if "%{_target_base_arch}" != "%{_arch}"
+%if "%{_target_base_arch}" != "%{_host_base_arch}"
 BuildRequires:	cross%{_target_base_arch}-uClibc-static
 %else
 	%ifarch ppc %{x8664}
@@ -91,7 +91,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir		/bin
 
-%if "%{_target_base_arch}" != "%{_arch}"
+%if "%{_target_base_arch}" != "%{_host_base_arch}"
 	%define CrossOpts CROSS="%{_target_cpu}-pld-linux-"
 %else
 	%define CrossOpts %{nil}
@@ -189,7 +189,7 @@ install %{SOURCE2} .config
 	%{CrossOpts} \
 	CC="%{__cc}"
 %else
-	%if "%{_target_base_arch}" != "%{_arch}"
+	%if "%{_target_base_arch}" != "%{_host_base_arch}"
 	CROSS="%{_target_cpu}-uclibc-" \
 	%endif
 	CC="%{_target_cpu}-uclibc-gcc"
@@ -220,7 +220,7 @@ install %{SOURCE1} .config
 	%{CrossOpts} \
 	CC="%{__cc}"
 %else
-	%if "%{_target_base_arch}" != "%{_arch}"
+	%if "%{_target_base_arch}" != "%{_host_base_arch}"
 	CROSS="%{_target_cpu}-uclibc-" \
 	%endif
 	CC="%{_target_cpu}-uclibc-gcc"
