@@ -278,7 +278,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS README .config
 
 %if %{with linkfl}
-%attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) /bin/*
 %attr(755,root,root) /sbin/*
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_sbindir}/*
@@ -287,7 +287,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %{_libdir}/busybox
-%{_mandir}/man1/*
+%{_mandir}/man1/busybox.1*
 %endif
 
 %if %{with static}
