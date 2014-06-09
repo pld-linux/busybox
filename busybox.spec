@@ -18,7 +18,7 @@
 %bcond_without	initrd		# don't build initrd version
 %bcond_with	dietlibc	# build dietlibc-based initrd and static versions
 %bcond_with	glibc		# build glibc-based initrd and static versions
-%bcond_with	verbose		# verbose build
+%bcond_without	verbose		# verbose build
 # Options below are useful, when you want fileutils and grep providing.
 # For example, ash package requires fileutils and grep.
 %bcond_with	fileutl_prov	# adds fileutils providing
@@ -38,7 +38,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.22.1
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -52,6 +52,8 @@ Patch101:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-date.patch
 # Patch101-md5:	bc381f9ceb3824141c968f5bc4353943
 Patch102:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-iplink.patch
 # Patch102-md5:	24686ec2750a8703feb57fc9c6aaed1d
+Patch103:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-nc.patch
+# Patch103-md5:	69eecaae5f812d08655dfdf34b60503f
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
 Patch3:		%{name}-loadfont.patch
@@ -161,6 +163,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch100 -p1
 %patch101 -p1
 %patch102 -p1
+%patch103 -p1
 %patch1 -p1
 %patch2 -p1
 #%patch3 -p1
