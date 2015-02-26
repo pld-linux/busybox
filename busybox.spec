@@ -38,7 +38,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.22.1
-Release:	4
+Release:	5
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -58,6 +58,7 @@ Patch104:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-lzop.patch
 # Patch104-md5:	14fb3bf7ffaba153b3cad385677b18c3
 Patch105:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-zcat-no-ext.patch
 # Patch105-md5:	158c8c4c73db6d920bdd7d4b9b65b2a5
+Patch0:		x32.patch
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
 Patch3:		%{name}-loadfont.patch
@@ -168,6 +169,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch101 -p1
 %patch102 -p1
 %patch103 -p1
+%patch0 -p1
 %patch1 -p1
 %patch2 -p1
 #%patch3 -p1

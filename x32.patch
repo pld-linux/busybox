@@ -1,0 +1,24 @@
+--- busybox-1.22.1/include/libbb.h.orig	2015-01-26 19:38:58.762414035 +0000
++++ busybox-1.22.1/include/libbb.h	2015-01-26 19:39:20.749079926 +0000
+@@ -232,6 +232,13 @@
+ #else
+ /* CONFIG_LFS is off */
+ # if UINT_MAX == 0xffffffff
++#ifdef __ILP32__
++typedef unsigned long long uoff_t;
++#  define XATOOFF(a) xatoull_range((a), 0, LLONG_MAX)
++#  define BB_STRTOOFF bb_strtoull
++#  define STRTOOFF strtoull
++#  define OFF_FMT "ll"
++#else
+ /* While sizeof(off_t) == sizeof(int), off_t is typedef'ed to long anyway.
+  * gcc will throw warnings on printf("%d", off_t). Crap... */
+ typedef unsigned long uoff_t;
+@@ -239,6 +246,7 @@
+ #  define BB_STRTOOFF bb_strtou
+ #  define STRTOOFF strtol
+ #  define OFF_FMT "l"
++#endif
+ # else
+ typedef unsigned long uoff_t;
+ #  define XATOOFF(a) xatoul_range((a), 0, LONG_MAX)
