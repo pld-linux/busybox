@@ -30,7 +30,11 @@
 # functionality as their GNU countenders.
 #
 %ifnarch %{ix86} %{x8664} ppc
-%define with_glibc 1
+%define		with_glibc	1
+%endif
+%ifarch x32
+# until uClibc builds on x32
+%undefine	with_static
 %endif
 Summary:	Set of common Unix utilities for embeded systems
 Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
@@ -38,7 +42,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.22.1
-Release:	5
+Release:	6
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
