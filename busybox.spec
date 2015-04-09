@@ -41,27 +41,15 @@ Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 # stable line only
-Version:	1.22.1
-Release:	6
+Version:	1.23.2
+Release:	1
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	337d1a15ab1cb1d4ed423168b1eb7d7e
+# Source0-md5:	7925683d7dd105aabe9b6b618d48cc73
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
-Patch100:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-ash.patch
-# Patch100-md5:	538d8cddbdfc449239b25a40bc8d1575
-Patch101:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-date.patch
-# Patch101-md5:	bc381f9ceb3824141c968f5bc4353943
-Patch102:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-iplink.patch
-# Patch102-md5:	24686ec2750a8703feb57fc9c6aaed1d
-Patch103:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-nc.patch
-# Patch103-md5:	69eecaae5f812d08655dfdf34b60503f
-Patch104:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-lzop.patch
-# Patch104-md5:	14fb3bf7ffaba153b3cad385677b18c3
-Patch105:	http://busybox.net/downloads/fixes-1.22.1/busybox-1.22.1-zcat-no-ext.patch
-# Patch105-md5:	158c8c4c73db6d920bdd7d4b9b65b2a5
 Patch0:		x32.patch
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
@@ -169,10 +157,6 @@ Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q
-%patch100 -p1
-%patch101 -p1
-%patch102 -p1
-%patch103 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
