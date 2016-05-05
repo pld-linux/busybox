@@ -41,15 +41,21 @@ Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 # stable line only
-Version:	1.23.2
+Version:	1.24.2
 Release:	1
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	7925683d7dd105aabe9b6b618d48cc73
+# Source0-md5:	2eaae519cac1143bcf583636a745381f
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
+Patch100:	https://busybox.net/downloads/fixes-1.24.2/busybox-1.24.2-CVE-2016-2147.patch
+# Patch100-md5:	c45a85f5ced712743efbb683900f8c1d
+Patch101:	https://busybox.net/downloads/fixes-1.24.2/busybox-1.24.2-CVE-2016-2148.patch
+# Patch101-md5:	850a57ca2871e370b4916161a0320a3f
+Patch102:	https://busybox.net/downloads/fixes-1.24.2/busybox-1.24.2-ash-recursive-heredocs.patch
+# Patch102-md5:	b59eb7536609db1ab5215de860d9e558
 Patch0:		x32.patch
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
@@ -157,6 +163,10 @@ Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q
+%patch100 -p1
+%patch101 -p1
+%patch102 -p1
+
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
