@@ -20,12 +20,13 @@
  # define LOOP_NAMESIZE (sizeof("/dev/loop") + sizeof(int)*3 + 1)
 --- busybox/init/init.c.orig	2008-04-19 04:03:13.000000000 +0000
 +++ busybox.o/init/init.c	2008-04-26 17:09:58.075653000 +0000
-@@ -64,7 +64,7 @@
- /* Static variables */
+@@ -217,7 +217,7 @@ struct init_action {
  static struct init_action *init_action_list = NULL;
  
+ #if !ENABLE_FEATURE_INIT_SYSLOG
 -static const char *log_console = VC_5;
 +static const char *log_console = VC_12;
+ #endif
  
  enum {
- 	L_LOG = 0x1,
+
