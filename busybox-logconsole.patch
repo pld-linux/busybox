@@ -1,32 +1,21 @@
---- busybox-1.17.3/include/libbb.h.orig	2010-10-09 22:57:13.000000000 +0300
-+++ busybox-1.17.3/include/libbb.h	2010-11-08 21:21:38.520518694 +0200
-@@ -1677,7 +1677,7 @@
- # define VC_2 "/dev/vc/2"
- # define VC_3 "/dev/vc/3"
- # define VC_4 "/dev/vc/4"
--# define VC_5 "/dev/vc/5"
-+# define VC_12 "/dev/vc/12"
- # define VC_FORMAT "/dev/vc/%d"
- # define LOOP_FORMAT "/dev/loop/%d"
- # define LOOP_NAMESIZE (sizeof("/dev/loop/") + sizeof(int)*3 + 1)
-@@ -1690,7 +1690,7 @@
- # define VC_2 "/dev/tty2"
+--- busybox-1.29.3/include/libbb.h~	2018-12-16 11:20:56.000000000 +0100
++++ busybox-1.29.3/include/libbb.h	2018-12-16 11:22:32.895687694 +0100
+@@ -2095,6 +2095,7 @@ extern const char bb_default_login_shell
  # define VC_3 "/dev/tty3"
  # define VC_4 "/dev/tty4"
--# define VC_5 "/dev/tty5"
+ # define VC_5 "/dev/tty5"
 +# define VC_12 "/dev/tty12"
  # define VC_FORMAT "/dev/tty%d"
- # define LOOP_FORMAT "/dev/loop%d"
- # define LOOP_NAMESIZE (sizeof("/dev/loop") + sizeof(int)*3 + 1)
---- busybox/init/init.c.orig	2008-04-19 04:03:13.000000000 +0000
-+++ busybox.o/init/init.c	2008-04-26 17:09:58.075653000 +0000
-@@ -217,7 +217,7 @@ struct init_action {
- static struct init_action *init_action_list = NULL;
- 
- #if !ENABLE_FEATURE_INIT_SYSLOG
--static const char *log_console = VC_5;
-+static const char *log_console = VC_12;
- #endif
+ #elif ENABLE_FEATURE_DEVFS
+ /*Linux, obsolete devfs names */
+--- busybox-1.29.3/init/init.c~	2018-07-02 13:23:06.000000000 +0200
++++ busybox-1.29.3/init/init.c	2018-12-16 11:21:50.307764617 +0100
+@@ -221,7 +221,7 @@ struct globals {
+ #define G (*(struct globals*)bb_common_bufsiz1)
+ #define INIT_G() do { \
+ 	setup_common_bufsiz(); \
+-	IF_NOT_FEATURE_INIT_SYSLOG(G.log_console = VC_5;) \
++	IF_NOT_FEATURE_INIT_SYSLOG(G.log_console = VC_12;) \
+ } while (0)
  
  enum {
-
