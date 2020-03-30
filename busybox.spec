@@ -42,7 +42,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.31.1
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -58,6 +58,7 @@ Patch4:		%{name}-kernel_headers.patch
 Patch5:		%{name}-insmod-morearchs.patch
 Patch6:		%{name}-dhcp.patch
 Patch7:		%{name}-fix_64_archs.patch
+Patch8:		busybox-1.31.1-stime-fix.patch
 Patch9:		%{name}-ash-export-PATH.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
@@ -167,6 +168,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 %patch9 -p1
 
 %build
@@ -177,7 +179,7 @@ install %{SOURCE2} .config
 %{__make} \
 	%{?with_verbose:V=1} \
 	CROSS_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
-	LDFLAGS="%{rpmldflags} -static" \
+	LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
 	CC="diet %{__cc}"
@@ -208,7 +210,7 @@ install %{SOURCE1} .config
 %{__make} \
 	%{?with_verbose:V=1} \
 	CROSS_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
-	LDFLAGS="%{rpmldflags} -static" \
+	LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
 	CC="diet %{__cc}"
@@ -234,7 +236,7 @@ mv -f busybox built/busybox.static
 	%{?with_verbose:V=1} \
 	%{CrossOpts} \
 	CFLAGS_EXTRA="%{rpmcflags}" \
-	LDFLAGS="%{rpmldflags}" \
+	LDFLAGS="%{rpmldflags} -Wl,-z,noexecstack" \
 	CC="%{__cc}"
 %{__make} busybox.links docs/busybox.1
 %endif
