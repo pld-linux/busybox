@@ -178,8 +178,8 @@ install %{SOURCE2} .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	CROSS_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
-	LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
+	EXTRA_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
+	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
 	CC="diet %{__cc}"
@@ -209,8 +209,8 @@ install %{SOURCE1} .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	CROSS_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
-	LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
+	EXTRA_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
+	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
 	CC="diet %{__cc}"
@@ -235,8 +235,8 @@ mv -f busybox built/busybox.static
 %{__make} \
 	%{?with_verbose:V=1} \
 	%{CrossOpts} \
-	CFLAGS_EXTRA="%{rpmcflags}" \
-	LDFLAGS="%{rpmldflags} -Wl,-z,noexecstack" \
+	EXTRA_CFLAGS="%{rpmcflags}" \
+	EXTRA_LDFLAGS="%{rpmldflags} -Wl,-z,noexecstack" \
 	CC="%{__cc}"
 %{__make} busybox.links docs/busybox.1
 %endif
