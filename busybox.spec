@@ -64,12 +64,17 @@ URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.652
+%if %{with glibc}
+BuildRequires:	libtirpc-devel
+BuildRequires:	pkgconfig
+%endif
 %if %{with initrd} || %{with static}
 	%if %{with dietlibc}
 BuildRequires:	dietlibc-static
 	%else
 		%if %{with glibc}
 BuildRequires:	glibc-static
+BuildRequires:	libtirpc-static
 		%else
 %if "%{_target_base_arch}" != "%{_host_base_arch}"
 BuildRequires:	cross%{_target_base_arch}-uClibc-static
@@ -98,6 +103,16 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %endif
 
 %define		filterout_ld	-Wl,-z,(combreloc|relro)
+
+%if %{with glibc}
+%define		tirpccflags	%(pkg-config --cflags libtirpc)
+%if %{with initrd} || %{with static}
+%define		tirpcslibs	%(pkg-config --libs --static libtirpc|sed s/-l//g)
+%endif
+%if %{with dynamic}
+%define		tirpcdlibs	%(pkg-config --libs libtirpc|sed s/-l//g)
+%endif
+%endif
 
 %description
 BusyBox combines tiny versions of many common UNIX utilities into a
@@ -175,10 +190,11 @@ Statycznie skonsolidowany busybox dla initrd.
 install -d built
 %if %{with initrd}
 install %{SOURCE2} .config
+echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
+	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_BSD_SOURCE" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
@@ -199,17 +215,17 @@ mv -f busybox built/busybox.initrd
 %{__make} clean
 %endif
 
+%if %{with static}
 %if %{with altconfig}
 install %{SOURCE3} .config
 %else
 install %{SOURCE1} .config
+echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
 %endif
-
-%if %{with static}
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} -Os -D_BSD_SOURCE" \
+	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_BSD_SOURCE" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
@@ -231,11 +247,17 @@ mv -f busybox built/busybox.static
 %endif
 
 %if %{with dynamic}
+%if %{with altconfig}
+install %{SOURCE3} .config
+%else
+install %{SOURCE1} .config
+echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcdlibs}}"' >> .config
+%endif
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
 	%{CrossOpts} \
-	EXTRA_CFLAGS="%{rpmcflags}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -Wl,-z,noexecstack" \
 	CC="%{__cc}"
 %{__make} busybox.links docs/busybox.1
