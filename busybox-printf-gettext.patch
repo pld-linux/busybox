@@ -1,8 +1,9 @@
---- busybox-1.12.2/coreutils/printf.c	2008-09-28 20:04:18.000000000 +0200
-+++ busybox-1.12.2.patch/coreutils/printf.c	2008-11-19 13:00:54.187842550 +0100
-@@ -38,6 +38,9 @@
- 
- //   19990508 Busy Boxed! Dave Cinege
+diff -urNp -x '*.orig' busybox-1.31.1.org/coreutils/printf.c busybox-1.31.1/coreutils/printf.c
+--- busybox-1.31.1.org/coreutils/printf.c	2019-06-10 12:50:53.000000000 +0200
++++ busybox-1.31.1/coreutils/printf.c	2021-10-21 10:28:37.833148938 +0200
+@@ -59,6 +59,9 @@
+ //usage:       "$ printf \"Val=%d\\n\" 5\n"
+ //usage:       "Val=5\n"
  
 +// on by default
 +#define BB_FEATURE_PRINTF_GETTEXT
@@ -10,7 +11,7 @@
  #include "libbb.h"
  
  /* A note on bad input: neither bash 3.2 nor coreutils 6.10 stop on it.
-@@ -334,10 +337,131 @@
+@@ -400,11 +403,132 @@ static char **print_formatted(char *f, c
  	return argv;
  }
  
@@ -142,14 +143,15 @@
 +	format = getmsg(nls_file, argv[optind++]);
  
  	/* We must check that stdout is not closed.
-@@ -362,8 +486,8 @@
- 	if (!argv[1])
+ 	 * The reason for this is highly non-obvious.
+@@ -436,8 +560,8 @@ int printf_main(int argc UNUSED_PARAM, c
  		bb_show_usage();
+ 	}
  
 -	format = argv[1];
 -	argv2 = argv + 2;
 +    argv += optind;
 +	argv2 = argv;
  
+ 	conv_err = 0;
  	do {
- 		argv = argv2;
