@@ -61,6 +61,7 @@ Patch6:		%{name}-dhcp.patch
 Patch7:		%{name}-fix_64_archs.patch
 Patch8:		busybox-1.31.1-stime-fix.patch
 Patch9:		%{name}-ash-export-PATH.patch
+Patch10:	0001-modutils-check-ELF-header-before-calling-finit_module.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
@@ -188,6 +189,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
+%patch10 -p1
 
 %build
 install -d built
