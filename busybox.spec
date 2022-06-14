@@ -1,4 +1,5 @@
 # TODO:
+# - RPC/NFS with uClibc doesn't build (due to tirpc linking), so it's currently disabled
 # - review patch 3. Updated to 1.17.3, but the code changed so much it's unclear
 #   if it still serves a purpose
 # - sparc64 modules support in sparc(32), x86_64 modules support in i386 version
@@ -93,6 +94,8 @@ BuildRequires:	uClibc-static >= 3:0.9.30.1
 %{?with_grep_prov:Provides:	grep}
 Provides:	busybox-implementation = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		_enable_debug_packages	0
 
 %define		_bindir		/bin
 
@@ -194,7 +197,7 @@ echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_BSD_SOURCE" \
+	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_BSD_SOURCE %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
@@ -225,7 +228,7 @@ echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_BSD_SOURCE" \
+	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_BSD_SOURCE %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
@@ -257,7 +260,7 @@ echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcdlibs}}"' >> .config
 %{__make} \
 	%{?with_verbose:V=1} \
 	%{CrossOpts} \
-	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -Wl,-z,noexecstack" \
 	CC="%{__cc}"
 %{__make} busybox.links docs/busybox.1
