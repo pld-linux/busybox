@@ -199,7 +199,7 @@ echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_BSD_SOURCE %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_GNU_SOURCE %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
@@ -230,7 +230,7 @@ echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_BSD_SOURCE %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_GNU_SOURCE %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
