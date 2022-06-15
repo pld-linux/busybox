@@ -70,7 +70,7 @@ BuildRequires:	pkgconfig
 	%if %{with musl}
 BuildRequires:	linux-musl-headers
 BuildRequires:	musl-devel
-BuildRequires:	libtirpc-musl
+BuildRequires:	libtirpc-musl-devel
 	%else
 		%if %{with glibc}
 BuildRequires:	glibc-static
