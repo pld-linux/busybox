@@ -38,7 +38,7 @@ Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único b
 Name:		busybox
 # stable line only
 Version:	1.35.0
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -70,6 +70,7 @@ BuildRequires:	pkgconfig
 	%if %{with musl}
 BuildRequires:	linux-musl-headers
 BuildRequires:	musl-devel
+BuildRequires:	libtirpc-musl
 	%else
 		%if %{with glibc}
 BuildRequires:	glibc-static
@@ -117,6 +118,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %if %{with dynamic}
 %define         tirpcdlibs      %(pkg-config --libs libtirpc|sed s/-l//g)
+%endif
+
+%if %{with musl}
+%define		tirpcslibs	%(pkg-config --libs libtirpc|sed s/-l//g)
 %endif
 
 %description
@@ -199,10 +204,8 @@ install -d built
 install %{SOURCE2} .config
 %if %{with musl}
 sed -i -e 's|CONFIG_FEATURE_VI_REGEX_SEARCH=y|# CONFIG_FEATURE_VI_REGEX_SEARCH is not set|g' .config
-sed -i -e 's|CONFIG_FEATURE_MOUNT_NFS=y|# CONFIG_FEATURE_MOUNT_NFS is not set|g' .config
-sed -i -e 's|CONFIG_FEATURE_INETD_RPC=y|# CONFIG_FEATURE_INETD_RPC is not set|g' .config
 %endif
-echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
+echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}} %{?with_musl:%{tirpcslibs}}"' >> .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
@@ -231,12 +234,10 @@ mv -f busybox built/busybox.initrd
 install %{SOURCE3} .config
 %else
 install %{SOURCE1} .config
-echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
+echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}} %{?with_musl:%{tirpcslibs}}""' >> .config
 %endif
 %if %{with musl}
 sed -i -e 's|CONFIG_FEATURE_VI_REGEX_SEARCH=y|# CONFIG_FEATURE_VI_REGEX_SEARCH is not set|g' .config
-sed -i -e 's|CONFIG_FEATURE_MOUNT_NFS=y|# CONFIG_FEATURE_MOUNT_NFS is not set|g' .config
-sed -i -e 's|CONFIG_FEATURE_INETD_RPC=y|# CONFIG_FEATURE_INETD_RPC is not set|g' .config
 sed -i -e 's|CONFIG_EXTRA_COMPAT=y|# CONFIG_EXTRA_COMPAT is not set|g' .config
 %endif
 %{__make} oldconfig
