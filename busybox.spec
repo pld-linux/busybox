@@ -16,7 +16,7 @@
 %bcond_without	dynamic		# don't build dynamic (base) version
 %bcond_without	static		# don't build static version
 %bcond_without	initrd		# don't build initrd version
-%bcond_with	dietlibc	# build dietlibc-based initrd and static versions
+%bcond_with	musl		# build musl-based initrd and static versions
 %bcond_with	glibc		# build glibc-based initrd and static versions
 %bcond_without	verbose		# verbose build
 # Options below are useful, when you want fileutils and grep providing.
@@ -71,8 +71,9 @@ BuildRequires:	libtirpc-devel
 BuildRequires:	pkgconfig
 %endif
 %if %{with initrd} || %{with static}
-	%if %{with dietlibc}
-BuildRequires:	dietlibc-static
+	%if %{with musl}
+BuildRequires:	linux-musl-headers
+BuildRequires:	musl-devel
 	%else
 		%if %{with glibc}
 BuildRequires:	glibc-static
@@ -200,15 +201,19 @@ Statycznie skonsolidowany busybox dla initrd.
 install -d built
 %if %{with initrd}
 install %{SOURCE2} .config
+%if %{with musl}
+sed -i -e 's|CONFIG_FEATURE_VI_REGEX_SEARCH=y|# CONFIG_FEATURE_VI_REGEX_SEARCH is not set|g' .config
+sed -i -e 's|CONFIG_FEATURE_MOUNT_NFS=y|# CONFIG_FEATURE_MOUNT_NFS is not set|g' .config
+sed -i -e 's|CONFIG_FEATURE_INETD_RPC=y|# CONFIG_FEATURE_INETD_RPC is not set|g' .config
+%endif
 echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{tirpccflags} -Os -D_GNU_SOURCE %{!?with_glibc:-fno-stack-protector}" \
-	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
-%if %{with dietlibc}
-	LIBRARIES="-lrpc" \
-	CC="diet %{__cc}"
+	EXTRA_CFLAGS="%{rpmcflags} %{tirpccflags} -Os -D_GNU_SOURCE %{?with_musl:-I%{_includedir}/musl} %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack %{?with_musl:-L%{_libdir}/musl}" \
+%if %{with musl}
+	CC="musl-gcc"
 %else
 %if %{with glibc}
 	%{CrossOpts} \
@@ -232,14 +237,19 @@ install %{SOURCE3} .config
 install %{SOURCE1} .config
 echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
 %endif
+%if %{with musl}
+sed -i -e 's|CONFIG_FEATURE_VI_REGEX_SEARCH=y|# CONFIG_FEATURE_VI_REGEX_SEARCH is not set|g' .config
+sed -i -e 's|CONFIG_FEATURE_MOUNT_NFS=y|# CONFIG_FEATURE_MOUNT_NFS is not set|g' .config
+sed -i -e 's|CONFIG_FEATURE_INETD_RPC=y|# CONFIG_FEATURE_INETD_RPC is not set|g' .config
+sed -i -e 's|CONFIG_EXTRA_COMPAT=y|# CONFIG_EXTRA_COMPAT is not set|g' .config
+%endif
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{tirpccflags} -Os -D_GNU_SOURCE %{!?with_glibc:-fno-stack-protector}" \
-	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
-%if %{with dietlibc}
-	LIBRARIES="-lrpc" \
-	CC="diet %{__cc}"
+	EXTRA_CFLAGS="%{rpmcflags} %{tirpccflags} -Os -D_GNU_SOURCE %{?with_musl:-I%{_includedir}/musl} %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack %{?with_musl:-L%{_libdir}/musl}" \
+%if %{with musl}
+	CC="musl-gcc"
 %else
 %if %{with glibc}
 	%{CrossOpts} \
