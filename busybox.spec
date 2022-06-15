@@ -62,6 +62,7 @@ Patch7:		%{name}-fix_64_archs.patch
 Patch8:		busybox-1.31.1-stime-fix.patch
 Patch9:		%{name}-ash-export-PATH.patch
 Patch10:	0001-modutils-check-ELF-header-before-calling-finit_module.patch
+Patch11:	strip-quotes.patch
 URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
@@ -76,7 +77,10 @@ BuildRequires:	dietlibc-static
 	%else
 		%if %{with glibc}
 BuildRequires:	glibc-static
+BuildRequires:	libcom_err-static
 BuildRequires:	libtirpc-static
+BuildRequires:	openssl-static
+BuildRequires:	sqlite3-static
 		%else
 %if "%{_target_base_arch}" != "%{_host_base_arch}"
 BuildRequires:	cross%{_target_base_arch}-uClibc-static
@@ -111,7 +115,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %if %{with glibc}
 %define		tirpccflags	%(pkg-config --cflags libtirpc)
 %if %{with initrd} || %{with static}
-%define		tirpcslibs	%(pkg-config --libs --static libtirpc|sed s/-l//g)
+%define		tirpcslibs	%(pkg-config --libs --static libtirpc krb5 krb5-gssapi openssl sqlite3|sed 's/-l//g')
 %endif
 %if %{with dynamic}
 %define		tirpcdlibs	%(pkg-config --libs libtirpc|sed s/-l//g)
@@ -190,6 +194,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 %build
 install -d built

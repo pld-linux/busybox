@@ -1,0 +1,11 @@
+--- busybox-1.35.0/Makefile~	2022-06-15 10:08:14.000000000 +0200
++++ busybox-1.35.0/Makefile	2022-06-15 10:11:50.040293067 +0200
+@@ -612,7 +612,7 @@ quiet_cmd_busybox__ ?= LINK    $@
+       "$(core-y)" \
+       "$(libs-y)" \
+       "$(LDLIBS)" \
+-      "$(CONFIG_EXTRA_LDLIBS)" \
++      "$(strip $(subst ",,$(CONFIG_EXTRA_LDLIBS)))" \
+       && $(srctree)/scripts/generate_BUFSIZ.sh --post include/common_bufsiz.h
+ 
+ # Generate System.map
