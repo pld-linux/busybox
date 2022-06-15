@@ -1,5 +1,4 @@
 # TODO:
-# - RPC/NFS with uClibc doesn't build (due to tirpc linking), so it's currently disabled
 # - review patch 3. Updated to 1.17.3, but the code changed so much it's unclear
 #   if it still serves a purpose
 # - sparc64 modules support in sparc(32), x86_64 modules support in i386 version
@@ -112,14 +111,15 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		filterout_ld	-Wl,-z,(combreloc|relro)
 
-%if %{with glibc}
 %define		tirpccflags	%(pkg-config --cflags libtirpc)
+%if %{with glibc}
 %if %{with initrd} || %{with static}
 %define		tirpcslibs	%(pkg-config --libs --static libtirpc krb5 krb5-gssapi openssl sqlite3|sed 's/-l//g')
 %endif
-%if %{with dynamic}
-%define		tirpcdlibs	%(pkg-config --libs libtirpc|sed s/-l//g)
 %endif
+
+%if %{with dynamic}
+%define         tirpcdlibs      %(pkg-config --libs libtirpc|sed s/-l//g)
 %endif
 
 %description
@@ -204,7 +204,7 @@ echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_GNU_SOURCE %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{tirpccflags} -Os -D_GNU_SOURCE %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
@@ -235,7 +235,7 @@ echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}}"' >> .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} -Os -D_GNU_SOURCE %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{tirpccflags} -Os -D_GNU_SOURCE %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack" \
 %if %{with dietlibc}
 	LIBRARIES="-lrpc" \
@@ -261,13 +261,13 @@ mv -f busybox built/busybox.static
 install %{SOURCE3} .config
 %else
 install %{SOURCE1} .config
-echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcdlibs}}"' >> .config
+echo 'CONFIG_EXTRA_LDLIBS="%{tirpcdlibs}"' >> .config
 %endif
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
 	%{CrossOpts} \
-	EXTRA_CFLAGS="%{rpmcflags} %{?with_glibc:%{tirpccflags}} %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{tirpccflags} %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -Wl,-z,noexecstack" \
 	CC="%{__cc}"
 %{__make} busybox.links docs/busybox.1
