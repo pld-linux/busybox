@@ -217,7 +217,7 @@ echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}} %{?with_musl:%{tirpcslib
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{tirpcscflags} -Os -D_GNU_SOURCE %{?with_musl:-I%{_includedir}/musl} %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{?tirpcscflags} -Os -D_GNU_SOURCE %{?with_musl:-I%{_includedir}/musl} %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack %{?with_musl:-L%{_libdir}/musl}" \
 %if %{with musl}
 	CC="musl-gcc"
@@ -251,7 +251,7 @@ sed -i -e 's|CONFIG_EXTRA_COMPAT=y|# CONFIG_EXTRA_COMPAT is not set|g' .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{tirpcscflags} -Os -D_GNU_SOURCE %{?with_musl:-I%{_includedir}/musl} %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{?tirpcscflags} -Os -D_GNU_SOURCE %{?with_musl:-I%{_includedir}/musl} %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack %{?with_musl:-L%{_libdir}/musl}" \
 %if %{with musl}
 	CC="musl-gcc"
