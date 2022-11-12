@@ -62,7 +62,7 @@ URL:		http://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.652
-%if %{with glibc}
+%if %{with glibc} || %{with dynamic}
 BuildRequires:	libtirpc-devel
 BuildRequires:	pkgconfig
 %endif
