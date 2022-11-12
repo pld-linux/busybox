@@ -49,7 +49,6 @@ Source2:	%{name}-initrd.config
 Patch0:		x32.patch
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
-Patch3:		%{name}-loadfont.patch
 Patch4:		%{name}-kernel_headers.patch
 Patch5:		%{name}-insmod-morearchs.patch
 Patch6:		%{name}-dhcp.patch
@@ -198,7 +197,6 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-#%patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
