@@ -109,7 +109,17 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		filterout_ld	-Wl,-z,(combreloc|relro)
 
-%define		tirpccflags	%(pkg-config --cflags libtirpc)
+%if %{with dynamic}
+%define		tirpcdcflags	%(pkg-config --cflags libtirpc)
+%endif
+%if %{with initrd} || %{with static}
+%if %{with musl}
+%define		tirpcscflags	-I%{_includedir}/musl/tirpc
+%endif
+%if %{with glibc}
+%define		tirpcscflags	%(pkg-config --cflags libtirpc)
+%endif
+%endif
 %if %{with glibc}
 %if %{with initrd} || %{with static}
 %define		tirpcslibs	%(pkg-config --libs --static libtirpc krb5 krb5-gssapi openssl sqlite3|sed 's/-l//g')
@@ -121,7 +131,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %endif
 
 %if %{with musl}
-%define		tirpcslibs	%(pkg-config --libs libtirpc|sed s/-l//g)
+%define		tirpcslibs	tirpc
 %endif
 
 %description
@@ -209,7 +219,7 @@ echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}} %{?with_musl:%{tirpcslib
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{tirpccflags} -Os -D_GNU_SOURCE %{?with_musl:-I%{_includedir}/musl} %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{tirpcscflags} -Os -D_GNU_SOURCE %{?with_musl:-I%{_includedir}/musl} %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack %{?with_musl:-L%{_libdir}/musl}" \
 %if %{with musl}
 	CC="musl-gcc"
@@ -243,7 +253,7 @@ sed -i -e 's|CONFIG_EXTRA_COMPAT=y|# CONFIG_EXTRA_COMPAT is not set|g' .config
 %{__make} oldconfig
 %{__make} \
 	%{?with_verbose:V=1} \
-	EXTRA_CFLAGS="%{rpmcflags} %{tirpccflags} -Os -D_GNU_SOURCE %{?with_musl:-I%{_includedir}/musl} %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{tirpcscflags} -Os -D_GNU_SOURCE %{?with_musl:-I%{_includedir}/musl} %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -static -Wl,-z,noexecstack %{?with_musl:-L%{_libdir}/musl}" \
 %if %{with musl}
 	CC="musl-gcc"
@@ -274,7 +284,7 @@ echo 'CONFIG_EXTRA_LDLIBS="%{tirpcdlibs}"' >> .config
 %{__make} \
 	%{?with_verbose:V=1} \
 	%{CrossOpts} \
-	EXTRA_CFLAGS="%{rpmcflags} %{tirpccflags} %{!?with_glibc:-fno-stack-protector}" \
+	EXTRA_CFLAGS="%{rpmcflags} %{tirpcdcflags} %{!?with_glibc:-fno-stack-protector}" \
 	EXTRA_LDFLAGS="%{rpmldflags} -Wl,-z,noexecstack" \
 	CC="%{__cc}"
 %{__make} busybox.links docs/busybox.1
