@@ -41,7 +41,7 @@ Version:	1.36.1
 Release:	1
 License:	GPL v2
 Group:		Applications
-Source0:	http://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
+Source0:	https://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
 # Source0-md5:	0fc591bc9f4e365dfd9ade0014f32561
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
@@ -58,7 +58,7 @@ Patch8:		busybox-1.31.1-stime-fix.patch
 Patch9:		%{name}-ash-export-PATH.patch
 Patch10:	0001-modutils-check-ELF-header-before-calling-finit_module.patch
 Patch11:	strip-quotes.patch
-URL:		http://www.busybox.net/
+URL:		https://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpmbuild(macros) >= 1.652
