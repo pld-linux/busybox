@@ -210,6 +210,8 @@ install -d built
 install %{SOURCE2} .config
 %if %{with musl}
 sed -i -e 's|CONFIG_FEATURE_VI_REGEX_SEARCH=y|# CONFIG_FEATURE_VI_REGEX_SEARCH is not set|g' .config
+# musl has no getrpcbyname()
+sed -i -e 's|CONFIG_FEATURE_INETD_RPC=y|# CONFIG_FEATURE_INETD_RPC is not set|g' .config
 %endif
 echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}} %{?with_musl:%{tirpcslibs}}"' >> .config
 %{__make} oldconfig
@@ -244,6 +246,8 @@ echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}} %{?with_musl:%{tirpcslib
 %endif
 %if %{with musl}
 sed -i -e 's|CONFIG_FEATURE_VI_REGEX_SEARCH=y|# CONFIG_FEATURE_VI_REGEX_SEARCH is not set|g' .config
+# musl has no getrpcbyname()
+sed -i -e 's|CONFIG_FEATURE_INETD_RPC=y|# CONFIG_FEATURE_INETD_RPC is not set|g' .config
 sed -i -e 's|CONFIG_EXTRA_COMPAT=y|# CONFIG_EXTRA_COMPAT is not set|g' .config
 %endif
 %{__make} oldconfig
