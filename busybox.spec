@@ -37,16 +37,15 @@ Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 # stable line only
-Version:	1.36.1
+Version:	1.38.0
 Release:	1
 License:	GPL v2
 Group:		Applications
 Source0:	https://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	0fc591bc9f4e365dfd9ade0014f32561
+# Source0-md5:	2a76df79da776a165bf85257403c97bc
 Source1:	%{name}.config
 Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
-Patch0:		x32.patch
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
 Patch3:		busybox-1.36.1-kernel-6.8.patch
@@ -56,8 +55,7 @@ Patch6:		%{name}-dhcp.patch
 Patch7:		%{name}-fix_64_archs.patch
 Patch8:		busybox-1.31.1-stime-fix.patch
 Patch9:		%{name}-ash-export-PATH.patch
-Patch10:	0001-modutils-check-ELF-header-before-calling-finit_module.patch
-Patch11:	strip-quotes.patch
+Patch12:	%{name}-inetd-rpc-portno.patch
 URL:		https://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
@@ -195,7 +193,6 @@ Statycznie skonsolidowany busybox dla initrd.
 
 %prep
 %setup -q
-%patch -P0 -p1
 %patch -P1 -p1
 %patch -P2 -p1
 %patch -P3 -p1
@@ -205,8 +202,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch -P7 -p1
 %patch -P8 -p1
 %patch -P9 -p1
-%patch -P10 -p1
-%patch -P11 -p1
+%patch -P12 -p1
 
 %build
 install -d built
@@ -244,7 +240,7 @@ mv -f busybox built/busybox.initrd
 install %{SOURCE3} .config
 %else
 install %{SOURCE1} .config
-echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}} %{?with_musl:%{tirpcslibs}}""' >> .config
+echo 'CONFIG_EXTRA_LDLIBS="%{?with_glibc:%{tirpcslibs}} %{?with_musl:%{tirpcslibs}}"' >> .config
 %endif
 %if %{with musl}
 sed -i -e 's|CONFIG_FEATURE_VI_REGEX_SEARCH=y|# CONFIG_FEATURE_VI_REGEX_SEARCH is not set|g' .config

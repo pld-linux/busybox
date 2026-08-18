@@ -1,6 +1,5 @@
-diff -urNp -x '*.orig' busybox-1.31.1.org/coreutils/printf.c busybox-1.31.1/coreutils/printf.c
---- busybox-1.31.1.org/coreutils/printf.c	2019-06-10 12:50:53.000000000 +0200
-+++ busybox-1.31.1/coreutils/printf.c	2021-10-21 10:28:37.833148938 +0200
+--- busybox-1.38.0.org/coreutils/printf.c
++++ busybox-1.38.0/coreutils/printf.c
 @@ -59,6 +59,9 @@
  //usage:       "$ printf \"Val=%d\\n\" 5\n"
  //usage:       "Val=5\n"
@@ -11,7 +10,7 @@ diff -urNp -x '*.orig' busybox-1.31.1.org/coreutils/printf.c busybox-1.31.1/core
  #include "libbb.h"
  
  /* A note on bad input: neither bash 3.2 nor coreutils 6.10 stop on it.
-@@ -400,11 +403,132 @@ static char **print_formatted(char *f, c
+@@ -401,11 +404,132 @@ static char **print_formatted(char *f, c
  	return argv;
  }
  
@@ -144,14 +143,13 @@ diff -urNp -x '*.orig' busybox-1.31.1.org/coreutils/printf.c busybox-1.31.1/core
  
  	/* We must check that stdout is not closed.
  	 * The reason for this is highly non-obvious.
-@@ -436,8 +560,8 @@ int printf_main(int argc UNUSED_PARAM, c
+@@ -437,8 +561,7 @@ int printf_main(int argc UNUSED_PARAM, c
  		bb_show_usage();
  	}
  
--	format = argv[1];
--	argv2 = argv + 2;
-+    argv += optind;
-+	argv2 = argv;
+-	format = argv[0];
+-	argv2 = argv + 1;
++	argv2 = argv + (optind - 1);
  
  	conv_err = 0;
  	do {
