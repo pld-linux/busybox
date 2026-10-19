@@ -1,6 +1,4 @@
 # TODO:
-# - review patch 3. Updated to 1.17.3, but the code changed so much it's unclear
-#   if it still serves a purpose
 # - sparc64 modules support in sparc(32), x86_64 modules support in i386 version
 # - make internal commands work even if busybox is not in /bin/busybox (initrd)
 #   or when /proc is not mounted (static / normal)
@@ -36,9 +34,8 @@ Summary:	Set of common Unix utilities for embeded systems
 Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
-# stable line only
 Version:	1.38.0
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Applications
 Source0:	https://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -48,6 +45,7 @@ Source2:	%{name}-initrd.config
 %{?with_altconfig:Source3:	%{cfgfile}}
 Patch1:		%{name}-logconsole.patch
 Patch2:		%{name}-printf-gettext.patch
+# needed with Linux >= 6.8 headers, which removed the CBQ uapi definitions
 Patch3:		busybox-1.36.1-kernel-6.8.patch
 Patch4:		%{name}-kernel_headers.patch
 Patch5:		%{name}-insmod-morearchs.patch
@@ -56,6 +54,29 @@ Patch7:		%{name}-fix_64_archs.patch
 Patch8:		busybox-1.31.1-stime-fix.patch
 Patch9:		%{name}-ash-export-PATH.patch
 Patch12:	%{name}-inetd-rpc-portno.patch
+Patch13:	%{name}-CVE-2023-42366.patch
+Patch14:	%{name}-CVE-2025-46394.patch
+Patch15:	%{name}-CVE-2024-58251.patch
+Patch16:	%{name}-CVE-2025-60876.patch
+Patch17:	%{name}-CVE-2026-38752.patch
+Patch18:	%{name}-CVE-2026-38753.patch
+Patch19:	%{name}-CVE-2026-38754.patch
+Patch20:	%{name}-CVE-2026-38755.patch
+Patch21:	%{name}-CVE-2026-88830.patch
+Patch22:	%{name}-CVE-2026-88831.patch
+Patch23:	%{name}-CVE-2026-88832.patch
+Patch24:	%{name}-CVE-2026-88835.patch
+Patch25:	%{name}-CVE-2026-88837.patch
+Patch26:	%{name}-CVE-2026-88834.patch
+Patch27:	%{name}-CVE-2026-88839.patch
+Patch28:	%{name}-CVE-2026-88840.patch
+Patch29:	%{name}-CVE-2026-88842.patch
+Patch30:	%{name}-CVE-2026-108119.patch
+# local backports, no upstream or distro fix available
+Patch31:	%{name}-CVE-2026-88833.patch
+Patch32:	%{name}-CVE-2026-88838.patch
+# No fix available (upstream, Debian, SUSE, Fedora) for CVE-2026-88829
+# (httpd proxy auth and pipelining) and CVE-2026-90954 (dpkg-deb ar link flush).
 URL:		https://www.busybox.net/
 BuildRequires:	gcc >= 3.2
 BuildRequires:	perl-tools-pod
@@ -203,6 +224,26 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch -P8 -p1
 %patch -P9 -p1
 %patch -P12 -p1
+%patch -P13 -p1
+%patch -P14 -p1
+%patch -P15 -p1
+%patch -P16 -p1
+%patch -P17 -p1
+%patch -P18 -p1
+%patch -P19 -p1
+%patch -P20 -p1
+%patch -P21 -p1
+%patch -P22 -p1
+%patch -P23 -p1
+%patch -P24 -p1
+%patch -P25 -p1
+%patch -P26 -p1
+%patch -P27 -p1
+%patch -P28 -p1
+%patch -P29 -p1
+%patch -P30 -p1
+%patch -P31 -p1
+%patch -P32 -p1
 
 %build
 install -d built
