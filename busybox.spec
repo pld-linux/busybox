@@ -35,7 +35,7 @@ Summary(pl.UTF-8):	Zestaw narzędzi uniksowych dla systemów wbudowanych
 Summary(pt_BR.UTF-8):	BusyBox é um conjunto de utilitários UNIX em um único binário
 Name:		busybox
 Version:	1.38.0
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Applications
 Source0:	https://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
@@ -75,6 +75,8 @@ Patch30:	%{name}-CVE-2026-108119.patch
 # local backports, no upstream or distro fix available
 Patch31:	%{name}-CVE-2026-88833.patch
 Patch32:	%{name}-CVE-2026-88838.patch
+# upstream 5eee8017a8: ash reads past the unset MAIL literal (stats ./MAILPATH before each prompt)
+Patch33:	%{name}-ash-MAIL-oob-read.patch
 # No fix available (upstream, Debian, SUSE, Fedora) for CVE-2026-88829
 # (httpd proxy auth and pipelining) and CVE-2026-90954 (dpkg-deb ar link flush).
 URL:		https://www.busybox.net/
@@ -244,6 +246,7 @@ Statycznie skonsolidowany busybox dla initrd.
 %patch -P30 -p1
 %patch -P31 -p1
 %patch -P32 -p1
+%patch -P33 -p1
 
 %build
 install -d built
